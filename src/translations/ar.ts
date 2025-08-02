@@ -486,6 +486,7 @@ export const ar = {
     defaultProfession: 'صالون',
   },
   home: {
+    location: 'الموقع',
     currency: 'د.أ',
     offers: 'عروض لك',
     enableNotification: 'تفعيل الإشعارات',

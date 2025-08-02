@@ -542,6 +542,7 @@ export const en = {
     defaultProfession: 'Salon',
   },
   home: {
+    location: 'Location',
     currency: 'JOD',
     offers: 'Offers For You',
     notNow: 'Not Now',
