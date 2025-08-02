@@ -1,0 +1,2 @@
+  // PrivacyPolicyScreen: undefined;
+  // TermsPolicyScreen: undefined; 

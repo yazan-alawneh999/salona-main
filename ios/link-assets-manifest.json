@@ -1,0 +1,49 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Astronauta-Script.ttf",
+      "sha1": "efe560646f921479d6423d5f2c8fa33b22c97d09"
+    },
+    {
+      "path": "assets/fonts/Maitree-Bold.ttf",
+      "sha1": "2fdd672fe31bd7f3698d618397b54ce73fadfb70"
+    },
+    {
+      "path": "assets/fonts/Maitree-ExtraLight.ttf",
+      "sha1": "541358cd5815822e01c83236195e3775f22e8c37"
+    },
+    {
+      "path": "assets/fonts/Maitree-Light.ttf",
+      "sha1": "dc07d489b1b2256e41f0d4691291f6934171333b"
+    },
+    {
+      "path": "assets/fonts/Maitree-Medium.ttf",
+      "sha1": "7264cf6d1f188de393dac4458b416866eb72d2ef"
+    },
+    {
+      "path": "assets/fonts/Maitree-Regular.ttf",
+      "sha1": "e09a25c03f642e5d3f47ebcb03ab0e25b6977d7a"
+    },
+    {
+      "path": "assets/fonts/Maitree-SemiBold.ttf",
+      "sha1": "d171abf733e223411c4b8121ee5286984b9dcc58"
+    },
+    {
+      "path": "assets/fonts/Poppins-Bold.ttf",
+      "sha1": "875cf0cecd647bcf22e79d633d868c1b1ec98dfa"
+    },
+    {
+      "path": "assets/fonts/Poppins-Medium.ttf",
+      "sha1": "283f21b44efbdbf276ba802be2d949a36bbc4233"
+    },
+    {
+      "path": "assets/fonts/Poppins-Regular.ttf",
+      "sha1": "fdd3002e7d814ee47c1c1b8487c72c6bbb3a2d00"
+    },
+    {
+      "path": "assets/fonts/Poppins-SemiBold.ttf",
+      "sha1": "8a4ace9392d06bcb7f8ea2f5169b07e4c383a90d"
+    }
+  ]
+}
