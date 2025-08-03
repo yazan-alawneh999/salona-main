@@ -14,139 +14,134 @@ const AddressList: React.FC<AddressListProps> = ({
   onEdit
 }) => {
   const { t } = useTranslation();
+
   const renderAddressItem = ({ item }: { item: Address }) => (
-    <View style={styles.addressCard}>
-      <View style={styles.addressHeader}>
-        <View style={styles.addressInfo}>
-          <Text style={styles.addressTitle}>
+    <TouchableOpacity 
+      style={styles.addressItem}
+      onPress={() => onSetPrimary && onSetPrimary(item.id)}
+    >
+      <View style={styles.addressContent}>
+        <View style={styles.locationIcon}>
+          <Icon name="location-on" size={20} color="#666" />
+        </View>
+        
+        <View style={styles.addressDetails}>
+          <Text style={styles.addressName}>
             {item.isCurrentLocation ? t.editLocation.currentLocation : item.description}
           </Text>
-          {item.isPrimary && (
-            <View style={styles.primaryBadge}>
-              <Text style={styles.primaryText}>{t.editLocation.primaryLocation}</Text>
-            </View>
-          )}
+          <Text style={styles.addressText}>
+            {item.isCurrentLocation ? t.editLocation.currentLocation : item.description}
+          </Text>
         </View>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            onPress={() => onToggleFavorite(item.id)}
-            style={styles.iconButton}
-          >
-            <Icon 
-              name={item.isFavorite ? "favorite" : "favorite-border"} 
-              size={24} 
-              color={Colors.gold} 
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onEdit && onEdit(item)}
-            style={styles.iconButton}
-          >
-            <Icon name="edit" size={24} color={Colors.gold} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onDelete(item.id)}
-            style={styles.iconButton}
-          >
-            <Icon name="delete" size={24} color={Colors.gold} />
-          </TouchableOpacity>
+        
+        <View style={styles.radioButton}>
+          <View style={[
+            styles.radioCircle,
+            item.isPrimary && styles.radioCircleSelected
+          ]}>
+            {item.isPrimary && <View style={styles.radioDot} />}
+          </View>
         </View>
       </View>
-      <TouchableOpacity
-        // onPress={() => onSetPrimary(item.id)}
-        style={[
-          styles.setPrimaryButton,
-          item.isPrimary && styles.setPrimaryButtonActive
-        ]}
-      >
-        <Text style={[
-          styles.setPrimaryText,
-          item.isPrimary && styles.setPrimaryTextActive
-        ]}>
-          {item.isPrimary ? t.editLocation.primaryLocation : t.editLocation.primaryLocation}
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
-    <FlatList
-      data={addresses}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={renderAddressItem}
-      contentContainerStyle={styles.listContainer}
-      showsVerticalScrollIndicator={false}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={addresses}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderAddressItem}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
+      
+      <TouchableOpacity style={styles.addNewButton}>
+        <Icon name="add" size={24} color="#666" />
+        <Text style={styles.addNewText}>Add New Shipping Address</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  addressCard: {
-    backgroundColor: Colors.black,
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: Colors.gold,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 15,
-  },
-  addressInfo: {
+  container: {
     flex: 1,
-  },
-  addressTitle: {
-    color: Colors.white,
-    fontSize: 16,
-    fontFamily: 'Maitree-Regular',
-    marginBottom: 5,
-  },
-  primaryBadge: {
-    backgroundColor: Colors.gold,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  primaryText: {
-    color: Colors.white,
-    fontSize: 12,
-    fontFamily: 'Maitree-Regular',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  iconButton: {
-    padding: 8,
-  },
-  setPrimaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.gold,
-    borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
-  },
-  setPrimaryButtonActive: {
-    backgroundColor: Colors.gold,
-  },
-  setPrimaryText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontFamily: 'Maitree-Regular',
-  },
-  setPrimaryTextActive: {
-    color: Colors.white,
+    backgroundColor: '#fff',
   },
   listContainer: {
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  addressItem: {
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  addressContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  locationIcon: {
+    marginRight: 12,
+  },
+  addressDetails: {
+    flex: 1,
+  },
+  addressName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  radioButton: {
+    marginLeft: 12,
+  },
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioCircleSelected: {
+    borderColor: Colors.primary,
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primary,
+  },
+  addNewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F8F9FA',
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    paddingVertical: 16,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  addNewText: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
+    fontWeight: '500',
   },
 });
 

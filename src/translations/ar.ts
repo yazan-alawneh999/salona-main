@@ -685,6 +685,11 @@ export const ar = {
     confirm: 'تأكيد',
     selectedLocation: 'الموقع المحدد',
     loading: 'جاري التحميل...',
+    deliveryAddress: 'عنوان التوصيل',
+    detectingLocation: 'جاري تحديد الموقع...',
+    locationBubble: {
+      subtitle: 'سيتم توصيل طلبك هنا',
+    },
     error: {
       noLocation: 'لم يتم تحديد موقع',
       locationError: 'حدث خطأ في تحديد الموقع',

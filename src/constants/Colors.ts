@@ -12,6 +12,11 @@ const Colors = {
   descriptionColor: '#fff', // Text color for descriptions
   customBlack: '#000', // Custom black color for buttons
   customWhite: '#fff', // Custom white color for buttons
+  medium: '#9F9AA1',
+  mediumDark: '#424242',
+  lightGrey: '#FCF8FF',
+  grey: '#EEE9F0',
+  primary: '#e37673',
 };
 
 export default Colors;

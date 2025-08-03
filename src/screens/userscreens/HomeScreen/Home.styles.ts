@@ -39,7 +39,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    // paddingStart: 8,
+    marginStart: 8,
     paddingBottom: 20,
   },
   headerRTL: {
@@ -237,11 +238,11 @@ const styles = StyleSheet.create({
   addressTextHolder: {
     flexDirection: 'row-reverse',
     // alignItems: 'center',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     minWidth: 40,
     maxWidth: 120,
-    marginRight: 4,
-    gap: 3,
+    // marginStart: 8,
+    // gap: 3,
   },
   addressTextHolderNotRTL: {
     flexDirection: 'row',
@@ -259,12 +260,13 @@ const styles = StyleSheet.create({
 
     // fontFamily: 'Maitree-Regular',
     // marginRight: ,
-    // marginRight: 2,
+    // marginStart: 4,
   },
   addressText: {
     color: Colors.black,
     fontSize: 14,
     maxWidth: 60,
+    paddingStart: 4,
     // flexShrink: 1,
   },
   modalOverlay: {
@@ -548,7 +550,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   discountText: {
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 12,
     fontWeight: '700',
     fontFamily: 'Maitree-Bold',
@@ -585,7 +587,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   priceText: {
-    color: Colors.white,
+    color: Colors.black,
     fontSize: 14,
     fontWeight: '700',
     fontFamily: 'Maitree-Bold',

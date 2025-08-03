@@ -52,7 +52,7 @@ const DeliveryLocationSheet = ({
         />
       </TouchableOpacity>
 
-      {/* {currenctLocation && (
+      {currenctLocation && (
         <TouchableOpacity
           style={styles.footerButton}
           onPress={setCurrentLocation}>
@@ -63,13 +63,15 @@ const DeliveryLocationSheet = ({
             style={styles.footerIcon}
           />
           <View style={styles.footerTextContainer}>
-            <Text style={styles.footerText}>{t.home.deliverToCurrentLocation}</Text>
+            <Text style={styles.footerText}>
+              {t.home.deliverToCurrentLocation}
+            </Text>
             <Text style={styles.footerSubText}>
               {currenctLocation.description || t.home.currentLocation}
             </Text>
           </View>
         </TouchableOpacity>
-      )} */}
+      )}
     </View>
   );
 
@@ -83,6 +85,7 @@ const DeliveryLocationSheet = ({
       }
       ListFooterComponent={renderFooter}
       contentContainerStyle={styles.listContent}
+      showsVerticalScrollIndicator={false}
     />
   );
 };
@@ -92,6 +95,7 @@ export default DeliveryLocationSheet;
 const styles = StyleSheet.create({
   listContent: {
     padding: 16,
+    paddingBottom: 100,
   },
   header: {
     fontSize: 18,

@@ -708,6 +708,11 @@ export const en = {
     confirm: 'Confirm',
     selectedLocation: 'Selected Location',
     loading: 'Loading...',
+    deliveryAddress: 'Delivery Address',
+    detectingLocation: 'Detecting location...',
+    locationBubble: {
+      subtitle: 'Your order will be delivered here',
+    },
     error: {
       updateAddress: 'Failed to update address',
       deleteAddress: 'Failed to delete address',

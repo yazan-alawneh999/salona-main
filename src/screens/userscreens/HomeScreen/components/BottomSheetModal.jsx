@@ -6,6 +6,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -86,6 +87,7 @@ const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
 };
 
 export default BottomSheetModal;
+const {height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   overlay: {
@@ -101,6 +103,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 20,
+    maxHeight: height * 0.8,
   },
   header: {
     flexDirection: 'row',
