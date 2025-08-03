@@ -11,9 +11,11 @@ import {
   Platform,
   PermissionsAndroid,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
+import BottomSheetModal from './components/BottomSheetModal';
 
 import Colors from '../../../constants/Colors';
 import styles from './Home.styles';
@@ -34,6 +36,7 @@ import {GOOGLE_MAPS_API_KEY} from '@env';
 import {useLocation} from '../../userscreens/EditLocation/hooks/useLocation';
 import SearchBarWithMenu from '../../../components/SearchBarWithMenu/SearchBarWithMenu';
 import {Address} from '../../userscreens/EditLocation/types';
+import DeliveryLocationSheet from './components/DeliveryLocatioinSheet';
 
 interface ExtendedSalon extends Salon {
   working_hours?: any[];
@@ -307,23 +310,26 @@ const HomeScreen: React.FC = () => {
 
   const handleGoSearch = useCallback(() => {
     navigation.navigate('ExploreScreen');
-  });
+  }, [navigation]);
   const handleGoFilter = useCallback(() => {
     navigation.navigate('FilterScreen');
-  });
+  }, [navigation]);
 
-  const handlePackagePress = (packageItem: Package) => {
-    const salon = packageItem.salon || {
-      id: packageItem.salon_id,
-      name: packageItem.salon_name,
-      image_url: packageItem.salon_image,
-    };
+  const handlePackagePress = useCallback(
+    (packageItem: Package) => {
+      const salon = packageItem.salon || {
+        id: packageItem.salon_id,
+        name: packageItem.salon_name,
+        image_url: packageItem.salon_image,
+      };
 
-    navigation.navigate('SalonProfileScreen', {
-      salon,
-      initialTab: 'Packages',
-    });
-  };
+      navigation.navigate('SalonProfileScreen', {
+        salon,
+        initialTab: 'Packages',
+      });
+    },
+    [navigation],
+  );
 
   const fetchCategories = async () => {
     try {
@@ -475,38 +481,61 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const handleAddressSelect = async address => {
-    dispatch(setSelectedAddress(address));
-    setIsAddressModalVisible(false);
-    try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        console.log('No authentication token found');
-        return;
-      }
-      const response = await fetch(
-        `https://spa.dev2.prodevr.com/api/update-primary-address/${address.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${token}`,
+  const handleAddressSelect = useCallback(
+    async address => {
+      dispatch(setSelectedAddress(address));
+      setIsAddressModalVisible(false);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          console.log('No authentication token found');
+          return;
+        }
+        const response = await fetch(
+          `https://spa.dev2.prodevr.com/api/update-primary-address/${address.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
-      const data = await response.json();
-      console.log('Update primary address response:', data);
-      console.log('Address selected:');
-    } catch (error) {
-      console.error('Error updating primary address:', error);
+        );
+        const data = await response.json();
+        console.log('Update primary address response:', data);
+        console.log('Address selected:');
+      } catch (error) {
+        console.error('Error updating primary address:', error);
+      }
+    },
+    [dispatch],
+  );
+
+  const handleCurrentLocationSelect = useCallback(() => {
+    if (currentLocation) {
+      // Create a proper address object for current location
+      const currentLocationAddress = {
+        id: 'current-location',
+        description: 'Current Location',
+        latitude: currentLocation.lat,
+        longitude: currentLocation.lng,
+        isPrimary: false,
+        isFavorite: false,
+      };
+      handleAddressSelect(currentLocationAddress);
     }
-  };
+  }, [currentLocation, handleAddressSelect]);
 
-  const handleSearch = (text: string) => {
+  const handleAddNewAddress = useCallback(() => {
+    setIsAddressModalVisible(false);
+    navigation.navigate('EditLocationScreen');
+  }, [navigation]);
+
+  const handleSearch = useCallback((text: string) => {
     setSearchQuery(text);
-  };
+  }, []);
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = useCallback(() => {
     if (searchQuery.trim()) {
       navigation.navigate('ExploreScreen', {
         filters: {
@@ -515,11 +544,11 @@ const HomeScreen: React.FC = () => {
         },
       });
     }
-  };
+  }, [searchQuery, navigation]);
 
-  const handleMenuPress = () => {
+  const handleMenuPress = useCallback(() => {
     console.log('Menu button pressed');
-  };
+  }, []);
 
   useEffect(() => {
     fetchPackages();
@@ -592,123 +621,173 @@ const HomeScreen: React.FC = () => {
     const index = Math.floor(Math.random() * itemImages.length);
     return itemImages[index];
   };
-  const PackageItem = ({package: pkg}: {package: Package}) => {
-    const image = getRandomImage();
+  const PackageItem = useCallback(
+    ({package: pkg}: {package: Package}) => {
+      const image = getRandomImage();
 
-    return (
-      <View style={styles.featuredSection}>
-        <TouchableOpacity
-          style={styles.featuredCard}
-          activeOpacity={0.9}
-          // onPress={() => router.push(`/recipe/${pkg.id}`)}
-        >
-          <View style={styles.featuredImageContainer}>
-            <Image
-              source={image}
-              style={styles.featuredImage}
-              resizeMode="cover"
-              transition={500}
-            />
+      return (
+        <View style={styles.featuredSection}>
+          <TouchableOpacity
+            style={styles.featuredCard}
+            activeOpacity={0.9}
+            onPress={() => handlePackagePress(pkg)}>
+            <View style={styles.featuredImageContainer}>
+              <Image
+                source={image}
+                style={styles.featuredImage}
+                resizeMode="cover"
+                transition={500}
+              />
 
-            <View style={styles.featuredOverlay}>
-              <View style={styles.featuredBadge}>
-                <Text style={styles.featuredBadgeText}>
-                  {pkg.discount_percentage} %
-                </Text>
-              </View>
-
-              <View style={styles.featuredContent}>
-                <Text style={styles.featuredTitle} numberOfLines={2}>
-                  {pkg.name}
-                </Text>
-
-                <View style={styles.featuredMeta}>
-                  <View style={styles.metaItem}>
-                    <Icon name="time-outline" size={16} color={Colors.black} />
-                    <Text style={styles.metaText}>
-                      {pkg.time} {t.home.min}
-                    </Text>
-                  </View>
-
-                  {/* <View style={styles.metaItem}>
-                    {/* <Text style={styles.metaText}>{pkg.description}</Text> 
-                    <Text style={styles.metaText}>{pkg.description}</Text>
-                  </View> */}
-                  <View style={styles.metaItem}>
-                    {/* //{' '}
-                    <Icon
-                      name="location-outline"
-                      size={16}
-                      color={Colors.black}
-                    /> */}
-                    <Text style={styles.metaText} numberOfLines={2}>
-                      {pkg.description}
-                    </Text>
-                  </View>
-
-                  {/* Uncomment this block if needed */}
-                  {/* {pkg.area && (
-                  <View style={styles.metaItem}>
-                    // <Icon name="location-outline" size={16} color={Colors.black} />
-                    <Text style={styles.metaText}>{pkg.area}</Text>
-                  </View>
-                )} */}
-                </View>
-                <View style={styles.metaItem}>
-                  {/* <Icon
-                    name="location-outline"
-                    size={16}
-                    color={Colors.black}
-                  /> */}
-                  <Text style={styles.metaText}>
-                    {pkg.amount} {t.home.currency}
+              <View style={styles.featuredOverlay}>
+                <View style={styles.featuredBadge}>
+                  <Text style={styles.featuredBadgeText}>
+                    {pkg.discount_percentage} %
                   </Text>
+                </View>
+
+                <View style={styles.featuredContent}>
+                  <Text style={styles.featuredTitle} numberOfLines={2}>
+                    {pkg.name}
+                  </Text>
+
+                  <View style={styles.featuredMeta}>
+                    <View style={styles.metaItem}>
+                      <Icon
+                        name="time-outline"
+                        size={16}
+                        color={Colors.black}
+                      />
+                      <Text style={styles.metaText}>
+                        {pkg.time} {t.home.min}
+                      </Text>
+                    </View>
+
+                    <View style={styles.metaItem}>
+                      <Text style={styles.metaText} numberOfLines={2}>
+                        {pkg.description}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.metaItem}>
+                    <Text style={styles.metaText}>
+                      {pkg.amount} {t.home.currency}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+          </TouchableOpacity>
+        </View>
+      );
+    },
+    [handlePackagePress, t.home.min, t.home.currency],
+  );
 
-  const SearchBar = () => (
-    <View style={styles.searchContainer}>
-      <View style={styles.searchSection}>
-        <TouchableOpacity
-          style={styles.searchField}
-          onPress={handleGoSearch}
-          activeOpacity={0.9}>
-          <Icon
-            style={styles.searchIcon}
-            name="search-outline"
-            size={20}
-            color={Colors.gold}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={t.home.search_here}
-            editable={false} // prevent typing
-            pointerEvents="none" // prevent touch
-          />
-        </TouchableOpacity>
-        {/* <Link href={'/(modal)/filter'} asChild> */}
-        <TouchableOpacity
-          style={styles.optionButton}
-          activeOpacity={0.9}
-          onPress={handleGoFilter}>
-          <Icon name="options-outline" size={26} color={Colors.gold} />
-        </TouchableOpacity>
-        {/* </Link> */}
+  const SearchBar = useCallback(
+    () => (
+      <View style={styles.searchContainer}>
+        <View style={styles.searchSection}>
+          <TouchableOpacity
+            style={styles.searchField}
+            onPress={handleGoSearch}
+            activeOpacity={0.9}>
+            <Icon
+              style={styles.searchIcon}
+              name="search-outline"
+              size={20}
+              color={Colors.gold}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder={t.home.search_here}
+              editable={false} // prevent typing
+              pointerEvents="none" // prevent touch
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.optionButton}
+            activeOpacity={0.9}
+            onPress={handleGoFilter}>
+            <Icon name="options-outline" size={26} color={Colors.gold} />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    ),
+    [handleGoSearch, handleGoFilter, t.home.search_here],
   );
 
   // const bottomSheetRef = useRef<BottomSheetModal>(null);
 
-  const openModal = () => {
-    bottomSheetRef.current?.present();
-  };
+  const openModal = useCallback(
+    () => (
+      <BottomSheetModal
+        visible={isAddressModalVisible}
+        onClose={() => setIsAddressModalVisible(false)}
+        title={t.home.selectAddress}>
+        {isLoadingAddresses ? (
+          <ActivityIndicator size="large" color={Colors.gold} />
+        ) : (
+          <DeliveryLocationSheet
+            currenctLocation={
+              currentLocation
+                ? {
+                    id: 'current-location',
+                    description: 'Current Location',
+                    latitude: currentLocation.lat,
+                    longitude: currentLocation.lng,
+                  }
+                : null
+            }
+            selectedAddress={selectedAddress}
+            handleSelected={handleAddressSelect}
+            setCurrentLocation={handleCurrentLocationSelect}
+            addNewAddress={handleAddNewAddress}
+            addresses={userAddresses}
+          />
+        )}
+      </BottomSheetModal>
+    ),
+    [
+      isAddressModalVisible,
+      t.home.selectAddress,
+      isLoadingAddresses,
+      currentLocation,
+      selectedAddress,
+      handleAddressSelect,
+      handleCurrentLocationSelect,
+      handleAddNewAddress,
+      userAddresses,
+    ],
+  );
+
+  const handleSalonPress = useCallback(
+    salon => {
+      navigation.navigate('SalonProfileScreen', {
+        salon,
+        initialTab: 'Services',
+      });
+    },
+    [navigation],
+  );
+
+  const handleViewAllPress = useCallback(() => {
+    navigation.navigate('ExploreScreen', {
+      filters: {categories: []},
+    });
+  }, [navigation]);
+
+  const handleCategoryPress = useCallback(
+    (categoryId: number) => {
+      navigation.navigate('ExploreScreen', {
+        filters: {
+          categories: [categoryId.toString()],
+          initialTab: 'Services',
+        },
+      });
+    },
+    [navigation],
+  );
 
   return (
     <View style={styles.mainContainer}>
@@ -721,8 +800,8 @@ const HomeScreen: React.FC = () => {
                 styles.addressButton,
                 !isRTL && styles.addressButtonNotRTL,
               ]}
-              // onPress={() => setIsAddressModalVisible(true)}>
-              onPress={openModal}>
+              onPress={() => setIsAddressModalVisible(true)}>
+              {/* onPress={openModal}> */}
               <View
                 style={[
                   styles.addressTextHolder,
@@ -751,82 +830,8 @@ const HomeScreen: React.FC = () => {
         </View>
 
         {/* Address Selection Modal */}
-        <Modal
-          visible={isAddressModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setIsAddressModalVisible(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t.home.selectAddress}</Text>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => setIsAddressModalVisible(false)}>
-                  <Icon name="close" size={24} color={Colors.gold} />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={styles.addAddressButton}
-                onPress={() => {
-                  setIsAddressModalVisible(false);
-                  navigation.navigate('EditLocationScreen');
-                }}>
-                <Icon name="add-location" size={20} color={Colors.gold} />
-                <Text style={styles.addAddressText}>Add Address</Text>
-              </TouchableOpacity>
+        {openModal()}
 
-              {isLoadingAddresses ? (
-                <ActivityIndicator size="large" color={Colors.gold} />
-              ) : (
-                <FlatList
-                  data={userAddresses}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => (
-                    <TouchableOpacity
-                      style={[
-                        styles.addressItem,
-                        selectedAddress?.id === item.id &&
-                          styles.selectedAddressItem,
-                      ]}
-                      onPress={() => handleAddressSelect(item)}>
-                      <View style={styles.addressItemContent}>
-                        <Icon
-                          name="location-on"
-                          size={20}
-                          color={
-                            selectedAddress?.id === item.id
-                              ? Colors.black
-                              : Colors.gold
-                          }
-                        />
-                        <View style={styles.addressItemText}>
-                          <Text
-                            style={[
-                              styles.addressItemTitle,
-                              selectedAddress?.id === item.id &&
-                                styles.selectedAddressText,
-                            ]}>
-                            {item.description}
-                          </Text>
-                          {item.isPrimary && (
-                            <View style={styles.primaryBadge}>
-                              <Text style={styles.primaryBadgeText}>
-                                {t.home.primary}
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                  contentContainerStyle={styles.addressList}
-                />
-              )}
-            </View>
-          </View>
-        </Modal>
-        {/* <BottomSheet ref={bottomSheetRef} /> */}
         {isLoadingAny ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.gold} />
@@ -839,14 +844,7 @@ const HomeScreen: React.FC = () => {
             <View style={styles.sectionSpacing}>
               {/* <SwiperComponent /> */}
             </View>
-            {/* 
-            <View style={styles.sectionSpacing2}>
-              <TouchableOpacity
-                style={styles.notificationIconContainer}
-                onPress={() => navigation.navigate('NotificationsScreen')}>
-                <Icon name="notifications" size={20} color={Colors.black} />
-              </TouchableOpacity>
-            </View> */}
+
             {/* offers */}
             <View style={styles.sectionSpacing2}>
               <Text style={styles.sectionTitle}>{t.home.offers}</Text>
@@ -882,14 +880,7 @@ const HomeScreen: React.FC = () => {
                     <TouchableOpacity
                       key={category.id}
                       style={styles.serviceItem}
-                      onPress={() =>
-                        navigation.navigate('ExploreScreen', {
-                          filters: {
-                            categories: [category.id.toString()],
-                            initialTab: 'Services',
-                          },
-                        })
-                      }>
+                      onPress={() => handleCategoryPress(category.id)}>
                       <Image
                         source={
                           category.image_url
@@ -913,17 +904,8 @@ const HomeScreen: React.FC = () => {
               <BeautyServicesSection
                 title={t.home.nearbySalons}
                 data={mappedSalons.slice(0, 4)}
-                onItemPress={salon =>
-                  navigation.navigate('SalonProfileScreen', {
-                    salon,
-                    initialTab: 'Services',
-                  })
-                }
-                onViewAllPress={() =>
-                  navigation.navigate('ExploreScreen', {
-                    filters: {categories: []},
-                  })
-                }
+                onItemPress={handleSalonPress}
+                onViewAllPress={handleViewAllPress}
               />
             </View>
 
@@ -941,5 +923,58 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 };
+
+const locationStyles = StyleSheet.create({
+  locationListContainer: {
+    padding: 16,
+  },
+  locationHeader: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 16,
+    color: '#000',
+  },
+  locationAddressItem: {
+    marginBottom: 16,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  locationTextContainer: {
+    flex: 1,
+  },
+  locationLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  locationAddress: {
+    fontSize: 13,
+    color: '#444',
+  },
+  locationFooter: {
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 16,
+    marginTop: 16,
+    gap: 20,
+  },
+  locationFooterButton: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  locationFooterText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+  },
+  locationFooterSubText: {
+    fontSize: 12,
+    color: '#666',
+  },
+});
 
 export default HomeScreen;

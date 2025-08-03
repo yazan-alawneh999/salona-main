@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
   addressTextPlaceholder: {
     color: Colors.black,
     fontSize: 14,
+
     // fontFamily: 'Maitree-Regular',
     // marginRight: ,
     marginRight: 2,

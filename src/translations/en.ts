@@ -559,6 +559,10 @@ export const en = {
     packages: 'Featured Packages',
     packagesTitle: 'Packages',
     ourCategories: 'Bella Lounge',
+    savedLocations: 'Saved locations',
+    deliverToDifferentLocation: 'Deliver to a different location',
+    deliverToCurrentLocation: 'Deliver to current location',
+    currentLocation: 'Current location',
     services: {
       haircut: 'Haircut',
       nails: 'Nails',

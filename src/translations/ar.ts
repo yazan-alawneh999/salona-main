@@ -502,6 +502,10 @@ export const ar = {
     packages: 'الباقات المميزة',
     packagesTitle: 'الباقات',
     ourCategories: 'صالة بيلا',
+    savedLocations: 'المواقع المحفوظة',
+    deliverToDifferentLocation: 'توصيل إلى موقع مختلف',
+    deliverToCurrentLocation: 'توصيل إلى الموقع الحالي',
+    currentLocation: 'الموقع الحالي',
     services: {
       haircut: 'قص الشعر',
       nails: 'الأظافر',
