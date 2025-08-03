@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import Colors from '../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useTranslation } from '../../contexts/TranslationContext';
+import {useTranslation} from '../../contexts/TranslationContext';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 interface ServiceItem {
   id: string;
@@ -41,15 +41,14 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
   onViewAllPress,
   onItemPress,
 }) => {
-  const { isRTL, t } = useTranslation();
+  const {isRTL, t} = useTranslation();
 
   const renderItem = (item: ServiceItem | SalonItem) => {
     if (item.isService) {
       return (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.serviceContainer}
-          onPress={() => onItemPress?.(item)}
-        >
+          onPress={() => onItemPress?.(item)}>
           <Image source={item.image} style={styles.serviceImage} />
           <Text style={styles.serviceTitle}>{item.title}</Text>
         </TouchableOpacity>
@@ -58,14 +57,15 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
 
     const salonItem = item as SalonItem;
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.salonCard}
-        onPress={() => onItemPress?.(item)}
-      >
+        onPress={() => onItemPress?.(item)}>
         <View style={styles.imageContainer}>
-          <Image 
-            source={typeof item.image === 'string' ? { uri: item.image } : item.image} 
-            style={styles.salonImage} 
+          <Image
+            source={
+              typeof item.image === 'string' ? {uri: item.image} : item.image
+            }
+            style={styles.salonImage}
           />
           {salonItem.rating && (
             <View style={styles.ratingOverlay}>
@@ -77,7 +77,12 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
         <View style={styles.salonInfo}>
           <Text style={styles.salonName}>{item.title}</Text>
           <View style={styles.locationContainer}>
-            <Icon name="location-on" size={12} color="#000000" style={styles.locationIcon} />
+            <Icon
+              name="location-on"
+              size={12}
+              color="#000000"
+              style={styles.locationIcon}
+            />
             <Text numberOfLines={1} style={styles.locationText}>
               {salonItem.distance} • {salonItem.time}
             </Text>
@@ -89,29 +94,31 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
-        {onViewAllPress && (
+      <View
+        style={[
+          styles.header,
+          {flexDirection: !isRTL ? 'row-reverse' : 'row'},
+        ]}>
+        {/* {onViewAllPress && (
           <TouchableOpacity onPress={onViewAllPress}>
             <Text style={[styles.viewAll]}>{t.home.viewAll}</Text>
           </TouchableOpacity>
-        )}
+        )} */}
         <Text style={[styles.title]}>{title}</Text>
       </View>
 
-      <View style={[
-        styles.itemsContainer,
-        data[0]?.isService ? styles.servicesGrid : styles.salonsGrid,
-        { 
-          flexDirection: isRTL ? 'row-reverse' : 'row',
-        }
-      ]}>
-        {data.map((item) => (
-          <View 
-            key={item.id} 
-            style={[
-              data[0]?.isService ? {} : styles.salonWrapper
-            ]}
-          >
+      <View
+        style={[
+          styles.itemsContainer,
+          data[0]?.isService ? styles.servicesGrid : styles.salonsGrid,
+          {
+            flexDirection: isRTL ? 'row-reverse' : 'row',
+          },
+        ]}>
+        {data.map(item => (
+          <View
+            key={item.id}
+            style={[data[0]?.isService ? {} : styles.salonWrapper]}>
             {renderItem(item)}
           </View>
         ))}
@@ -127,16 +134,18 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    // justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginBottom: 16,
     width: '100%',
   },
   title: {
     fontSize: 18,
-    fontFamily: 'Maitree-Medium',
+    fontFamily: 'Poppins-Medium',
     color: Colors.white,
+    // alignSelf: 'flex-start',
   },
+
   viewAll: {
     fontSize: 14,
     fontFamily: 'Maitree-Regular',
@@ -145,7 +154,7 @@ const styles = StyleSheet.create({
   itemsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 7
+    gap: 7,
   },
   // Services styles
   servicesGrid: {

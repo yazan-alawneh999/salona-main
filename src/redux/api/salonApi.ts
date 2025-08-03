@@ -12,8 +12,23 @@ import {
   UpdateAvailabilityRequest,
   GetAvailabilityRequest,
   Category,
+  Package,
+  Address,
 } from '../../types/salon';
 import { setOnlineStatus } from '../slices/authSlice';
+
+// Add interface for nearby salon
+export interface NearbySalon {
+  id: number;
+  name: string;
+  description: string;
+  salon_latitude: string;
+  salon_longitude: string;
+  distance: number;
+  image_url: string | null;
+  rating_avg: any;
+  travelTime?: string;
+}
 
 // API Configuration
 const API_BASE_URL = 'https://spa.dev2.prodevr.com/api';
@@ -332,11 +347,12 @@ export const salonApi = createApi({
         }
       },
     }),
-    getCategories: builder.query<Category[], void>({
+    getCategories: builder.query<{ success: boolean; categories: Category[] }, void>({
       query: () => ({
         url: 'categories',
         method: 'GET',
       }),
+      providesTags: ['Category'],
     }),
     getFavorites: builder.query<Salon[], void>({
       query: () => {
@@ -407,6 +423,42 @@ export const salonApi = createApi({
       }),
       invalidatesTags: ['Appointments'],
     }),
+    getPackages: builder.query<{ success: boolean; packages: { data: Package[] } }, void>({
+      query: () => ({
+        url: 'salons/get-package',
+        method: 'GET',
+      }),
+      providesTags: ['Package'],
+    }),
+    getAddresses: builder.query<{ addresses: Address[] }, void>({
+      query: () => ({
+        url: 'addresses',
+        method: 'GET',
+      }),
+      providesTags: ['Address'],
+    }),
+    getNearbySalons: builder.query<{ success: boolean; salons: NearbySalon[] }, { latitude: number; longitude: number; radius?: number }>({
+      query: ({ latitude, longitude, radius = 10 }) => ({
+        url: `nearby-salons?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
+        method: 'GET',
+      }),
+      providesTags: ['Salon'],
+    }),
+    createAddress: builder.mutation<{ address: Address }, { description: string; is_favorite: boolean; latitude: string; longitude: string }>({
+      query: (addressData) => ({
+        url: 'new-address',
+        method: 'POST',
+        body: addressData,
+      }),
+      invalidatesTags: ['Address'],
+    }),
+    updatePrimaryAddress: builder.mutation<{ success: boolean }, number>({
+      query: (addressId) => ({
+        url: `update-primary-address/${addressId}`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['Address'],
+    }),
   }),
 });
 
@@ -434,4 +486,9 @@ export const {
   useToggleSalonStatusMutation,
   useUpdateAddressMutation,
   useMarkAppointmentAsReadMutation,
+  useGetPackagesQuery,
+  useGetAddressesQuery,
+  useGetNearbySalonsQuery,
+  useCreateAddressMutation,
+  useUpdatePrimaryAddressMutation,
 } = salonApi;

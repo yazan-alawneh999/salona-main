@@ -29,7 +29,16 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Salon} from '../../../types/salon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from '../../../contexts/TranslationContext';
-import {useGetAllSalonsQuery} from '../../../redux/api/salonApi';
+import {
+  useGetAllSalonsQuery,
+  useGetPackagesQuery,
+  useGetCategoriesQuery,
+  useGetAddressesQuery,
+  useGetNearbySalonsQuery,
+  useCreateAddressMutation,
+  useUpdatePrimaryAddressMutation,
+} from '../../../redux/api/salonApi';
+import {skip} from '@reduxjs/toolkit/query';
 import {Package} from '../../../components/PackagesSection/PackagesSection';
 import messaging from '@react-native-firebase/messaging';
 import {GOOGLE_MAPS_API_KEY} from '@env';
@@ -148,26 +157,91 @@ const HomeScreen: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const {t, isRTL} = useTranslation();
-  const [nearbySalons, setNearbySalons] = useState<NearbySalon[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [packagesLoading, setPackagesLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const {getCurrentLocation, requestLocationPermission} = useLocation();
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
-  const [userAddresses, setUserAddresses] = useState<Address[]>([]);
-  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // RTK Query hooks
+  const {data: salonsData, isLoading: salonsLoading} = useGetAllSalonsQuery({});
+  const {
+    data: packagesData,
+    isLoading: packagesLoading,
+    error: packagesError,
+  } = useGetPackagesQuery();
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useGetCategoriesQuery();
+  const {
+    data: addressesData,
+    isLoading: addressesLoading,
+    refetch: refetchAddresses,
+    error: addressesError,
+  } = useGetAddressesQuery();
+  const [createAddress] = useCreateAddressMutation();
+  const [updatePrimaryAddress] = useUpdatePrimaryAddressMutation();
+
   const selectedAddress = useSelector(
     (state: RootState) => state.salons.selectedAddress,
   );
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const {data: salonsData, isLoading: salonsLoading} = useGetAllSalonsQuery({});
+  const {getCurrentLocation, requestLocationPermission} = useLocation();
+
+  // Nearby salons query - only runs when we have coordinates
+  const {data: nearbySalonsData, isLoading: nearbySalonsLoading} =
+    useGetNearbySalonsQuery(
+      selectedAddress && selectedAddress.latitude && selectedAddress.longitude
+        ? {
+            latitude: selectedAddress.latitude,
+            longitude: selectedAddress.longitude,
+            radius: 10,
+          }
+        : skip,
+      {
+        skip:
+          !selectedAddress ||
+          !selectedAddress.latitude ||
+          !selectedAddress.longitude,
+      },
+    );
+
+  // Extract data from RTK Query responses
+  const packages = packagesData?.packages?.data || [];
+  const categories = categoriesData?.categories || [];
+  const userAddresses = addressesData?.addresses || [];
+  const nearbySalons = nearbySalonsData?.salons || [];
+
+  // Debug logging
+  console.log('RTK Query Data:', {
+    packagesData,
+    packages,
+    packagesLoading,
+    packagesError,
+    categoriesData,
+    categories,
+    categoriesLoading,
+    categoriesError,
+    addressesData,
+    userAddresses,
+    addressesLoading,
+    addressesError,
+    nearbySalonsData,
+    nearbySalons,
+    nearbySalonsLoading,
+  });
+
+  // Additional debugging for rendering
+  console.log('Rendering Debug:', {
+    packagesLength: packages.length,
+    categoriesLength: categories.length,
+    isLoadingAny,
+    packagesLoading,
+    categoriesLoading,
+  });
 
   const getAndSetCurrentLocation = async () => {
     console.log('selected address mother', selectedAddress);
@@ -189,326 +263,19 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const fetchNearbySalons = async (latitude: number, longitude: number) => {
-    try {
-      console.log('fetching nearby salons');
-      console.log('latitude', latitude);
-      console.log('longitude', longitude);
-      console.log('selected address latitude', selectedAddress?.latitude);
-      console.log('selected address longitude', selectedAddress?.longitude);
-      setIsLoading(true);
-      const token = await AsyncStorage.getItem('token');
-
-      const response = await fetch(
-        `https://spa.dev2.prodevr.com/api/nearby-salons?latitude=${latitude}&longitude=${longitude}&radius=10`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data: NearbySalonsResponse = await response.json();
-      console.log('Nearby salons response:', data);
-
-      if (data.success) {
-        // Get travel times for each salon
-        const salonsWithTravelTime = await Promise.all(
-          data.salons.map(async salon => {
-            try {
-              const distanceResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${latitude},${longitude}&destinations=${salon.salon_latitude},${salon.salon_longitude}&mode=driving&key=${GOOGLE_MAPS_API_KEY}`,
-              );
-              const distanceData = await distanceResponse.json();
-
-              if (distanceData.rows[0]?.elements[0]?.duration?.text) {
-                return {
-                  ...salon,
-                  travelTime: distanceData.rows[0].elements[0].duration.text,
-                };
-              }
-              return salon;
-            } catch (error) {
-              console.error('Error fetching travel time:', error);
-              return salon;
-            }
-          }),
-        );
-
-        setNearbySalons(salonsWithTravelTime);
-        // Transform nearby salons to match Salon type before dispatching
-        dispatch(setSalons(salonsWithTravelTime.map(mapNearbySalonToSalon)));
-      } else {
-        console.error('Failed to fetch nearby salons');
-      }
-    } catch (error) {
-      console.error('Error fetching nearby salons:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const mappedSalons = useMemo(() => {
-    return nearbySalons.map((salon: any): MappedSalon => {
-      const distanceText =
-        salon.distance < 1
-          ? `${Math.round(salon.distance * 1000)}m`
-          : `${salon.distance.toFixed(1)} km`;
-
-      return {
-        id: salon.id.toString(),
-        title: salon.name,
-        image: salon.image_url
-          ? {uri: salon.image_url}
-          : require('../../../assets/images/alia-ahmad.png'),
-        distance: distanceText,
-        time: salon.travelTime || undefined,
-        rating: salon.average_rating || '0.0',
-      };
-    });
-  }, [nearbySalons]);
-
-  const handleNotificationPress = () => {
-    navigation.navigate('NotificationsScreen');
-  };
-
-  const handleChatPress = () => {
-    console.log('Navigating to UserChatListScreen');
-    navigation.navigate('UserChatListScreen');
-  };
-
-  const fetchPackages = async () => {
-    try {
-      setPackagesLoading(true);
-      const token = await AsyncStorage.getItem('token');
-
-      const response = await fetch(
-        'https://spa.dev2.prodevr.com/api/salons/get-package',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      const data: PackagesResponse = await response.json();
-
-      if (data.success && data.packages) {
-        setPackages(data.packages.data);
-        console.log(`packages`);
-        console.log(data.packages.data);
-      } else {
-        console.error('Failed to fetch packages:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching packages:', error);
-    } finally {
-      setPackagesLoading(false);
-    }
-  };
-
-  const handleGoSearch = useCallback(() => {
-    navigation.navigate('ExploreScreen');
-  }, [navigation]);
-  const handleGoFilter = useCallback(() => {
-    navigation.navigate('FilterScreen');
-  }, [navigation]);
-
-  const handlePackagePress = useCallback(
-    (packageItem: Package) => {
-      const salon = packageItem.salon || {
-        id: packageItem.salon_id,
-        name: packageItem.salon_name,
-        image_url: packageItem.salon_image,
-      };
-
-      navigation.navigate('SalonProfileScreen', {
-        salon,
-        initialTab: 'Packages',
-      });
-    },
-    [navigation],
-  );
-
-  const fetchCategories = async () => {
-    try {
-      setCategoriesLoading(true);
-      const token = await AsyncStorage.getItem('token');
-
-      const response = await fetch(
-        'https://spa.dev2.prodevr.com/api/categories',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data: CategoriesResponse = await response.json();
-
-      if (data.success) {
-        setCategories(data.categories);
-      } else {
-        console.error('Failed to fetch categories');
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    } finally {
-      setCategoriesLoading(false);
-    }
-  };
-
-  const fetchUserAddresses = async () => {
-    try {
-      setIsLoadingAddresses(true);
-      const token = await AsyncStorage.getItem('token');
-      const response = await fetch(
-        'https://spa.dev2.prodevr.com/api/addresses',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      const data = await response.json();
-      console.log('Fetched addresses:', data);
-      if (data.success) {
-        setUserAddresses(data.addresses);
-        // Find the primary address
-        const primaryAddress = data.addresses.find(
-          addr => addr.is_primary === 1,
-        );
-        if (primaryAddress) {
-          dispatch(setSelectedAddress(primaryAddress));
-        } else if (data.addresses.length === 0) {
-          // If no addresses exist, get current location and add it
-          console.log('No addresses found, getting current location...');
-          const granted = await requestLocationPermission();
-          if (granted) {
-            const location = await getCurrentLocation();
-            if (location) {
-              console.log('Current location received:', location);
-              // Get address from coordinates
-              const geocodeResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${GOOGLE_MAPS_API_KEY}`,
-              );
-              const geocodeData = await geocodeResponse.json();
-              console.log('Geocoding response:', geocodeData);
-
-              if (geocodeData.results && geocodeData.results[0]) {
-                console.log('Adding current location as address...');
-                const addressResponse = await fetch(
-                  'https://spa.dev2.prodevr.com/api/new-address',
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${token}`,
-                      Accept: 'application/json',
-                    },
-                    body: JSON.stringify({
-                      description: geocodeData.results[0].formatted_address,
-                      is_favorite: false,
-                      latitude: location.latitude.toString(),
-                      longitude: location.longitude.toString(),
-                    }),
-                  },
-                );
-
-                const responseText = await addressResponse.text();
-                console.log('Raw response:', responseText);
-
-                if (!addressResponse.ok) {
-                  throw new Error(
-                    `Failed to add address: ${addressResponse.status} ${responseText}`,
-                  );
-                }
-
-                let addressData;
-                try {
-                  addressData = JSON.parse(responseText);
-                  console.log('Parsed response:', addressData);
-                } catch (parseError) {
-                  console.error('Error parsing response:', parseError);
-                  throw new Error('Invalid response from server');
-                }
-
-                if (!addressData.address?.id) {
-                  throw new Error(
-                    'Invalid response format: missing address ID',
-                  );
-                }
-
-                const newAddress = {
-                  id: addressData.address.id,
-                  description: geocodeData.results[0].formatted_address,
-                  locationLink: `https://www.google.com/maps/place/?q=place_id:${geocodeData.results[0].place_id}`,
-                  isFavorite: false,
-                  isPrimary: true,
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                };
-
-                // Update the addresses list and set as selected
-                setUserAddresses([newAddress]);
-                dispatch(setSelectedAddress(newAddress));
-
-                // Make it the primary address
-                const primaryResponse = await fetch(
-                  `https://spa.dev2.prodevr.com/api/update-primary-address/${newAddress.id}`,
-                  {
-                    method: 'PUT',
-                    headers: {
-                      Accept: 'application/json',
-                      Authorization: `Bearer ${token}`,
-                    },
-                  },
-                );
-                const primaryData = await primaryResponse.json();
-                console.log('Set primary address response:', primaryData);
-              }
-            }
-          }
-        }
-      } else {
-        console.error('Failed to fetch addresses');
-      }
-    } catch (error) {
-      console.error('Error fetching addresses:', error);
-    } finally {
-      setIsLoadingAddresses(false);
-    }
-  };
-
+  // Handle address selection
   const handleAddressSelect = useCallback(
     async address => {
       dispatch(setSelectedAddress(address));
       setIsAddressModalVisible(false);
       try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          console.log('No authentication token found');
-          return;
-        }
-        const response = await fetch(
-          `https://spa.dev2.prodevr.com/api/update-primary-address/${address.id}`,
-          {
-            method: 'PUT',
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        const data = await response.json();
-        console.log('Update primary address response:', data);
-        console.log('Address selected:');
+        await updatePrimaryAddress(address.id);
+        console.log('Address selected and set as primary');
       } catch (error) {
         console.error('Error updating primary address:', error);
       }
     },
-    [dispatch],
+    [dispatch, updatePrimaryAddress],
   );
 
   const handleCurrentLocationSelect = useCallback(() => {
@@ -531,6 +298,10 @@ const HomeScreen: React.FC = () => {
     navigation.navigate('EditLocationScreen');
   }, [navigation]);
 
+  const handleGoFilter = useCallback(() => {
+    navigation.navigate('FilterScreen');
+  }, [navigation]);
+
   const handleSearch = useCallback((text: string) => {
     setSearchQuery(text);
   }, []);
@@ -550,9 +321,34 @@ const HomeScreen: React.FC = () => {
     console.log('Menu button pressed');
   }, []);
 
-  useEffect(() => {
-    fetchPackages();
-  }, []);
+  const handleNotificationPress = () => {
+    navigation.navigate('NotificationsScreen');
+  };
+
+  const handleChatPress = () => {
+    console.log('Navigating to UserChatListScreen');
+    navigation.navigate('UserChatListScreen');
+  };
+
+  const handlePackagePress = useCallback(
+    (packageItem: Package) => {
+      const salon = packageItem.salon || {
+        id: packageItem.salon_id,
+        name: packageItem.salon_name,
+        image_url: packageItem.salon_image,
+      };
+
+      navigation.navigate('SalonProfileScreen', {
+        salon,
+        initialTab: 'Packages',
+      });
+    },
+    [navigation],
+  );
+
+  const handleGoSearch = useCallback(() => {
+    navigation.navigate('ExploreScreen');
+  }, [navigation]);
 
   const requestUserPermission = async () => {
     if (Platform.OS === 'ios') {
@@ -578,37 +374,87 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  // Initialize current location on mount
   useEffect(() => {
-    console.log('Requesting location on Home screen...');
     getAndSetCurrentLocation();
-    if (selectedAddress) {
-      fetchNearbySalons(selectedAddress.latitude, selectedAddress.longitude);
-    }
-    fetchCategories();
     requestUserPermission();
-    fetchUserAddresses();
   }, []);
 
+  // Set primary address when addresses are loaded
   useEffect(() => {
-    if (
-      selectedAddress &&
-      selectedAddress.latitude &&
-      selectedAddress.longitude
-    ) {
-      fetchNearbySalons(selectedAddress.latitude, selectedAddress.longitude);
+    if (userAddresses.length > 0 && !selectedAddress) {
+      const primaryAddress = userAddresses.find(addr => addr.is_primary === 1);
+      if (primaryAddress) {
+        dispatch(setSelectedAddress(primaryAddress));
+      }
     }
-  }, [selectedAddress]);
+  }, [userAddresses, selectedAddress, dispatch]);
 
-  // Add navigation focus listener to refetch addresses
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchUserAddresses();
+  // Handle case when no addresses exist
+  useEffect(() => {
+    const handleNoAddresses = async () => {
+      if (userAddresses.length === 0 && currentLocation) {
+        try {
+          // Get address from coordinates
+          const geocodeResponse = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentLocation.lat},${currentLocation.lng}&key=${GOOGLE_MAPS_API_KEY}`,
+          );
+          const geocodeData = await geocodeResponse.json();
+
+          if (geocodeData.results && geocodeData.results[0]) {
+            await createAddress({
+              description: geocodeData.results[0].formatted_address,
+              is_favorite: false,
+              latitude: currentLocation.lat.toString(),
+              longitude: currentLocation.lng.toString(),
+            });
+            // Refetch addresses to get the new one
+            refetchAddresses();
+          }
+        } catch (error) {
+          console.error('Error creating address from current location:', error);
+        }
+      }
+    };
+
+    handleNoAddresses();
+  }, [userAddresses.length, currentLocation, createAddress, refetchAddresses]);
+
+  // Transform nearby salons for display
+  const mappedSalons = useMemo(() => {
+    return nearbySalons.map((salon: any): MappedSalon => {
+      const distanceText =
+        salon.distance < 1
+          ? `${Math.round(salon.distance * 1000)}m`
+          : `${salon.distance.toFixed(1)} km`;
+
+      return {
+        id: salon.id.toString(),
+        title: salon.name,
+        image: salon.image_url
+          ? {uri: salon.image_url}
+          : require('../../../assets/images/alia-ahmad.png'),
+        distance: distanceText,
+        time: salon.travelTime || undefined,
+        rating: salon.average_rating || '0.0',
+      };
     });
-    return unsubscribe;
-  }, [navigation]);
+  }, [nearbySalons]);
 
+  // Loading state - much simpler now
   const isLoadingAny =
-    isLoading || packagesLoading || categoriesLoading || salonsLoading;
+    packagesLoading ||
+    categoriesLoading ||
+    addressesLoading ||
+    nearbySalonsLoading;
+
+  console.log('Loading states:', {
+    packagesLoading,
+    categoriesLoading,
+    addressesLoading,
+    nearbySalonsLoading,
+    isLoadingAny,
+  });
 
   // src/constants/images.js
   const itemImages = [
@@ -621,68 +467,110 @@ const HomeScreen: React.FC = () => {
     const index = Math.floor(Math.random() * itemImages.length);
     return itemImages[index];
   };
-  const PackageItem = useCallback(
-    ({package: pkg}: {package: Package}) => {
-      const image = getRandomImage();
+  // Loading skeleton for packages
+  const PackageSkeleton = () => (
+    <View style={styles.packageContainer}>
+      <View style={styles.packageCard}>
+        <View style={styles.packageImageContainer}>
+          <View style={styles.skeletonImage} />
+          <View style={styles.packageContent}>
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonPrice} />
+            <View style={styles.skeletonDetails} />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
 
-      return (
-        <View style={styles.featuredSection}>
-          <TouchableOpacity
-            style={styles.featuredCard}
-            activeOpacity={0.9}
-            onPress={() => handlePackagePress(pkg)}>
-            <View style={styles.featuredImageContainer}>
-              <Image
-                source={image}
-                style={styles.featuredImage}
-                resizeMode="cover"
-                transition={500}
-              />
+  // Memoized PackageItem component for better performance
+  const PackageItem = React.memo(({package: pkg}: {package: Package}) => {
+    const image = useMemo(() => getRandomImage(), []);
 
-              <View style={styles.featuredOverlay}>
-                <View style={styles.featuredBadge}>
-                  <Text style={styles.featuredBadgeText}>
-                    {pkg.discount_percentage} %
+    const handlePress = useCallback(() => {
+      handlePackagePress(pkg);
+    }, [pkg, handlePackagePress]);
+
+    const handleImageError = useCallback(() => {
+      console.log('Image failed to load for package:', pkg.id);
+    }, [pkg.id]);
+
+    return (
+      <View style={styles.packageContainer}>
+        <TouchableOpacity
+          style={styles.packageCard}
+          activeOpacity={0.95}
+          onPress={handlePress}>
+          <View style={styles.packageImageContainer}>
+            <Image
+              source={image}
+              style={styles.packageImage}
+              resizeMode="cover"
+              fadeDuration={300}
+              onError={handleImageError}
+              progressiveRenderingEnabled={true}
+            />
+
+            {/* Gradient Overlay */}
+            <View style={styles.packageGradient} />
+
+            {/* Discount Badge */}
+            {pkg.discount_percentage > 0 && (
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>
+                  {pkg.discount_percentage}% OFF
+                </Text>
+              </View>
+            )}
+
+            {/* Content */}
+            <View style={styles.packageContent}>
+              <View style={styles.packageHeader}>
+                <Text style={styles.packageTitle} numberOfLines={2}>
+                  {pkg.name}
+                </Text>
+                <View style={styles.packagePrice}>
+                  <Text style={styles.priceText}>
+                    {pkg.amount} {t.home.currency}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.packageDetails}>
+                <View style={styles.detailItem}>
+                  <Icon name="time-outline" size={14} color={Colors.black} />
+                  <Text style={styles.detailText}>
+                    {pkg.time} {t.home.min}
                   </Text>
                 </View>
 
-                <View style={styles.featuredContent}>
-                  <Text style={styles.featuredTitle} numberOfLines={2}>
-                    {pkg.name}
-                  </Text>
-
-                  <View style={styles.featuredMeta}>
-                    <View style={styles.metaItem}>
-                      <Icon
-                        name="time-outline"
-                        size={16}
-                        color={Colors.black}
-                      />
-                      <Text style={styles.metaText}>
-                        {pkg.time} {t.home.min}
-                      </Text>
-                    </View>
-
-                    <View style={styles.metaItem}>
-                      <Text style={styles.metaText} numberOfLines={2}>
-                        {pkg.description}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.metaItem}>
-                    <Text style={styles.metaText}>
-                      {pkg.amount} {t.home.currency}
+                {pkg.description && (
+                  <View style={styles.detailItem}>
+                    <Icon
+                      name="information-circle-outline"
+                      size={14}
+                      color={Colors.black}
+                    />
+                    <Text style={styles.detailText} numberOfLines={1}>
+                      {pkg.description}
                     </Text>
                   </View>
+                )}
+              </View>
+
+              {/* Action Button */}
+              <View style={styles.packageAction}>
+                <View style={styles.actionButton}>
+                  <Text style={styles.actionText}>View Details</Text>
+                  <Icon name="chevron-forward" size={16} color={Colors.black} />
                 </View>
               </View>
             </View>
-          </TouchableOpacity>
-        </View>
-      );
-    },
-    [handlePackagePress, t.home.min, t.home.currency],
-  );
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  });
 
   const SearchBar = useCallback(
     () => (
@@ -725,7 +613,7 @@ const HomeScreen: React.FC = () => {
         visible={isAddressModalVisible}
         onClose={() => setIsAddressModalVisible(false)}
         title={t.home.selectAddress}>
-        {isLoadingAddresses ? (
+        {addressesLoading ? (
           <ActivityIndicator size="large" color={Colors.gold} />
         ) : (
           <DeliveryLocationSheet
@@ -751,7 +639,7 @@ const HomeScreen: React.FC = () => {
     [
       isAddressModalVisible,
       t.home.selectAddress,
-      isLoadingAddresses,
+      addressesLoading,
       currentLocation,
       selectedAddress,
       handleAddressSelect,
@@ -835,6 +723,10 @@ const HomeScreen: React.FC = () => {
         {isLoadingAny ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.gold} />
+            <Text
+              style={{marginTop: 10, textAlign: 'center', color: Colors.gold}}>
+              Loading...
+            </Text>
           </View>
         ) : (
           <ScrollView
@@ -852,13 +744,39 @@ const HomeScreen: React.FC = () => {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.horizontalScrollContent}>
-                {packages.length > 0 ? (
+                {packagesLoading ? (
+                  <FlatList
+                    data={[1, 2, 3]} // Show 3 skeleton items
+                    keyExtractor={item => `skeleton-${item}`}
+                    renderItem={() => <PackageSkeleton />}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={3}
+                    windowSize={5}
+                    initialNumToRender={2}
+                    getItemLayout={(data, index) => ({
+                      length: 296,
+                      offset: 296 * index,
+                      index,
+                    })}
+                  />
+                ) : packages.length > 0 ? (
                   <FlatList
                     data={packages}
-                    keyExtractor={item => item.id.toString()}
+                    keyExtractor={item => `package-${item.id}`}
                     renderItem={({item}) => <PackageItem package={item} />}
                     horizontal
                     showsHorizontalScrollIndicator={false}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={3}
+                    windowSize={5}
+                    initialNumToRender={2}
+                    getItemLayout={(data, index) => ({
+                      length: 296, // 280 width + 16 margin
+                      offset: 296 * index,
+                      index,
+                    })}
                   />
                 ) : (
                   <Text style={styles.serviceTitle}>
@@ -923,58 +841,5 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 };
-
-const locationStyles = StyleSheet.create({
-  locationListContainer: {
-    padding: 16,
-  },
-  locationHeader: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 16,
-    color: '#000',
-  },
-  locationAddressItem: {
-    marginBottom: 16,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-  },
-  locationTextContainer: {
-    flex: 1,
-  },
-  locationLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  locationAddress: {
-    fontSize: 13,
-    color: '#444',
-  },
-  locationFooter: {
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 16,
-    marginTop: 16,
-    gap: 20,
-  },
-  locationFooterButton: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  locationFooterText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
-  },
-  locationFooterSubText: {
-    fontSize: 12,
-    color: '#666',
-  },
-});
 
 export default HomeScreen;
