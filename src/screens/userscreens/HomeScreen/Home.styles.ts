@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     color: Colors.black,
     fontSize: 12,
+    paddingHorizontal: 10,
   },
   container: {
     flex: 1,
@@ -29,16 +30,16 @@ const styles = StyleSheet.create({
   headerContainer: {
     height: height * 0.25,
     justifyContent: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
     backgroundColor: Colors.gold,
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingBottom: 20,
   },
   headerRTL: {
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 15,
-    paddingHorizontal: 15,
+    paddingHorizontal: 8,
   },
   sectionSpacing: {
     marginBottom: 15,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     minWidth: 40,
     maxWidth: 120,
     marginRight: 4,
-    gap: 4,
+    gap: 3,
   },
   addressTextHolderNotRTL: {
     flexDirection: 'row',
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
 
     // fontFamily: 'Maitree-Regular',
     // marginRight: ,
-    marginRight: 2,
+    // marginRight: 2,
   },
   addressText: {
     color: Colors.black,
