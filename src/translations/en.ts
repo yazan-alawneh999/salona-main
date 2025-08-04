@@ -564,6 +564,7 @@ export const en = {
     deliverToCurrentLocation: 'Deliver to current location',
     currentLocation: 'Current location',
     gettingLocation: 'Getting location...',
+    gettingAddress: 'Getting address...',
     locationError: 'Location Error',
     locationPermissionError: 'Unable to get your current location. Please check your location permissions.',
     loading: 'Loading...',

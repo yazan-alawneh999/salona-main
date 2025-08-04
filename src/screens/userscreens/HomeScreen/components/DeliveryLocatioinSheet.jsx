@@ -57,7 +57,7 @@ const DeliveryLocationSheet = ({
           
           setCurrentLocation(currentLocationData);
           setLoading(false);
-          console.log('Current location set successfully');
+          console.log('Current location set successfully with address:', data.results[0].formatted_address);
         } else {
           console.log('No address found for coordinates');
           // Fallback to coordinates only

@@ -507,6 +507,7 @@ export const ar = {
     deliverToCurrentLocation: 'توصيل إلى الموقع الحالي',
     currentLocation: 'الموقع الحالي',
     gettingLocation: 'جاري تحديد الموقع...',
+    gettingAddress: 'جاري الحصول على العنوان...',
     locationError: 'خطأ في الموقع',
     locationPermissionError: 'لا يمكن الحصول على موقعك الحالي. يرجى التحقق من أذونات الموقع.',
     loading: 'جاري التحميل...',

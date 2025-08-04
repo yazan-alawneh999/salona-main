@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker, Region, LatLng } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -23,6 +23,9 @@ const LocationMapView: React.FC<MapViewProps> = ({
   const [currentLocationName, setCurrentLocationName] = useState('');
   const [currentAddress, setCurrentAddress] = useState('');
   const [mapRegion, setMapRegion] = useState<Region | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [tempLocation, setTempLocation] = useState<LatLng | null>(null);
+  const geocodingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Default region (Amman, Jordan)
   const defaultRegion: Region = {
@@ -43,23 +46,19 @@ const LocationMapView: React.FC<MapViewProps> = ({
       };
       setMapRegion(region);
       
-      // If initial location is provided, set it as selected location
+      // If initial location is provided, set it as selected location and get its address
       if (!selectedLocation) {
         onLocationSelect(initialLocation);
+        getAddressFromCoordinates(initialLocation.latitude, initialLocation.longitude);
       }
     } else {
       setMapRegion(defaultRegion);
     }
   }, [initialLocation]);
 
-  useEffect(() => {
-    if (selectedLocation && selectedLocation.latitude && selectedLocation.longitude) {
-      // Get address from coordinates
-      fetchAddressFromCoordinates(selectedLocation.latitude, selectedLocation.longitude);
-    }
-  }, [selectedLocation]);
-
-  const fetchAddressFromCoordinates = async (latitude: number, longitude: number) => {
+  // Function to get address from coordinates
+  const getAddressFromCoordinates = useCallback(async (latitude: number, longitude: number) => {
+    setIsGeocoding(true);
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyB-w38SqAU85WY8NzUDFKw5JX5RakNulaA`
@@ -74,15 +73,69 @@ const LocationMapView: React.FC<MapViewProps> = ({
         const addressParts = address.split(',');
         const shortName = addressParts[0] || address;
         setCurrentLocationName(shortName);
+      } else {
+        setCurrentLocationName(t.editLocation.currentLocation);
+        setCurrentAddress(t.editLocation.currentLocation);
       }
     } catch (error) {
       console.error('Error fetching address:', error);
       setCurrentLocationName(t.editLocation.currentLocation);
       setCurrentAddress(t.editLocation.currentLocation);
+    } finally {
+      setIsGeocoding(false);
     }
-  };
+  }, [t.editLocation.currentLocation]);
 
-  const handleRegionChangeComplete = (region: Region) => {
+  // Debounced geocoding function for map movements
+  const debouncedGeocoding = useCallback((latitude: number, longitude: number) => {
+    // Clear existing timeout
+    if (geocodingTimeoutRef.current) {
+      clearTimeout(geocodingTimeoutRef.current);
+    }
+
+    // Set new timeout for geocoding
+    geocodingTimeoutRef.current = setTimeout(() => {
+      getAddressFromCoordinates(latitude, longitude);
+    }, 300); // Reduced to 300ms for faster response
+  }, [getAddressFromCoordinates]);
+
+  // Handle map press for immediate pin placement
+  const handleMapPress = useCallback((event: any) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    
+    // Immediately set the pin location
+    const newLocation = { latitude, longitude };
+    setTempLocation(newLocation);
+    onLocationSelect(newLocation);
+    
+    // Get address for the new location
+    getAddressFromCoordinates(latitude, longitude);
+  }, [onLocationSelect, getAddressFromCoordinates]);
+
+  useEffect(() => {
+    if (selectedLocation && selectedLocation.latitude && selectedLocation.longitude) {
+      // Only geocode if location has significantly changed
+      const distance = Math.sqrt(
+        Math.pow(selectedLocation.latitude - (mapRegion?.latitude || 0), 2) +
+        Math.pow(selectedLocation.longitude - (mapRegion?.longitude || 0), 2)
+      );
+      
+      if (distance > 0.0001) { // Only geocode if moved more than ~10m
+        debouncedGeocoding(selectedLocation.latitude, selectedLocation.longitude);
+      }
+    }
+  }, [selectedLocation, debouncedGeocoding]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (geocodingTimeoutRef.current) {
+        clearTimeout(geocodingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleRegionChangeComplete = useCallback((region: Region) => {
     // Only update if the change is significant (not just map movement)
     if (selectedLocation) {
       const distance = Math.sqrt(
@@ -97,9 +150,9 @@ const LocationMapView: React.FC<MapViewProps> = ({
         });
       }
     }
-  };
+  }, [selectedLocation, onLocationSelect]);
 
-  const handleMyLocation = () => {
+  const handleMyLocation = useCallback(() => {
     if (mapRef.current && initialLocation && initialLocation.latitude && initialLocation.longitude) {
       const region: Region = {
         latitude: initialLocation.latitude,
@@ -110,8 +163,9 @@ const LocationMapView: React.FC<MapViewProps> = ({
       
       mapRef.current.animateToRegion(region, 1000);
       onLocationSelect(initialLocation);
+      getAddressFromCoordinates(initialLocation.latitude, initialLocation.longitude);
     }
-  };
+  }, [initialLocation, onLocationSelect, getAddressFromCoordinates]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,8 +193,11 @@ const LocationMapView: React.FC<MapViewProps> = ({
             style={styles.map}
             initialRegion={mapRegion}
             onRegionChangeComplete={handleRegionChangeComplete}
+            onPress={handleMapPress}
             showsUserLocation={true}
             showsMyLocationButton={false}
+            maxZoomLevel={18}
+            minZoomLevel={10}
           >
             {selectedLocation && selectedLocation.latitude && selectedLocation.longitude && (
               <Marker
@@ -167,10 +224,10 @@ const LocationMapView: React.FC<MapViewProps> = ({
               <Icon name="location-on" size={20} color={Colors.primary} />
               <View style={styles.locationTextContainer}>
                 <Text style={styles.locationName} numberOfLines={1}>
-                  {currentLocationName}
+                  {isGeocoding ? t.editLocation.gettingAddress : currentLocationName}
                 </Text>
                 <Text style={styles.locationAddress} numberOfLines={2}>
-                  {currentAddress}
+                  {isGeocoding ? t.editLocation.gettingAddress : currentAddress}
                 </Text>
               </View>
             </View>

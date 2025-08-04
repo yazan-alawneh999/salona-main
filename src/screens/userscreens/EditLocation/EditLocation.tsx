@@ -54,6 +54,7 @@ const EditLocationScreen: React.FC = () => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [newDescription, setNewDescription] = useState('');
   const [updateAddressApi] = useUpdateAddressMutation();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -183,45 +184,56 @@ const EditLocationScreen: React.FC = () => {
       
       console.log('Location received:', location);
 
-      console.log('Fetching address from coordinates...');
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=AIzaSyB-w38SqAU85WY8NzUDFKw5JX5RakNulaA`,
-      );
-      const data = await response.json();
-      console.log('Geocoding response:', data);
+      // Show loading state immediately
+      setLoading(true);
 
-      if (data.results && data.results[0]) {
-        console.log('Adding address to user profile...');
-        const newAddressId = await handleAddAddress(
-          data.results[0].formatted_address,
-          `https://www.google.com/maps/place/?q=place_id:${data.results[0].place_id}`,
-          location.latitude,
-          location.longitude,
+      try {
+        console.log('Fetching address from coordinates...');
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=AIzaSyB-w38SqAU85WY8NzUDFKw5JX5RakNulaA`,
         );
+        const data = await response.json();
+        console.log('Geocoding response:', data);
 
-        if (newAddressId) {
-          const newAddress = {
-            id: newAddressId,
-            description: data.results[0].formatted_address,
-            locationLink: `https://www.google.com/maps/place/?q=place_id:${data.results[0].place_id}`,
-            isFavorite: false,
-            isPrimary: false,
-            latitude: location.latitude,
-            longitude: location.longitude,
-          };
-          setEditingAddress(newAddress);
-          setNewDescription(data.results[0].formatted_address);
-          setEditModalVisible(true);
+        if (data.results && data.results[0]) {
+          console.log('Adding address to user profile...');
+          const newAddressId = await handleAddAddress(
+            data.results[0].formatted_address,
+            `https://www.google.com/maps/place/?q=place_id:${data.results[0].place_id}`,
+            location.latitude,
+            location.longitude,
+          );
+
+          if (newAddressId) {
+            const newAddress = {
+              id: newAddressId,
+              description: data.results[0].formatted_address,
+              locationLink: `https://www.google.com/maps/place/?q=place_id:${data.results[0].place_id}`,
+              isFavorite: false,
+              isPrimary: false,
+              latitude: location.latitude,
+              longitude: location.longitude,
+            };
+            setEditingAddress(newAddress);
+            setNewDescription(data.results[0].formatted_address);
+            setEditModalVisible(true);
+          }
+
+          console.log('Address added successfully');
+        } else {
+          console.log('No address found for coordinates');
+          Alert.alert(t.editLocation.errors.noAddress);
         }
-
-        console.log('Address added successfully');
-      } else {
-        console.log('No address found for coordinates');
-        Alert.alert(t.editLocation.errors.noAddress);
+      } catch (error) {
+        console.error('Error in geocoding:', error);
+        Alert.alert('Error', 'Failed to get address for current location. Please try again.');
+      } finally {
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error in handleCurrentLocation:', error);
       Alert.alert('Error getting location', 'Unable to get your current location. Please try again.');
+      setLoading(false);
     }
   };
 
