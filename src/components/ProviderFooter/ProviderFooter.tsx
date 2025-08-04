@@ -4,16 +4,28 @@ import styles from './ProviderFooter.styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../constants/Colors';
 import {useNavigation} from '@react-navigation/native';
-import { useTranslation } from '../../contexts/TranslationContext';
+import {useTranslation} from '../../contexts/TranslationContext';
 
 const ProviderFooter = () => {
   const navigation = useNavigation();
   const {t, isRTL} = useTranslation();
   const footerItems = [
-    {name: t.providerFooter.notifications, icon: 'notifications', screen: 'ProviderNotifications'},
-    {name: t.providerFooter.bookings, icon: 'calendar-today', screen: 'ProviderBookingScreen'},
+    {
+      name: t.providerFooter.notifications,
+      icon: 'notifications',
+      screen: 'ProviderNotifications',
+    },
+    {
+      name: t.providerFooter.bookings,
+      icon: 'calendar-today',
+      screen: 'ProviderBookingScreen',
+    },
     // {name: t.providerFooter.chat, icon: 'chat', screen: 'ProviderChatList'},
-    {name: t.providerFooter.account, icon: 'account-circle', screen: 'ProviderAccount'},
+    {
+      name: t.providerFooter.account,
+      icon: 'account-circle',
+      screen: 'ProviderAccount',
+    },
     {name: t.providerFooter.profile, icon: 'person', screen: 'ProviderProfile'},
   ];
 

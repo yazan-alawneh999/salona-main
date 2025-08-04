@@ -1,7 +1,7 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
 import Colors from '../../constants/Colors';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   footerContainer: {
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 12,
     marginTop: 4,
-    fontFamily: 'Maitree-Regular',
+    fontFamily: 'Poppins-Regular',
   },
   footerLabelActive: {
     color: Colors.white,
