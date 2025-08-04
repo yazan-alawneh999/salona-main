@@ -62,8 +62,10 @@ const EditLocationScreen: React.FC = () => {
       duration: 1000,
       useNativeDriver: true,
     }).start();
-    
-    console.log('EditLocation screen mounted, requesting permissions and initializing map...');
+
+    console.log(
+      'EditLocation screen mounted, requesting permissions and initializing map...',
+    );
     requestLocationPermission();
     // Initialize map with current location or default location
     initializeMap();
@@ -73,15 +75,18 @@ const EditLocationScreen: React.FC = () => {
     try {
       console.log('Initializing map with current location...');
       const location = await getCurrentLocation();
-      
+
       if (location && location.latitude && location.longitude) {
         console.log('Current location obtained:', location);
         const currentLocation = {
           latitude: location.latitude,
           longitude: location.longitude,
         };
-        
-        console.log('Setting initial map location to current location:', currentLocation);
+
+        console.log(
+          'Setting initial map location to current location:',
+          currentLocation,
+        );
         setInitialMapLocation(currentLocation);
         setSelectedLocation(currentLocation);
       } else {
@@ -91,7 +96,10 @@ const EditLocationScreen: React.FC = () => {
           latitude: 31.9454,
           longitude: 35.9284,
         };
-        console.log('Setting initial map location to default:', defaultLocation);
+        console.log(
+          'Setting initial map location to default:',
+          defaultLocation,
+        );
         setInitialMapLocation(defaultLocation);
         setSelectedLocation(defaultLocation);
       }
@@ -105,7 +113,10 @@ const EditLocationScreen: React.FC = () => {
         latitude: 31.9454,
         longitude: 35.9284,
       };
-      console.log('Setting initial map location to default due to error:', defaultLocation);
+      console.log(
+        'Setting initial map location to default due to error:',
+        defaultLocation,
+      );
       setInitialMapLocation(defaultLocation);
       setSelectedLocation(defaultLocation);
     }
@@ -175,13 +186,16 @@ const EditLocationScreen: React.FC = () => {
     try {
       console.log('Attempting to get current location...');
       const location = await getCurrentLocation();
-      
+
       if (!location || !location.latitude || !location.longitude) {
         console.log('No valid location received from getCurrentLocation');
-        Alert.alert('Error getting location', 'Unable to get your current location. Please try again.');
+        Alert.alert(
+          'Error getting location',
+          'Unable to get your current location. Please try again.',
+        );
         return;
       }
-      
+
       console.log('Location received:', location);
 
       // Show loading state immediately
@@ -226,13 +240,19 @@ const EditLocationScreen: React.FC = () => {
         }
       } catch (error) {
         console.error('Error in geocoding:', error);
-        Alert.alert('Error', 'Failed to get address for current location. Please try again.');
+        Alert.alert(
+          'Error',
+          'Failed to get address for current location. Please try again.',
+        );
       } finally {
         setLoading(false);
       }
     } catch (error) {
       console.error('Error in handleCurrentLocation:', error);
-      Alert.alert('Error getting location', 'Unable to get your current location. Please try again.');
+      Alert.alert(
+        'Error getting location',
+        'Unable to get your current location. Please try again.',
+      );
       setLoading(false);
     }
   };
@@ -306,7 +326,7 @@ const EditLocationScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LocationMapView
         onLocationSelect={handleMapPress}
         onConfirm={handleConfirmLocation}
@@ -355,7 +375,7 @@ const EditLocationScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 

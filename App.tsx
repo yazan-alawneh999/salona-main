@@ -67,7 +67,7 @@ const App = () => {
           <StatusBar
             translucent
             backgroundColor="transparent"
-            barStyle="light-content" // or 'dark-content' depending on background
+            barStyle="dark-content" // or 'dark-content' depending on background
           />
 
           <NavigationContainer ref={navigationRef}>
