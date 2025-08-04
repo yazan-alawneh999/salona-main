@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../../../constants/Colors';
 import { MapViewProps } from '../types';
 import { useTranslation } from '../../../../contexts/TranslationContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,9 +22,38 @@ const LocationMapView: React.FC<MapViewProps> = ({
   const [isDetectingLocation, setIsDetectingLocation] = useState(true);
   const [currentLocationName, setCurrentLocationName] = useState('');
   const [currentAddress, setCurrentAddress] = useState('');
+  const [mapRegion, setMapRegion] = useState<Region | null>(null);
+
+  // Default region (Amman, Jordan)
+  const defaultRegion: Region = {
+    latitude: 31.9454,
+    longitude: 35.9284,
+    latitudeDelta: 0.002,
+    longitudeDelta: 0.002,
+  };
 
   useEffect(() => {
-    if (selectedLocation) {
+    // Set initial region based on initialLocation or default
+    if (initialLocation && initialLocation.latitude && initialLocation.longitude) {
+      const region: Region = {
+        latitude: initialLocation.latitude,
+        longitude: initialLocation.longitude,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      };
+      setMapRegion(region);
+      
+      // If initial location is provided, set it as selected location
+      if (!selectedLocation) {
+        onLocationSelect(initialLocation);
+      }
+    } else {
+      setMapRegion(defaultRegion);
+    }
+  }, [initialLocation]);
+
+  useEffect(() => {
+    if (selectedLocation && selectedLocation.latitude && selectedLocation.longitude) {
       // Get address from coordinates
       fetchAddressFromCoordinates(selectedLocation.latitude, selectedLocation.longitude);
     }
@@ -52,120 +82,102 @@ const LocationMapView: React.FC<MapViewProps> = ({
     }
   };
 
-  const initialRegion: Region = initialLocation ? {
-    latitude: initialLocation.latitude,
-    longitude: initialLocation.longitude,
-    latitudeDelta: 0.002,
-    longitudeDelta: 0.002,
-  } : {
-    latitude: 31.9454,
-    longitude: 35.9284,
-    latitudeDelta: 0.002,
-    longitudeDelta: 0.002,
-  };
-
   const handleRegionChangeComplete = (region: Region) => {
-    onLocationSelect({
-      latitude: region.latitude,
-      longitude: region.longitude
-    });
+    // Only update if the change is significant (not just map movement)
+    if (selectedLocation) {
+      const distance = Math.sqrt(
+        Math.pow(region.latitude - selectedLocation.latitude, 2) +
+        Math.pow(region.longitude - selectedLocation.longitude, 2)
+      );
+      
+      if (distance > 0.001) { // Only update if moved more than ~100m
+        onLocationSelect({
+          latitude: region.latitude,
+          longitude: region.longitude
+        });
+      }
+    }
   };
 
   const handleMyLocation = () => {
-    if (mapRef.current && initialLocation) {
-      mapRef.current.animateToRegion({
+    if (mapRef.current && initialLocation && initialLocation.latitude && initialLocation.longitude) {
+      const region: Region = {
         latitude: initialLocation.latitude,
         longitude: initialLocation.longitude,
         latitudeDelta: 0.002,
         longitudeDelta: 0.002,
-      });
+      };
+      
+      mapRef.current.animateToRegion(region, 1000);
+      onLocationSelect(initialLocation);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onCancel} style={styles.headerButton}>
           <Icon name="close" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t.editLocation.deliveryAddress}</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Icon name="search" size={24} color="#000" />
+        <TouchableOpacity 
+          style={[styles.confirmButton, !selectedLocation && styles.confirmButtonDisabled]}
+          onPress={onConfirm}
+          disabled={!selectedLocation || loading}>
+          <Text style={[styles.confirmButtonText, !selectedLocation && styles.confirmButtonTextDisabled]}>
+            {t.editLocation.confirm}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Map - Full Width */}
       <View style={styles.mapContainer}>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          initialRegion={initialRegion}
-          onRegionChangeComplete={handleRegionChangeComplete}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-          showsCompass={false}
-          showsScale={false}
-          showsTraffic={false}
-          showsBuildings={true}
-          showsIndoors={true}
+        {mapRegion && (
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={mapRegion}
+            onRegionChangeComplete={handleRegionChangeComplete}
+            showsUserLocation={true}
+            showsMyLocationButton={false}
+          >
+            {selectedLocation && selectedLocation.latitude && selectedLocation.longitude && (
+              <Marker
+                coordinate={selectedLocation}
+                title={t.editLocation.selectedLocation}
+                pinColor={Colors.primary}
+              />
+            )}
+          </MapView>
+        )}
+
+        {/* My Location Button */}
+        <TouchableOpacity
+          style={styles.myLocationButton}
+          onPress={handleMyLocation}
         >
-          {selectedLocation && (
-            <Marker
-              coordinate={selectedLocation}
-              title="Selected Location"
-              pinColor={Colors.primary}
-            />
-          )}
-        </MapView>
+          <Icon name="my-location" size={24} color={Colors.primary} />
+        </TouchableOpacity>
 
-        {/* Map Controls - Floating */}
-        <View style={styles.mapControls}>
-          <View style={styles.googleLogo}>
-            <Text style={styles.googleText}>Google</Text>
-          </View>
-          
-          <View style={styles.controlButtons}>
-            <TouchableOpacity style={styles.controlButton} onPress={handleMyLocation}>
-              <Icon name="my-location" size={20} color="#000" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.controlButton}>
-              <Icon name="layers" size={20} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        {selectedLocation ? (
-          <View style={styles.locationInfo}>
-            <View style={styles.locationDetails}>
+        {/* Location Info Card */}
+        {selectedLocation && selectedLocation.latitude && selectedLocation.longitude && (
+          <View style={styles.locationCard}>
+            <View style={styles.locationInfo}>
               <Icon name="location-on" size={20} color={Colors.primary} />
-              <View style={styles.locationText}>
-                <Text style={styles.locationName}>
-                  {currentLocationName || t.editLocation.currentLocation}
+              <View style={styles.locationTextContainer}>
+                <Text style={styles.locationName} numberOfLines={1}>
+                  {currentLocationName}
                 </Text>
-                <Text style={styles.locationSubtitle}>
-                  {t.editLocation.locationBubble.subtitle}
+                <Text style={styles.locationAddress} numberOfLines={2}>
+                  {currentAddress}
                 </Text>
               </View>
             </View>
-            <TouchableOpacity 
-              style={styles.confirmButton} 
-              onPress={onConfirm}
-              disabled={loading}
-            >
-              <Text style={styles.confirmButtonText}>{t.editLocation.confirm}</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.detectingContainer}>
-            <Text style={styles.detectingText}>{t.editLocation.detectingLocation}</Text>
           </View>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -178,131 +190,100 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-    zIndex: 10,
+    borderBottomColor: '#e0e0e0',
   },
   headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 4,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    flex: 1,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
     color: '#000',
+  },
+  confirmButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: Colors.primary,
+  },
+  confirmButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  confirmButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  confirmButtonTextDisabled: {
+    color: '#999',
   },
   mapContainer: {
     flex: 1,
     position: 'relative',
-    width: '100%',
   },
   map: {
     flex: 1,
-    width: '100%',
-    marginHorizontal: 0,
-    paddingHorizontal: 0,
   },
-  mapControls: {
+  myLocationButton: {
+    position: 'absolute',
+    bottom: 120,
+    right: 16,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  locationCard: {
     position: 'absolute',
     bottom: 20,
     left: 16,
     right: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  googleLogo: {
     backgroundColor: '#fff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    borderRadius: 12,
+    padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  googleText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#666',
-  },
-  controlButtons: {
-    flexDirection: 'column',
-    gap: 8,
-  },
-  controlButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  footer: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E5E5',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   locationInfo: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  locationDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  locationTextContainer: {
     flex: 1,
-    marginRight: 16,
-  },
-  locationText: {
     marginLeft: 12,
-    flex: 1,
   },
   locationName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
-    marginBottom: 2,
+    color: '#333',
+    marginBottom: 4,
   },
-  locationSubtitle: {
-    fontSize: 12,
-    color: '#666',
-  },
-  confirmButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: 'center',
-    minWidth: 100,
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  detectingContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  detectingText: {
+  locationAddress: {
     fontSize: 14,
     color: '#666',
+    lineHeight: 20,
   },
 });
 

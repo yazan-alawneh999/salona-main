@@ -561,7 +561,7 @@ const HomeScreen: React.FC = () => {
               {/* Action Button */}
               <View style={styles.packageAction}>
                 <View style={styles.actionButton}>
-                  <Text style={styles.actionText}>View Details</Text>
+                  <Text style={styles.actionText}>{t.home.viewDetails}</Text>
                   <Icon name="chevron-forward" size={16} color={Colors.black} />
                 </View>
               </View>
@@ -679,44 +679,36 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.locationTxt}>{t.home.location}</Text>
-          <View style={[styles.header, isRTL && styles.headerRTL]}>
-            <TouchableOpacity
+      {/* Header Section - Full Width */}
+      <View style={styles.headerSection}>
+        <Text style={styles.locationTxt}>{t.home.location}</Text>
+        <View style={[styles.header, isRTL && styles.headerRTL]}>
+          <TouchableOpacity
+            style={[styles.addressButton, !isRTL && styles.addressButtonNotRTL]}
+            onPress={() => setIsAddressModalVisible(true)}>
+            <View
               style={[
-                styles.addressButton,
-                !isRTL && styles.addressButtonNotRTL,
-              ]}
-              onPress={() => setIsAddressModalVisible(true)}>
-              {/* onPress={openModal}> */}
-              <View
-                style={[
-                  styles.addressTextHolder,
-                  !isRTL && styles.addressTextHolderNotRTL,
-                ]}>
-                <Text style={styles.addressTextPlaceholder}>{t.home.amAt}</Text>
-                <Text style={styles.addressText} numberOfLines={1}>
-                  {selectedAddress ? selectedAddress.description : ''}
-                </Text>
-                <Icon name="chevron-down" size={20} color={Colors.black} />
-              </View>
-              <Icon name="location-sharp" size={18} color={Colors.black} />
-            </TouchableOpacity>
+                styles.addressTextHolder,
+                !isRTL && styles.addressTextHolderNotRTL,
+              ]}>
+              <Text style={styles.addressTextPlaceholder}>{t.home.amAt}</Text>
+              <Text style={styles.addressText} numberOfLines={1}>
+                {selectedAddress ? selectedAddress.description : ''}
+              </Text>
+              <Icon name="chevron-down" size={20} color={Colors.black} />
+            </View>
+            <Icon name="location-sharp" size={18} color={Colors.black} />
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.notificationIconContainer}
-              onPress={() => navigation.navigate('NotificationsScreen')}>
-              <Icon name="notifications" size={20} color={Colors.black} />
-            </TouchableOpacity>
-            {/* <View style={styles.welcomeContainer}>
-              <Text style={styles.welcomeText}>{t.home.welcome}</Text>
-              <Text style={styles.nameText}>{user?.name || ''}</Text>
-            </View> */}
-          </View>
-          <SearchBar />
+          <TouchableOpacity
+            style={styles.notificationIconContainer}
+            onPress={() => navigation.navigate('NotificationsScreen')}>
+            <Icon name="notifications" size={20} color={Colors.black} />
+          </TouchableOpacity>
         </View>
-
+        <SearchBar />
+      </View>
+      <View style={styles.container}>
         {/* Address Selection Modal */}
         {openModal()}
 
@@ -725,7 +717,7 @@ const HomeScreen: React.FC = () => {
             <ActivityIndicator size="large" color={Colors.gold} />
             <Text
               style={{marginTop: 10, textAlign: 'center', color: Colors.gold}}>
-              Loading...
+              {t.home.loading}
             </Text>
           </View>
         ) : (
@@ -733,107 +725,110 @@ const HomeScreen: React.FC = () => {
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}>
-            <View style={styles.sectionSpacing}>
-              {/* <SwiperComponent /> */}
-            </View>
+            {/* Content Section - With Padding */}
+            <View style={styles.contentSection}>
+              <View style={styles.sectionSpacing}>
+                {/* <SwiperComponent /> */}
+              </View>
 
-            {/* offers */}
-            <View style={styles.sectionSpacing2}>
-              <Text style={styles.sectionTitle}>{t.home.offers}</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalScrollContent}>
-                {packagesLoading ? (
-                  <FlatList
-                    data={[1, 2, 3]} // Show 3 skeleton items
-                    keyExtractor={item => `skeleton-${item}`}
-                    renderItem={() => <PackageSkeleton />}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    removeClippedSubviews={true}
-                    maxToRenderPerBatch={3}
-                    windowSize={5}
-                    initialNumToRender={2}
-                    getItemLayout={(data, index) => ({
-                      length: 296,
-                      offset: 296 * index,
-                      index,
-                    })}
-                  />
-                ) : packages.length > 0 ? (
-                  <FlatList
-                    data={packages}
-                    keyExtractor={item => `package-${item.id}`}
-                    renderItem={({item}) => <PackageItem package={item} />}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    removeClippedSubviews={true}
-                    maxToRenderPerBatch={3}
-                    windowSize={5}
-                    initialNumToRender={2}
-                    getItemLayout={(data, index) => ({
-                      length: 296, // 280 width + 16 margin
-                      offset: 296 * index,
-                      index,
-                    })}
-                  />
-                ) : (
-                  <Text style={styles.serviceTitle}>
-                    {t.home.noCategoriesAvailable}
-                  </Text>
-                )}
-              </ScrollView>
-            </View>
-            {/* categories */}
+              {/* offers */}
+              <View style={styles.sectionSpacing2}>
+                <Text style={styles.sectionTitle}>{t.home.offers}</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.horizontalScrollContent}>
+                  {packagesLoading ? (
+                    <FlatList
+                      data={[1, 2, 3]} // Show 3 skeleton items
+                      keyExtractor={item => `skeleton-${item}`}
+                      renderItem={() => <PackageSkeleton />}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      removeClippedSubviews={true}
+                      maxToRenderPerBatch={3}
+                      windowSize={5}
+                      initialNumToRender={2}
+                      getItemLayout={(data, index) => ({
+                        length: 296,
+                        offset: 296 * index,
+                        index,
+                      })}
+                    />
+                  ) : packages.length > 0 ? (
+                    <FlatList
+                      data={packages}
+                      keyExtractor={item => `package-${item.id}`}
+                      renderItem={({item}) => <PackageItem package={item} />}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      removeClippedSubviews={true}
+                      maxToRenderPerBatch={3}
+                      windowSize={5}
+                      initialNumToRender={2}
+                      getItemLayout={(data, index) => ({
+                        length: 296, // 280 width + 16 margin
+                        offset: 296 * index,
+                        index,
+                      })}
+                    />
+                  ) : (
+                    <Text style={styles.serviceTitle}>
+                      {t.home.noCategoriesAvailable}
+                    </Text>
+                  )}
+                </ScrollView>
+              </View>
+              {/* categories */}
 
-            <View style={styles.sectionSpacing2}>
-              <Text style={styles.sectionTitle}>{t.home.ourCategories}</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalScrollContent}>
-                {categories.length > 0 ? (
-                  categories.map(category => (
-                    <TouchableOpacity
-                      key={category.id}
-                      style={styles.serviceItem}
-                      onPress={() => handleCategoryPress(category.id)}>
-                      <Image
-                        source={
-                          category.image_url
-                            ? {uri: category.image_url}
-                            : require('../../../assets/images/prettyLogo.png')
-                        }
-                        style={styles.serviceImage}
-                      />
-                      <Text style={styles.serviceTitle}>{category.name}</Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={styles.serviceTitle}>
-                    {t.home.noCategoriesAvailable}
-                  </Text>
-                )}
-              </ScrollView>
-            </View>
+              <View style={styles.sectionSpacing2}>
+                <Text style={styles.sectionTitle}>{t.home.ourCategories}</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.horizontalScrollContent}>
+                  {categories.length > 0 ? (
+                    categories.map(category => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.serviceItem}
+                        onPress={() => handleCategoryPress(category.id)}>
+                        <Image
+                          source={
+                            category.image_url
+                              ? {uri: category.image_url}
+                              : require('../../../assets/images/prettyLogo.png')
+                          }
+                          style={styles.serviceImage}
+                        />
+                        <Text style={styles.serviceTitle}>{category.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <Text style={styles.serviceTitle}>
+                      {t.home.noCategoriesAvailable}
+                    </Text>
+                  )}
+                </ScrollView>
+              </View>
 
-            <View style={styles.sectionSpacing2}>
-              <BeautyServicesSection
-                title={t.home.nearbySalons}
-                data={mappedSalons.slice(0, 4)}
-                onItemPress={handleSalonPress}
-                onViewAllPress={handleViewAllPress}
-              />
-            </View>
+              <View style={styles.sectionSpacing2}>
+                <BeautyServicesSection
+                  title={t.home.nearbySalons}
+                  data={mappedSalons.slice(0, 4)}
+                  onItemPress={handleSalonPress}
+                  onViewAllPress={handleViewAllPress}
+                />
+              </View>
 
-            {/* <View style={styles.sectionSpacing2}>
-              <PackagesSection
-                title={<Text style={styles.sectionTitle}>{t.home.packages}</Text>}
-                data={packages}
-                onItemPress={handlePackagePress}
-              />
-            </View> */}
+              {/* <View style={styles.sectionSpacing2}>
+                <PackagesSection
+                  title={<Text style={styles.sectionTitle}>{t.home.packages}</Text>}
+                  data={packages}
+                  onItemPress={handlePackagePress}
+                />
+              </View> */}
+            </View>
           </ScrollView>
         )}
       </View>

@@ -23,22 +23,13 @@ import {useAddress} from './hooks/useAddress';
 import {useTranslation} from '../../../contexts/TranslationContext';
 import {useUpdateAddressMutation} from '../../../redux/api/salonApi';
 import {useNavigation} from '@react-navigation/native';
-interface Address {
-  id: number;
-  description: string;
-  locationLink: string;
-  isFavorite: boolean;
-  isPrimary: boolean;
-  latitude: number;
-  longitude: number;
-  isCurrentLocation?: boolean;
-}
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {Location, Address} from './types';
 
 const EditLocationScreen: React.FC = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {user, token} = useSelector((state: RootState) => state.auth);
-  const [showMap, setShowMap] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null,
   );
@@ -70,32 +61,58 @@ const EditLocationScreen: React.FC = () => {
       duration: 1000,
       useNativeDriver: true,
     }).start();
+    
+    console.log('EditLocation screen mounted, requesting permissions and initializing map...');
     requestLocationPermission();
+    // Initialize map with current location or default location
+    initializeMap();
   }, []);
+
+  const initializeMap = async () => {
+    try {
+      console.log('Initializing map with current location...');
+      const location = await getCurrentLocation();
+      
+      if (location && location.latitude && location.longitude) {
+        console.log('Current location obtained:', location);
+        const currentLocation = {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        };
+        
+        console.log('Setting initial map location to current location:', currentLocation);
+        setInitialMapLocation(currentLocation);
+        setSelectedLocation(currentLocation);
+      } else {
+        console.log('No current location available, using default');
+        // Set default location (Amman, Jordan) if current location fails
+        const defaultLocation = {
+          latitude: 31.9454,
+          longitude: 35.9284,
+        };
+        console.log('Setting initial map location to default:', defaultLocation);
+        setInitialMapLocation(defaultLocation);
+        setSelectedLocation(defaultLocation);
+      }
+    } catch (error) {
+      console.error(
+        'Error getting current location for map initialization:',
+        error,
+      );
+      // Set default location (Amman, Jordan)
+      const defaultLocation = {
+        latitude: 31.9454,
+        longitude: 35.9284,
+      };
+      console.log('Setting initial map location to default due to error:', defaultLocation);
+      setInitialMapLocation(defaultLocation);
+      setSelectedLocation(defaultLocation);
+    }
+  };
 
   const handleMapPress = (location: Location) => {
     console.log('Map pressed at location:', location);
     setSelectedLocation(location);
-  };
-
-  const handleOpenMap = async () => {
-    try {
-      const location = await getCurrentLocation();
-      if (location) {
-        setInitialMapLocation({
-          latitude: location.latitude,
-          longitude: location.longitude,
-        });
-        setSelectedLocation({
-          latitude: location.latitude,
-          longitude: location.longitude,
-        });
-      }
-      setShowMap(true);
-    } catch (error) {
-      console.error('Error getting current location:', error);
-      Alert.alert(t.editLocation.errors.noLocation);
-    }
   };
 
   const handleConfirmLocation = async () => {
@@ -141,7 +158,6 @@ const EditLocationScreen: React.FC = () => {
         }
 
         console.log('Address added successfully');
-        setShowMap(false);
         setSelectedLocation(null);
       } else {
         console.log('No address found for coordinates');
@@ -158,6 +174,13 @@ const EditLocationScreen: React.FC = () => {
     try {
       console.log('Attempting to get current location...');
       const location = await getCurrentLocation();
+      
+      if (!location || !location.latitude || !location.longitude) {
+        console.log('No valid location received from getCurrentLocation');
+        Alert.alert('Error getting location', 'Unable to get your current location. Please try again.');
+        return;
+      }
+      
       console.log('Location received:', location);
 
       console.log('Fetching address from coordinates...');
@@ -167,7 +190,7 @@ const EditLocationScreen: React.FC = () => {
       const data = await response.json();
       console.log('Geocoding response:', data);
 
-      if (data.results[0]) {
+      if (data.results && data.results[0]) {
         console.log('Adding address to user profile...');
         const newAddressId = await handleAddAddress(
           data.results[0].formatted_address,
@@ -198,99 +221,63 @@ const EditLocationScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Error in handleCurrentLocation:', error);
-      Alert.alert(t.editLocation.errors.noAddress);
+      Alert.alert('Error getting location', 'Unable to get your current location. Please try again.');
     }
   };
 
   const handleEditAddress = (address: Address) => {
     setEditingAddress(address);
-    setNewDescription('');
+    setNewDescription(address.description);
     setEditModalVisible(true);
   };
 
   const handleSaveDescription = async () => {
     if (!editingAddress || !newDescription.trim()) {
-      Alert.alert(t.editLocation.error.invalidDescription);
+      Alert.alert('Please enter a valid description');
       return;
     }
 
     try {
-      // Update using the specified API
+      await updateAddressApi({
+        id: editingAddress.id,
+        description: newDescription.trim(),
+        is_favorite: editingAddress.isFavorite,
+        latitude: editingAddress.latitude.toString(),
+        longitude: editingAddress.longitude.toString(),
+      }).unwrap();
 
-      if (!token) {
-        Alert.alert(t.editLocation.error.noAuthenticationToken);
-        console.log('No authentication token found', token);
-        return;
-      }
-      const response = await fetch(
-        'https://spa.dev2.prodevr.com/api/update-address-desc',
-        {
-          method: 'PUT',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            id: editingAddress.id,
-            description: newDescription.trim(),
-          }),
-        },
+      dispatch(
+        updateAddressAction({
+          id: editingAddress.id,
+          description: newDescription.trim(),
+        }),
       );
-      const data = await response.json();
-      console.log('Update address desc response:', data);
-      if (
-        data &&
-        (data.success || data.message === 'Salon address updated successfully')
-      ) {
-        dispatch(
-          updateAddressAction({
-            id: editingAddress.id,
-            description: newDescription.trim(),
-          }),
-        );
-        setEditModalVisible(false);
-        setEditingAddress(null);
-        setNewDescription('');
-        // Use safe fallback values in case translations are missing
-        Alert.alert(
-          t.editLocation.success.title,
-          t.editLocation.success.message,
-        );
-      } else {
-        throw new Error(data.message || 'Failed to update address');
-      }
+
+      setEditModalVisible(false);
+      setEditingAddress(null);
+      setNewDescription('');
     } catch (error) {
       console.error('Error updating address:', error);
-      Alert.alert(t.editLocation.error.updateAddress);
+      Alert.alert('Failed to update address');
     }
   };
 
   const renderAddressItem = ({item}: {item: Address}) => (
-    <Animated.View style={[styles.addressCard, {opacity: fadeAnim}]}>
-      <View style={styles.addressHeader}>
+    <Animated.View
+      key={item.id}
+      style={[styles.addressItem, {opacity: fadeAnim}]}>
+      <View style={styles.addressContent}>
         <View style={styles.addressInfo}>
-          <Text style={styles.addressTitle}>
-            {item.isCurrentLocation
-              ? t.editLocation.currentLocation
-              : item.description}
+          <Text style={styles.addressText} numberOfLines={2}>
+            {item.description}
           </Text>
           {item.isPrimary && (
             <View style={styles.primaryBadge}>
-              <Text style={styles.primaryText}>Primary</Text>
+              <Text style={styles.primaryText}>{t.editLocation.primary}</Text>
             </View>
           )}
         </View>
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            onPress={() => handleToggleFavorite(item.id)}
-            style={styles.iconButton}>
-            <Icon
-              name={item.isFavorite ? 'favorite' : 'favorite-border'}
-              size={24}
-              color={Colors.gold}
-            />
-          </TouchableOpacity>
+        <View style={styles.addressActions}>
           <TouchableOpacity
             onPress={() => handleEditAddress(item)}
             style={styles.iconButton}>
@@ -303,167 +290,62 @@ const EditLocationScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* <TouchableOpacity
-        onPress={() => handleSetPrimary(item.id)}
-        style={[
-          styles.setPrimaryButton,
-          item.isPrimary && styles.setPrimaryButtonActive
-        ]}
-      >
-        <Text style={[
-          styles.setPrimaryText,
-          item.isPrimary && styles.setPrimaryTextActive
-        ]}>
-          {item.isPrimary ? 'Primary Location' : 'Set asss Primary'}
-        </Text>
-      </TouchableOpacity> */}
     </Animated.View>
   );
 
   return (
-    <View style={styles.container}>
-      {showMap ? (
-        <LocationMapView
-          onLocationSelect={handleMapPress}
-          onConfirm={handleConfirmLocation}
-          onCancel={() => {
-            console.log('Map view cancelled');
-            setShowMap(false);
-            setSelectedLocation(null);
-            setInitialMapLocation(null);
-          }}
-          selectedLocation={selectedLocation}
-          initialLocation={initialMapLocation}
-          loading={addressLoading}
-        />
-      ) : (
-        <>
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="#000" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>{t.editLocation.title}</Text>
-            <View style={styles.headerPlaceholder} />
-          </View>
+    <SafeAreaView style={styles.container}>
+      <LocationMapView
+        onLocationSelect={handleMapPress}
+        onConfirm={handleConfirmLocation}
+        onCancel={() => {
+          console.log('Map view cancelled');
+          navigation.goBack();
+        }}
+        selectedLocation={selectedLocation}
+        initialLocation={initialMapLocation}
+        loading={addressLoading}
+      />
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.button, styles.currentLocationButton]}
-              onPress={handleCurrentLocation}
-              disabled={locationLoading || addressLoading}>
-              <Icon name="my-location" size={24} color={Colors.white} />
-              <Text
-                style={[styles.buttonText, {color: Colors.white}]}
-                numberOfLines={1}>
-                {t.editLocation.useCurrentLocation}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.pickOnMapButton]}
-              onPress={handleOpenMap}
-              disabled={addressLoading}>
-              <Icon name="map" size={24} color={Colors.white} />
-              <Text
-                style={[styles.buttonText, {color: Colors.white}]}
-                numberOfLines={1}>
-                {t.editLocation.pickOnMap}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.searchContainer}>
-            <GooglePlacesAutocomplete
-              placeholder={t.editLocation.searchPlaceholder}
-              fetchDetails={true}
-              onPress={(data, details) => {
-                console.log('Place selected:', data);
-                console.log('Place details:', details);
-                if (details?.geometry?.location) {
-                  handleAddAddress(
-                    data.description,
-                    `https://www.google.com/maps/place/?q=place_id:${details.place_id}`,
-                    details.geometry.location.lat,
-                    details.geometry.location.lng,
-                  );
-                }
-              }}
-              textInputProps={{
-                placeholderTextColor: Colors.white,
-              }}
-              query={{
-                key: 'AIzaSyB-w38SqAU85WY8NzUDFKw5JX5RakNulaA',
-                language: 'ar',
-              }}
-              styles={{
-                container: styles.autocompleteContainer,
-                textInput: styles.textInput,
-                listView: styles.listView,
-                row: styles.autocompleteRow,
-                description: styles.autocompleteDescription,
-              }}
-            />
-          </View>
-
-          {(locationLoading || addressLoading) && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={Colors.gold} />
-            </View>
-          )}
-
-          <AddressList
-            addresses={user?.addresses || []}
-            onDelete={handleDeleteAddress}
-            onToggleFavorite={handleToggleFavorite}
-            onSetPrimary={handleSetPrimary}
-            loading={addressLoading}
-            onEdit={handleEditAddress}
-          />
-        </>
-      )}
-
-      {/* Edit Description Modal */}
+      {/* Edit Address Modal */}
       <Modal
         visible={editModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setEditModalVisible(false)}>
+        transparent={true}
+        animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <TouchableOpacity
-                onPress={() => setEditModalVisible(false)}
-                style={styles.closeButton}>
-                <Icon name="close" size={24} color={Colors.white} />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>
-                {t.editLocation.editAddress}
-              </Text>
-            </View>
-
+            <Text style={styles.modalTitle}>{t.editLocation.editAddress}</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder={t.editLocation.addressDescription}
-              placeholderTextColor={Colors.softGray}
-              // value={newDescription}
+              value={newDescription}
               onChangeText={setNewDescription}
+              placeholder={t.editLocation.addressDescription}
+              placeholderTextColor="#999"
             />
-
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveDescription}>
-              <Text style={styles.saveButtonText}>{t.editLocation.save}</Text>
-            </TouchableOpacity>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setEditModalVisible(false);
+                  setEditingAddress(null);
+                  setNewDescription('');
+                }}>
+                <Text style={styles.cancelButtonText}>
+                  {t.editLocation.cancel}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveDescription}>
+                <Text style={styles.saveButtonText}>{t.editLocation.save}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
-
-export default EditLocationScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -478,208 +360,148 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+    borderBottomColor: '#e0e0e0',
+  },
+  backButton: {
+    padding: 8,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#000',
   },
   headerPlaceholder: {
-    width: 24,
-  },
-  backButton: {
-    padding: 4,
-  },
-  searchContainer: {
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  autocompleteContainer: {
-    flex: 0,
-    backgroundColor: 'transparent',
-  },
-  textInput: {
-    backgroundColor: '#fff',
-    color: '#000',
-    borderColor: '#E5E5E5',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    fontFamily: 'Maitree-Regular',
-  },
-  listView: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-  },
-  autocompleteRow: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  autocompleteDescription: {
-    color: '#000',
-  },
-  addressCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
-    shadowColor: Colors.gold,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  addressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 15,
-  },
-  addressInfo: {
-    flex: 1,
-  },
-  addressTitle: {
-    color: Colors.black,
-    fontSize: 16,
-    fontFamily: 'Maitree-Medium',
-    marginBottom: 5,
-  },
-  primaryBadge: {
-    backgroundColor: Colors.gold,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  primaryText: {
-    color: Colors.black,
-    fontSize: 12,
-    fontFamily: 'Maitree-Medium',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  iconButton: {
-    padding: 8,
-  },
-  setPrimaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.gold,
-    borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
-  },
-  setPrimaryButtonActive: {
-    backgroundColor: Colors.gold,
-  },
-  setPrimaryText: {
-    color: Colors.gold,
-    fontSize: 14,
-    fontFamily: 'Maitree-Medium',
-  },
-  setPrimaryTextActive: {
-    color: Colors.black,
-  },
-  loadingContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
+    width: 40,
   },
   buttonContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    flexDirection: 'row',
+    padding: 16,
     gap: 12,
   },
   button: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    gap: 8,
   },
   currentLocationButton: {
     backgroundColor: Colors.gold,
   },
   pickOnMapButton: {
-    backgroundColor: Colors.gold,
+    backgroundColor: Colors.primary,
   },
   buttonText: {
-    fontSize: 14,
-    fontFamily: 'Maitree-Medium',
-    marginLeft: 8,
-    flexShrink: 1,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  searchContainer: {
+    padding: 16,
+  },
+  addressItem: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 8,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  addressContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  addressInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  addressText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 4,
+  },
+  primaryBadge: {
+    backgroundColor: Colors.gold,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  primaryText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  addressActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
+    padding: 4,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   modalContent: {
-    backgroundColor: Colors.black,
-    borderRadius: 15,
-    padding: 20,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: Colors.gold,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    width: '80%',
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 18,
-    fontFamily: 'Maitree-Bold',
-    color: Colors.gold,
-  },
-  closeButton: {
-    padding: 5,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   modalInput: {
-    backgroundColor: Colors.black,
-    color: Colors.white,
-    borderColor: Colors.gold,
     borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    fontFamily: 'Maitree-Regular',
     marginBottom: 20,
   },
-  saveButton: {
-    backgroundColor: Colors.black,
-    borderWidth: 1,
-    borderColor: Colors.gold,
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
     borderRadius: 8,
-    padding: 15,
     alignItems: 'center',
   },
-  saveButtonText: {
-    color: Colors.gold,
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+  },
+  saveButton: {
+    backgroundColor: Colors.gold,
+  },
+  cancelButtonText: {
+    color: '#666',
     fontSize: 16,
-    fontFamily: 'Maitree-Medium',
+    fontWeight: '600',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
+
+export default EditLocationScreen;

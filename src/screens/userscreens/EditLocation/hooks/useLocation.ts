@@ -1,12 +1,41 @@
 import { useState } from 'react';
 import { Platform, PermissionsAndroid, Linking, Alert } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Location } from '../types';
 import { useTranslation } from '../../../../contexts/TranslationContext';
+
+const LOCATION_STORAGE_KEY = 'last_known_location';
+
 export const useLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
+
+  const saveLocationToStorage = async (location: Location) => {
+    try {
+      await AsyncStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(location));
+      console.log('Location saved to storage:', location);
+    } catch (error) {
+      console.error('Error saving location to storage:', error);
+    }
+  };
+
+  const getLocationFromStorage = async (): Promise<Location | null> => {
+    try {
+      const storedLocation = await AsyncStorage.getItem(LOCATION_STORAGE_KEY);
+      if (storedLocation) {
+        const location = JSON.parse(storedLocation);
+        console.log('Retrieved location from storage:', location);
+        return location;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting location from storage:', error);
+      return null;
+    }
+  };
+
   const requestLocationPermission = async () => {
     console.log('Requesting location permission...');
     if (Platform.OS === 'ios') {
@@ -14,10 +43,12 @@ export const useLocation = () => {
         console.log('iOS platform detected, requesting authorization...');
         await Geolocation.requestAuthorization();
         console.log('iOS location authorization successful');
+        return true;
       } catch (error) {
         console.error('iOS location permission error:', error);
         setError('Failed to request location permission on iOS');
         Alert.alert(t.editLocation.PermissionError);
+        return false;
       }
     } else {
       try {
@@ -74,38 +105,66 @@ export const useLocation = () => {
         return false;
       }
     }
-    return true;
   };
 
-  const getCurrentLocation = async (): Promise<Location> => {
+  const getCurrentLocation = async (): Promise<Location | null> => {
     try {
       console.log('Starting to get current location...');
       setLoading(true);
       setError(null);
 
-      // First check if we have permission
+      // First try to get stored location
+      const storedLocation = await getLocationFromStorage();
+      if (storedLocation) {
+        console.log('Using stored location:', storedLocation);
+        setLoading(false);
+        return storedLocation;
+      }
+
+      // If no stored location, check permission and get fresh location
       const hasPermission = await requestLocationPermission();
       console.log('Permission check result:', hasPermission);
       
       if (!hasPermission) {
-        console.log('Permission not granted, throwing error');
-        throw new Error('Location permission not granted');
+        console.log('Permission not granted, returning null');
+        setLoading(false);
+        return null;
       }
 
       return new Promise((resolve, reject) => {
         console.log('Calling getCurrentPosition...');
         
+        const timeoutId = setTimeout(() => {
+          console.log('Location request timed out');
+          setLoading(false);
+          reject(new Error('Location request timed out'));
+        }, 15000); // Reduced timeout to 15 seconds
+
         Geolocation.getCurrentPosition(
           (position) => {
             console.log('Location retrieved successfully:', position);
+            clearTimeout(timeoutId);
             setLoading(false);
-            resolve({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            });
+            
+            // Validate coordinates
+            const { latitude, longitude } = position.coords;
+            if (latitude && longitude && !isNaN(latitude) && !isNaN(longitude)) {
+              const location = {
+                latitude: latitude,
+                longitude: longitude
+              };
+              
+              // Save to storage for future use
+              saveLocationToStorage(location);
+              resolve(location);
+            } else {
+              console.error('Invalid coordinates received:', { latitude, longitude });
+              reject(new Error('Invalid coordinates received'));
+            }
           },
           (error) => {
             console.error('Location error:', error);
+            clearTimeout(timeoutId);
             setLoading(false);
             setError(error.message);
             
@@ -124,8 +183,8 @@ export const useLocation = () => {
           },
           {
             enableHighAccuracy: false,
-            timeout: 30000,
-            maximumAge: 10000
+            timeout: 10000, // Reduced timeout
+            maximumAge: 300000 // 5 minutes - use cached location if available
           }
         );
       });
@@ -133,7 +192,7 @@ export const useLocation = () => {
       console.error('Error in getCurrentLocation:', error);
       setLoading(false);
       setError(error instanceof Error ? error.message : 'Failed to get location');
-      throw error;
+      return null;
     }
   };
 
@@ -141,6 +200,8 @@ export const useLocation = () => {
     loading,
     error,
     requestLocationPermission,
-    getCurrentLocation
+    getCurrentLocation,
+    getLocationFromStorage,
+    saveLocationToStorage
   };
 }; 

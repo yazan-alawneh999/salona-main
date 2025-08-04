@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {FlatList, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {FlatList, View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from '../../../../contexts/TranslationContext';
+import {useLocation} from '../../../userscreens/EditLocation/hooks/useLocation';
 
 const DeliveryLocationSheet = ({
   selectedAddress,
@@ -12,7 +13,87 @@ const DeliveryLocationSheet = ({
   currenctLocation,
 }) => {
   const {t, isRTL} = useTranslation();
-  //   const [selectedId, setSelectedId] = useState('5');
+  const [loading, setLoading] = useState(false);
+  const {getCurrentLocation} = useLocation();
+
+  const handleGetCurrentLocation = async () => {
+    setLoading(true);
+    
+    try {
+      console.log('Getting current location using useLocation hook...');
+      const location = await getCurrentLocation();
+      
+      if (!location) {
+        console.log('No location received from getCurrentLocation');
+        Alert.alert(
+          t.home.locationError,
+          t.home.locationPermissionError,
+          [{text: 'OK'}]
+        );
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Location received:', location);
+
+      try {
+        console.log('Fetching address from coordinates...');
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=AIzaSyB-w38SqAU85WY8NzUDFKw5JX5RakNulaA`,
+        );
+        const data = await response.json();
+        console.log('Geocoding response:', data);
+
+        if (data.results && data.results[0]) {
+          console.log('Address found, creating location object...');
+          
+          // Create a location object with current coordinates and address
+          const currentLocationData = {
+            id: 'current-location',
+            description: data.results[0].formatted_address,
+            latitude: location.latitude,
+            longitude: location.longitude,
+          };
+          
+          setCurrentLocation(currentLocationData);
+          setLoading(false);
+          console.log('Current location set successfully');
+        } else {
+          console.log('No address found for coordinates');
+          // Fallback to coordinates only
+          const currentLocationData = {
+            id: 'current-location',
+            description: t.home.currentLocation,
+            latitude: location.latitude,
+            longitude: location.longitude,
+          };
+          
+          setCurrentLocation(currentLocationData);
+          setLoading(false);
+        }
+      } catch (geocodingError) {
+        console.error('Error in geocoding:', geocodingError);
+        // Fallback to coordinates only
+        const currentLocationData = {
+          id: 'current-location',
+          description: t.home.currentLocation,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        };
+        
+        setCurrentLocation(currentLocationData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error in handleGetCurrentLocation:', error);
+      Alert.alert(
+        t.home.locationError,
+        t.home.locationPermissionError,
+        [{text: 'OK'}]
+      );
+      setLoading(false);
+    }
+  };
 
   const renderItem = ({item, index}) => (
     <View>
@@ -21,7 +102,6 @@ const DeliveryLocationSheet = ({
         onPress={() => handleSelected(item)}>
         <Icon name="location-outline" size={20} color="#000" />
         <View style={styles.textContainer}>
-          {/* <Text style={styles.label}>{item.label}</Text> */}
           <Text style={styles.address}>{item.description}</Text>
         </View>
         {selectedAddress?.id === item.id && (
@@ -41,9 +121,9 @@ const DeliveryLocationSheet = ({
           color="#000"
           style={styles.footerIcon}
         />
-        <Text style={styles.footerText}>
-          {t.home.deliverToDifferentLocation}
-        </Text>
+                 <Text style={styles.footerText}>
+           {t.home.differentLocation}
+         </Text>
         <Icon
           name={isRTL ? 'chevron-back' : 'chevron-forward'}
           size={20}
@@ -52,26 +132,33 @@ const DeliveryLocationSheet = ({
         />
       </TouchableOpacity>
 
-      {currenctLocation && (
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={setCurrentLocation}>
+      <TouchableOpacity
+        style={[styles.footerButton, loading && styles.footerButtonDisabled]}
+        onPress={handleGetCurrentLocation}
+        disabled={loading}>
+        <Icon
+          name="location"
+          size={20}
+          color={loading ? "#ccc" : "#000"}
+          style={styles.footerIcon}
+        />
+        <View style={styles.footerTextContainer}>
+           <Text style={[styles.footerText, loading && styles.footerTextDisabled]}>
+             {loading ? t.home.gettingLocation : (currenctLocation?.description || t.home.currentLocation)}
+           </Text>
+           <Text style={[styles.footerSubText, loading && styles.footerTextDisabled]}>
+             {currenctLocation?.description || t.home.currentLocation}
+           </Text>
+         </View>
+        {loading && (
           <Icon
-            name="location"
-            size={20}
-            color="#000"
-            style={styles.footerIcon}
+            name="refresh"
+            size={16}
+            color="#ccc"
+            style={[styles.footerIcon, styles.loadingIcon]}
           />
-          <View style={styles.footerTextContainer}>
-            <Text style={styles.footerText}>
-              {t.home.deliverToCurrentLocation}
-            </Text>
-            <Text style={styles.footerSubText}>
-              {currenctLocation.description || t.home.currentLocation}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )}
+        )}
+      </TouchableOpacity>
     </View>
   );
 
@@ -115,7 +202,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    // fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 2,
     fontFamily: 'Poppins-Bold',
@@ -147,6 +233,9 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
+  footerButtonDisabled: {
+    opacity: 0.6,
+  },
   footerIcon: {
     marginTop: 2,
   },
@@ -155,11 +244,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     paddingHorizontal: 12,
   },
+  footerTextDisabled: {
+    color: '#ccc',
+  },
   footerTextContainer: {
     flex: 1,
   },
   footerSubText: {
     color: '#666',
     fontSize: 12,
+  },
+  loadingIcon: {
+    marginLeft: 'auto',
   },
 });

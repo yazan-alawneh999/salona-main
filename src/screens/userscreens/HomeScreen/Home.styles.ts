@@ -35,6 +35,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold,
     paddingHorizontal: 8,
   },
+  headerSection: {
+    height: height * 0.25,
+    justifyContent: 'center',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    backgroundColor: Colors.gold,
+    paddingHorizontal: 8,
+  },
+  contentSection: {
+    paddingHorizontal: 16,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -118,7 +129,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 15,
-    paddingHorizontal: 8,
   },
   sectionSpacing: {
     marginBottom: 15,
