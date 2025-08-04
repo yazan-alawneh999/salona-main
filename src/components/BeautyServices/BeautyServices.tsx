@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Poppins-Medium',
     color: Colors.white,
+    paddingHorizontal: 16,
     // alignSelf: 'flex-start',
   },
 
@@ -180,8 +181,9 @@ const styles = StyleSheet.create({
   // Salons styles
   salonsGrid: {
     flexDirection: 'row',
-    paddingHorizontal: 0,
+    // paddingHorizontal: 0,
     width: '100%',
+    paddingHorizontal: 12,
   },
   salonWrapper: {
     width: '48.8%',

@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   contentSection: {
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
   },
   header: {
     flexDirection: 'row',
@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
   },
   sectionSpacing2: {
     marginBottom: 15,
+    // paddingHorizontal: 16,
   },
   section: {
     marginBottom: 15,
@@ -150,13 +151,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     fontSize: 18,
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
     marginBottom: 15,
-    paddingHorizontal: 0,
+    // paddingHorizontal: 0,
+    paddingHorizontal: 16,
   },
   viewAllText: {
     position: 'absolute',
