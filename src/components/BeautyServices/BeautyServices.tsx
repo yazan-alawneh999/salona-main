@@ -69,7 +69,7 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
           />
           {salonItem.rating && (
             <View style={styles.ratingOverlay}>
-              <Icon name="star" size={12} color="#FFB6C1" />
+              <Icon name="star" size={12} color="#fffd73ff" />
               <Text style={styles.ratingOverlayText}>{salonItem.rating}</Text>
             </View>
           )}
@@ -79,8 +79,8 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
           <View style={styles.locationContainer}>
             <Icon
               name="location-on"
-              size={12}
-              color="#000000"
+              size={15}
+              color={Colors.gold}
               style={styles.locationIcon}
             />
             <Text numberOfLines={1} style={styles.locationText}>
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     right: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: Colors.gold,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
