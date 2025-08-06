@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // paddingHorizontal: 16,
     // paddingTop: 16,
+    marginEnd: 12,
     paddingBottom: 8,
     justifyContent: 'space-between',
   },
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'space-between',
     minWidth: 40,
     maxWidth: 120,
-    // marginStart: 8,
+
     // gap: 3,
   },
   addressTextHolderNotRTL: {
