@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.black,
   },
+
   locationTxt: {
     paddingTop: 20,
     color: Colors.black,
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: Colors.black,
   },
   headerContainer: {
     height: height * 0.25,
@@ -126,10 +128,12 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   scrollView: {
+    backgroundColor: Colors.gold,
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 15,
+    backgroundColor: Colors.black,
   },
   sectionSpacing: {
     marginBottom: 15,
@@ -546,10 +550,13 @@ const styles = StyleSheet.create({
     backgroundImage:
       'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7))',
   },
-  discountBadge: {
+  badgesContainer: {
     position: 'absolute',
-    top: 12,
+    top: 16,
     right: 12,
+    gap: 4,
+  },
+  discountBadge: {
     backgroundColor: Colors.gold,
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -576,6 +583,7 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
     paddingBottom: 12,
+    justifyContent: 'flex-start',
   },
   packageHeader: {
     flexDirection: 'row',
@@ -587,12 +595,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.black,
-    flex: 1,
+    flex: 0.6,
     marginRight: 8,
     fontFamily: 'Maitree-Bold',
     textShadowColor: 'rgba(0,0,0,0.8)',
     textShadowOffset: {width: 0, height: 1},
     textShadowRadius: 3,
+    textAlign: 'left',
   },
   packagePrice: {
     backgroundColor: Colors.gold,
@@ -619,6 +628,8 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontWeight: '500',
     marginLeft: 4,
+    textAlign: 'left',
+    justifyContent: 'flex-start',
     fontFamily: 'Maitree-Medium',
     textShadowColor: 'rgba(0,0,0,0.8)',
     textShadowOffset: {width: 0, height: 1},

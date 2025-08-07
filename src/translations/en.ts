@@ -304,6 +304,7 @@ export const en = {
       uploadImages: 'Upload images',
       deleteImage: 'Delete image',
       noImages: 'No images uploaded yet',
+
       uploadError: 'Failed to upload images',
       deleteError: 'Failed to delete image',
       uploadSuccess: 'Images uploaded successfully',
@@ -566,7 +567,8 @@ export const en = {
     gettingLocation: 'Getting location...',
     gettingAddress: 'Getting address...',
     locationError: 'Location Error',
-    locationPermissionError: 'Unable to get your current location. Please check your location permissions.',
+    locationPermissionError:
+      'Unable to get your current location. Please check your location permissions.',
     loading: 'Loading...',
     search_here: 'Search here',
     min: 'min',

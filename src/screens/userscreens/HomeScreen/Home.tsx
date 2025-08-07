@@ -337,6 +337,8 @@ const HomeScreen: React.FC = () => {
         name: packageItem.salon_name,
         image_url: packageItem.salon_image,
       };
+      console.log('package:');
+      console.log(packageItem);
 
       navigation.navigate('SalonProfileScreen', {
         salon,
@@ -515,13 +517,20 @@ const HomeScreen: React.FC = () => {
             <View style={styles.packageGradient} />
 
             {/* Discount Badge */}
-            {pkg.discount_percentage > 0 && (
+            {/* {pkg.discount_percentage > 0 && ( */}
+            <View style={styles.badgesContainer}>
               <View style={styles.discountBadge}>
                 <Text style={styles.discountText}>
                   {pkg.discount_percentage}% OFF
                 </Text>
               </View>
-            )}
+              <View style={styles.packagePrice}>
+                <Text style={styles.priceText}>
+                  {pkg.amount} {t.home.currency}
+                </Text>
+              </View>
+            </View>
+            {/* )} */}
 
             {/* Content */}
             <View style={styles.packageContent}>
@@ -529,11 +538,6 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.packageTitle} numberOfLines={2}>
                   {pkg.name}
                 </Text>
-                <View style={styles.packagePrice}>
-                  <Text style={styles.priceText}>
-                    {pkg.amount} {t.home.currency}
-                  </Text>
-                </View>
               </View>
 
               <View style={styles.packageDetails}>
@@ -679,52 +683,58 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.mainContainer}>
-      {/* Header Section - Full Width */}
-      <View style={styles.headerSection}>
-        <Text style={styles.locationTxt}>{t.home.location}</Text>
-        <View style={[styles.header, isRTL && styles.headerRTL]}>
-          <TouchableOpacity
-            style={[styles.addressButton, !isRTL && styles.addressButtonNotRTL]}
-            onPress={() => setIsAddressModalVisible(true)}>
-            <View
-              style={[
-                styles.addressTextHolder,
-                !isRTL && styles.addressTextHolderNotRTL,
-              ]}>
-              <Text style={styles.addressTextPlaceholder}>{t.home.amAt}</Text>
-              <Text style={styles.addressText} numberOfLines={1}>
-                {selectedAddress ? selectedAddress.description : ''}
-              </Text>
-              <Icon name="chevron-down" size={20} color={Colors.black} />
-            </View>
-            <Icon name="location-sharp" size={18} color={Colors.black} />
-          </TouchableOpacity>
+      {/* <View style={styles.container}> */}
+      {/* Address Selection Modal */}
+      {openModal()}
 
-          <TouchableOpacity
-            style={styles.notificationIconContainer}
-            onPress={() => navigation.navigate('NotificationsScreen')}>
-            <Icon name="notifications" size={20} color={Colors.black} />
-          </TouchableOpacity>
+      {isLoadingAny ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.gold} />
+          <Text
+            style={{marginTop: 10, textAlign: 'center', color: Colors.gold}}>
+            {t.home.loading}
+          </Text>
         </View>
-        <SearchBar />
-      </View>
-      <View style={styles.container}>
-        {/* Address Selection Modal */}
-        {openModal()}
+      ) : (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
+          <View style={styles.mainContainer}>
+            {/* Header Section - Full Width */}
+            <View style={styles.headerSection}>
+              <Text style={styles.locationTxt}>{t.home.location}</Text>
+              <View style={[styles.header, isRTL && styles.headerRTL]}>
+                <TouchableOpacity
+                  style={[
+                    styles.addressButton,
+                    !isRTL && styles.addressButtonNotRTL,
+                  ]}
+                  onPress={() => setIsAddressModalVisible(true)}>
+                  <View
+                    style={[
+                      styles.addressTextHolder,
+                      !isRTL && styles.addressTextHolderNotRTL,
+                    ]}>
+                    <Text style={styles.addressTextPlaceholder}>
+                      {t.home.amAt}
+                    </Text>
+                    <Text style={styles.addressText} numberOfLines={1}>
+                      {selectedAddress ? selectedAddress.description : ''}
+                    </Text>
+                    <Icon name="chevron-down" size={20} color={Colors.black} />
+                  </View>
+                  <Icon name="location-sharp" size={18} color={Colors.black} />
+                </TouchableOpacity>
 
-        {isLoadingAny ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.gold} />
-            <Text
-              style={{marginTop: 10, textAlign: 'center', color: Colors.gold}}>
-              {t.home.loading}
-            </Text>
-          </View>
-        ) : (
-          <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
+                <TouchableOpacity
+                  style={styles.notificationIconContainer}
+                  onPress={() => navigation.navigate('NotificationsScreen')}>
+                  <Icon name="notifications" size={20} color={Colors.black} />
+                </TouchableOpacity>
+              </View>
+              <SearchBar />
+            </View>
             {/* Content Section - With Padding */}
             <View style={styles.contentSection}>
               <View style={styles.sectionSpacing}>
@@ -829,9 +839,10 @@ const HomeScreen: React.FC = () => {
                 />
               </View> */}
             </View>
-          </ScrollView>
-        )}
-      </View>
+          </View>
+        </ScrollView>
+      )}
+      {/* </View> */}
       <Footer />
     </View>
   );

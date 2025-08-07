@@ -31,7 +31,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/store';
-import PortfolioGrid from './PortfolioGrid ';
+import PortfolioGrid from './components/PortfolioGrid ';
+import PackagesList from './components/Packages';
 
 type SalonProfileRouteProp = RouteProp<
   {
@@ -138,6 +139,7 @@ const SalonProfileScreen = () => {
         delete updatedState[id];
         return updatedState;
       }
+
       return {...prevState, [id]: service};
     });
   };
@@ -259,69 +261,13 @@ const SalonProfileScreen = () => {
         return renderServices();
       case 'Portfolio':
         return <PortfolioGrid data={salonData} tr={t} />;
-      // const assets = salonData?.salons?.assets || [];
-      // const portfolioImages = assets.filter(
-      //   asset => asset.type === 'portfolio',
-      // );
-      // if (!portfolioImages || portfolioImages.length === 0) {
-      //   return (
-      //     <View style={modalStyles.emptyContainer}>
-      //       <Text style={modalStyles.emptyText}>
-      //         {t.salonProfile.portfolio.noImages}
-      //       </Text>
-      //     </View>
-      //   );
-      // }
-      // return (
-      //   <View style={styles.portfolioList}>
-      //     {portfolioImages.map(item => (
-      //       <TouchableOpacity
-      //         key={`portfolio-${item.id}`}
-      //         onPress={() => {
-      //           setPortfolioImage(item.image_url);
-      //           setPortfolioModalVisible(true);
-      //         }}>
-      //         <Image
-      //           source={{uri: item.image_url}}
-      //           style={[styles.image, {width: '100%', height: 200}]}
-      //           resizeMode="cover"
-      //         />
-      //       </TouchableOpacity>
-      //     ))}
-      //     <Modal
-      //       visible={portfolioModalVisible}
-      //       transparent={true}
-      //       onRequestClose={() => setPortfolioModalVisible(false)}>
-      //       <View
-      //         style={{
-      //           flex: 1,
-      //           backgroundColor: 'rgba(0,0,0,0.9)',
-      //           justifyContent: 'center',
-      //           alignItems: 'center',
-      //         }}>
-      //         <TouchableOpacity
-      //           style={{
-      //             flex: 1,
-      //             width: '100%',
-      //             justifyContent: 'center',
-      //             alignItems: 'center',
-      //           }}
-      //           onPress={() => setPortfolioModalVisible(false)}>
-      //           {portfolioImage && (
-      //             <Image
-      //               source={{uri: portfolioImage}}
-      //               style={{width: '90%', height: '70%'}}
-      //               resizeMode="contain"
-      //             />
-      //           )}
-      //         </TouchableOpacity>
-      //       </View>
-      //     </Modal>
-      //   </View>
-      // );
+
       case 'Reviews':
         const reviews = salonData?.salons?.ratings_received || [];
         console.log('Reviews Data:', reviews);
+
+      case 'Packages':
+        return renderPackages();
 
         if (!reviews || reviews.length === 0) {
           return (
@@ -562,7 +508,7 @@ const SalonProfileScreen = () => {
               back={true}
             />
             <View style={[styles.tabs, isRTL && styles.tabsRTL]}>
-              {['Services', 'Portfolio', 'Reviews'].map(tab => (
+              {['Services', 'Portfolio', 'Reviews', 'Packages'].map(tab => (
                 <TouchableOpacity
                   key={tab}
                   style={[styles.tab, activeTab === tab && styles.activeTab]}

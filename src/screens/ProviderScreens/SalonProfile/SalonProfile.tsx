@@ -32,12 +32,12 @@ import PackagesTab from './components/PackagesTab';
 import AddPackageModal from '../../../components/AddPackageModal/AddPackageModal';
 import EditPackageModal from '../../../components/EditPackageModal/EditPackageModal';
 import {Service} from '../../../types/salon';
-import { useTranslation } from '../../../contexts/TranslationContext';
+import {useTranslation} from '../../../contexts/TranslationContext';
 
 const ProviderSalonProfileScreen = () => {
   const navigation = useNavigation();
   const {user} = useSelector((state: RootState) => state.auth);
-  const { t, isRTL } = useTranslation();
+  const {t, isRTL} = useTranslation();
   const salonId = user?.id;
 
   if (!salonId) {
@@ -123,7 +123,13 @@ const ProviderSalonProfileScreen = () => {
 
     switch (activeTab) {
       case 'About':
-        return <AboutTab salon={salonData.salons} salonId={salonId} onAvailabilityUpdate={handleAvailabilityUpdate} />;
+        return (
+          <AboutTab
+            salon={salonData.salons}
+            salonId={salonId}
+            onAvailabilityUpdate={handleAvailabilityUpdate}
+          />
+        );
       case 'Services':
         return (
           <ServicesTab
@@ -149,10 +155,12 @@ const ProviderSalonProfileScreen = () => {
           />
         );
       case 'Portfolio':
-        return <PortfolioTab 
-          assets={salonData.salons.assets} 
-          onAssetsUpdated={refetch}
-        />;
+        return (
+          <PortfolioTab
+            assets={salonData.salons.assets}
+            onAssetsUpdated={refetch}
+          />
+        );
       case 'Reviews':
         return <ReviewsTab reviews={salonData.salons.ratings_received} />;
       default:
@@ -169,7 +177,9 @@ const ProviderSalonProfileScreen = () => {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}>
         <View style={modalStyles.modalContainer}>
-          <Text style={modalStyles.modalTitle}>{t.salonProfile.services.added}</Text>
+          <Text style={modalStyles.modalTitle}>
+            {t.salonProfile.services.added}
+          </Text>
           <FlatList
             data={Object.values(selectedServices)}
             keyExtractor={(item: any) => item.id}
@@ -197,7 +207,8 @@ const ProviderSalonProfileScreen = () => {
               <View>
                 <View style={modalStyles.summary}>
                   <Text style={modalStyles.summaryText}>
-                    {t.salonProfile.services.serviceFees}: {serviceFees} {t.salonProfile.services.price}
+                    {t.salonProfile.services.serviceFees}: {serviceFees}{' '}
+                    {t.salonProfile.services.price}
                   </Text>
                   <Text style={modalStyles.summaryText}>
                     {t.salonProfile.services.total}: {totalPrice}
@@ -222,7 +233,7 @@ const ProviderSalonProfileScreen = () => {
   };
 
   return (
-    <View style={[styles.container, isRTL && { direction: 'rtl' }]}>
+    <View style={[styles.container, isRTL && {direction: 'rtl'}]}>
       <ScrollView>
         <View style={styles.header}>
           <View>
@@ -257,11 +268,11 @@ const ProviderSalonProfileScreen = () => {
 
         <View style={styles.tabs}>
           {[
-            { key: 'About', label: t.salonProfile.tabs.about },
-            { key: 'Services', label: t.salonProfile.tabs.services },
-            // { key: 'Packages', label: t.salonProfile.tabs.packages },
-            { key: 'Portfolio', label: t.salonProfile.tabs.portfolio },
-            { key: 'Reviews', label: t.salonProfile.tabs.reviews }
+            {key: 'About', label: t.salonProfile.tabs.about},
+            {key: 'Services', label: t.salonProfile.tabs.services},
+            {key: 'Packages', label: t.salonProfile.tabs.packages},
+            {key: 'Portfolio', label: t.salonProfile.tabs.portfolio},
+            {key: 'Reviews', label: t.salonProfile.tabs.reviews},
           ].map(tab => (
             <TouchableOpacity
               key={tab.key}
@@ -303,12 +314,16 @@ const ProviderSalonProfileScreen = () => {
           visible={isEditModalVisible}
           onClose={() => setEditModalVisible(false)}
           onSubmit={data => handleEditService(selectedService.id, data)}
-          defaultValues={selectedService ? {
-            name: selectedService.service,
-            description: selectedService.description,
-            price: selectedService.price,
-            time: selectedService.time
-          } : undefined}
+          defaultValues={
+            selectedService
+              ? {
+                  name: selectedService.service,
+                  description: selectedService.description,
+                  price: selectedService.price,
+                  time: selectedService.time,
+                }
+              : undefined
+          }
         />
 
         <AddPackageModal
