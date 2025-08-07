@@ -2,6 +2,7 @@ import {Dimensions, StyleSheet} from 'react-native';
 import Colors from '../../../constants/Colors';
 import {startAfter} from 'firebase/database';
 
+const {width: screenWidth} = Dimensions.get('window');
 // Font family mapping based on available Maitree weights
 const Fonts = {
   extraLight: 'Maitree-ExtraLight',
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
   },
   sectionSpacing2: {
     marginBottom: 15,
+    width: '100%',
     // paddingHorizontal: 16,
   },
   section: {
@@ -518,22 +520,26 @@ const styles = StyleSheet.create({
   // Enhanced Package Styles
   packageContainer: {
     marginRight: 16,
-    marginBottom: 8,
+    // marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
+
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 8,
+    paddingHorizontal: 8,
+    // marginHorizontal: 8,
+    width: screenWidth - 16,
   },
   packageCard: {
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: Colors.white,
-    width: 280,
-    height: 200,
+
+    height: 160,
   },
   packageImageContainer: {
     width: '100%',

@@ -46,6 +46,7 @@ import {useLocation} from '../../userscreens/EditLocation/hooks/useLocation';
 import SearchBarWithMenu from '../../../components/SearchBarWithMenu/SearchBarWithMenu';
 import {Address} from '../../userscreens/EditLocation/types';
 import DeliveryLocationSheet from './components/DeliveryLocatioinSheet';
+import Swiper from 'react-native-swiper';
 
 interface ExtendedSalon extends Salon {
   working_hours?: any[];
@@ -464,11 +465,10 @@ const HomeScreen: React.FC = () => {
     require('../../../assets/images/br2.jpg'),
     require('../../../assets/images/br3.jpg'),
   ];
-
-  const getRandomImage = (): string => {
-    const index = Math.floor(Math.random() * itemImages.length);
-    return itemImages[index];
+  const getImageForPackage = (id: number): any => {
+    return packageImagesRef.current[id] || itemImages[0];
   };
+
   // Loading skeleton for packages
   const PackageSkeleton = () => (
     <View style={styles.packageContainer}>
@@ -485,9 +485,18 @@ const HomeScreen: React.FC = () => {
     </View>
   );
 
+  const packageImagesRef = useRef<Record<number, any>>({});
+
+  useEffect(() => {
+    const map: Record<number, any> = {};
+    packages.forEach((pkg, index) => {
+      map[pkg.id] = itemImages[index % itemImages.length];
+    });
+    packageImagesRef.current = map;
+  }, [packages]);
   // Memoized PackageItem component for better performance
   const PackageItem = React.memo(({package: pkg}: {package: Package}) => {
-    const image = useMemo(() => getRandomImage(), []);
+    const image = useMemo(() => getImageForPackage(pkg.id), [pkg.id]);
 
     const handlePress = useCallback(() => {
       handlePackagePress(pkg);
@@ -744,54 +753,69 @@ const HomeScreen: React.FC = () => {
               {/* offers */}
               <View style={styles.sectionSpacing2}>
                 <Text style={styles.sectionTitle}>{t.home.offers}</Text>
-                <ScrollView
+                {/* <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.horizontalScrollContent}>
-                  {packagesLoading ? (
-                    <FlatList
-                      data={[1, 2, 3]} // Show 3 skeleton items
-                      keyExtractor={item => `skeleton-${item}`}
-                      renderItem={() => <PackageSkeleton />}
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      removeClippedSubviews={true}
-                      maxToRenderPerBatch={3}
-                      windowSize={5}
-                      initialNumToRender={2}
-                      getItemLayout={(data, index) => ({
-                        length: 296,
-                        offset: 296 * index,
-                        index,
-                      })}
-                    />
-                  ) : packages.length > 0 ? (
-                    <FlatList
-                      data={packages}
-                      keyExtractor={item => `package-${item.id}`}
-                      renderItem={({item}) => <PackageItem package={item} />}
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      removeClippedSubviews={true}
-                      maxToRenderPerBatch={3}
-                      windowSize={5}
-                      initialNumToRender={2}
-                      getItemLayout={(data, index) => ({
-                        length: 296, // 280 width + 16 margin
-                        offset: 296 * index,
-                        index,
-                      })}
-                    />
-                  ) : (
-                    <Text style={styles.serviceTitle}>
-                      {t.home.noCategoriesAvailable}
-                    </Text>
-                  )}
-                </ScrollView>
+                  contentContainerStyle={styles.horizontalScrollContent}> */}
+                {packagesLoading ? (
+                  <FlatList
+                    data={[1, 2, 3]} // Show 3 skeleton items
+                    keyExtractor={item => `skeleton-${item}`}
+                    renderItem={() => <PackageSkeleton />}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={3}
+                    windowSize={5}
+                    initialNumToRender={2}
+                    getItemLayout={(data, index) => ({
+                      length: 296,
+                      offset: 296 * index,
+                      index,
+                    })}
+                  />
+                ) : packages.length > 0 ? (
+                  <Swiper
+                    autoplay
+                    showsPagination
+                    dotColor="#ccc"
+                    loop={false}
+                    activeDotColor={Colors.gold}
+                    // height={200}
+                    contentContainerStyle={{
+                      paddingHorizontal: 18,
+                      paddingVertical: 20,
+                    }}>
+                    {packages.map(pkg => (
+                      <PackageItem key={pkg.id} package={pkg} />
+                    ))}
+                  </Swiper>
+                ) : (
+                  // <FlatList
+                  //   data={packages}
+                  //   keyExtractor={item => `package-${item.id}`}
+                  //   renderItem={({item}) => <PackageItem package={item} />}
+                  //   horizontal
+                  //   showsHorizontalScrollIndicator={false}
+                  //   removeClippedSubviews={true}
+                  //   maxToRenderPerBatch={3}
+                  //   windowSize={5}
+                  //   initialNumToRender={2}
+                  //   getItemLayout={(data, index) => ({
+                  //     length: 296, // 280 width + 16 margin
+                  //     offset: 296 * index,
+                  //     index,
+                  //   })}
+                  // />
+                  <Text style={styles.serviceTitle}>
+                    {t.home.noCategoriesAvailable}
+                  </Text>
+                )}
+                {/* </ScrollView> */}
               </View>
               {/* categories */}
 
-              <View style={styles.sectionSpacing2}>
+              <View style={[styles.sectionSpacing2, {marginTop: -15}]}>
                 <Text style={styles.sectionTitle}>{t.home.ourCategories}</Text>
                 <ScrollView
                   horizontal
