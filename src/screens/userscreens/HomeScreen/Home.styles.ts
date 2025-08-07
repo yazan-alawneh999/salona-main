@@ -530,16 +530,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 8,
-    paddingHorizontal: 8,
-    // marginHorizontal: 8,
-    width: screenWidth - 16,
+    // paddingHorizontal: 2,
+    // marginHorizontal: 4,
+    width: screenWidth - 40,
   },
   packageCard: {
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: Colors.white,
 
-    height: 160,
+    height: 170,
   },
   packageImageContainer: {
     width: '100%',

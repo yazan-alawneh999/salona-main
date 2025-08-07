@@ -466,7 +466,8 @@ const HomeScreen: React.FC = () => {
     require('../../../assets/images/br3.jpg'),
   ];
   const getImageForPackage = (id: number): any => {
-    return packageImagesRef.current[id] || itemImages[0];
+    const index = id % itemImages.length;
+    return itemImages[index];
   };
 
   // Loading skeleton for packages
@@ -775,22 +776,40 @@ const HomeScreen: React.FC = () => {
                     })}
                   />
                 ) : packages.length > 0 ? (
-                  <Swiper
-                    autoplay
-                    showsPagination
-                    dotColor="#ccc"
-                    loop={false}
-                    activeDotColor={Colors.gold}
-                    // height={200}
-                    contentContainerStyle={{
-                      paddingHorizontal: 18,
-                      paddingVertical: 20,
-                    }}>
-                    {packages.map(pkg => (
-                      <PackageItem key={pkg.id} package={pkg} />
-                    ))}
-                  </Swiper>
+                  <FlatList
+                    data={packages}
+                    contentContainerStyle={{paddingHorizontal: 4}}
+                    keyExtractor={item => `package-${item.id}`}
+                    renderItem={({item}) => <PackageItem package={item} />}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    removeClippedSubviews={true}
+                    maxToRenderPerBatch={3}
+                    windowSize={5}
+                    initialNumToRender={2}
+                    getItemLayout={(data, index) => ({
+                      length: 296, // 280 width + 16 margin
+                      offset: 296 * index,
+                      index,
+                    })}
+                  />
                 ) : (
+                  // <Swiper
+                  //   autoplay
+                  //   showsPagination
+                  //   dotColor="#ccc"
+                  //   loop={false}
+
+                  //   activeDotColor={Colors.gold}
+                  //   // height={200}
+                  //   contentContainerStyle={{
+                  //     paddingHorizontal: 18,
+                  //     paddingVertical: 20,
+                  //   }}>
+                  //   {packages.map(pkg => (
+                  //     <PackageItem key={pkg.id} package={pkg} />
+                  //   ))}
+                  // </Swiper>
                   // <FlatList
                   //   data={packages}
                   //   keyExtractor={item => `package-${item.id}`}
@@ -815,7 +834,7 @@ const HomeScreen: React.FC = () => {
               </View>
               {/* categories */}
 
-              <View style={[styles.sectionSpacing2, {marginTop: -15}]}>
+              <View style={[styles.sectionSpacing2]}>
                 <Text style={styles.sectionTitle}>{t.home.ourCategories}</Text>
                 <ScrollView
                   horizontal
