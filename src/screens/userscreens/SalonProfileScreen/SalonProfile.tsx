@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
+  Share,
 } from 'react-native';
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -482,6 +483,36 @@ const SalonProfileScreen = () => {
     );
   };
 
+  const onShare = useCallback(async () => {
+    try {
+      const current_salon = salonData?.salons;
+      const contactName = current_salon?.name || salon.name;
+      const phoneNumber = current_salon?.phone_number;
+
+      const description =
+        salonData?.salons?.bio || t.salonProfile.about.noDescription;
+
+      const message =
+        `${t.editProfile.Name}: ${contactName}\n` +
+        `${t.editProfile.phone}: ${phoneNumber}\n` +
+        `${t.editProfile.description}: ${description}\n`;
+
+      const result = await Share.share({message});
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          console.log('Shared successfully!');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  }, [salonData]); // ✅ add dependencies here
+
   return (
     <View style={{flex: 1, position: 'relative'}}>
       <ImageBackground
@@ -499,6 +530,7 @@ const SalonProfileScreen = () => {
               title={
                 salonData?.salons?.bio || t.salonProfile.about.noDescription
               }
+              onShare={onShare}
               rating={4.5}
               reviews={salonData?.salons?.ratings_received?.length || 0}
               favorite={isFavorite}
@@ -605,7 +637,7 @@ const modalStyles = StyleSheet.create({
     fontFamily: 'Maitree-Bold',
   },
   removeButton: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.red,
     padding: 5,
     borderRadius: 8,
     width: 60,
@@ -629,14 +661,16 @@ const modalStyles = StyleSheet.create({
     marginBottom: 5,
   },
   continueButton: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.black,
     padding: 15,
     borderRadius: 34,
+    borderColor: Colors.gold,
+    borderWidth: 1,
     alignItems: 'center',
     marginTop: 20,
   },
   continueButtonText: {
-    color: Colors.black,
+    color: Colors.white,
     fontSize: 16,
     fontFamily: 'Maitree-Bold',
   },

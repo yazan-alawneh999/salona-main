@@ -103,6 +103,10 @@ export const ar = {
     welcomeCreateAccount: 'يرجى إنشاء حسابك',
   },
   editProfile: {
+    Name: 'الأسم',
+    description: 'الوصف',
+    phone: 'الرقم',
+
     updateProfileSuccess: {
       updateProfile: 'تحديث الملف الشخصي',
       updateProfileMessage: 'تم تحديث الملف الشخصي بنجاح',
@@ -486,6 +490,7 @@ export const ar = {
     defaultProfession: 'صالون',
   },
   home: {
+    currentLocation: 'الموقع الحالي',
     location: 'الموقع',
     currency: 'د.أ',
     offers: 'عروض لك',
@@ -505,11 +510,12 @@ export const ar = {
     savedLocations: 'المواقع المحفوظة',
     deliverToDifferentLocation: 'توصيل إلى موقع مختلف',
     deliverToCurrentLocation: 'توصيل إلى الموقع الحالي',
-    currentLocation: 'الموقع الحالي',
+
     gettingLocation: 'جاري تحديد الموقع...',
     gettingAddress: 'جاري الحصول على العنوان...',
     locationError: 'خطأ في الموقع',
-    locationPermissionError: 'لا يمكن الحصول على موقعك الحالي. يرجى التحقق من أذونات الموقع.',
+    locationPermissionError:
+      'لا يمكن الحصول على موقعك الحالي. يرجى التحقق من أذونات الموقع.',
     loading: 'جاري التحميل...',
     search_here: 'ابحث هنا',
     min: 'دقيقة',

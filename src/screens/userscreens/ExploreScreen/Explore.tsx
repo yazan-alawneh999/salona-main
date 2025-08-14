@@ -9,6 +9,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  ImageBackground,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './Explore.styles';
@@ -51,7 +52,7 @@ const ExploreScreen: React.FC = () => {
     'most_popular' | 'rated_review' | 'cost_low_to_high'
   >('most_popular');
   const [priceRange, setPriceRange] = useState<string | undefined>();
-  const [isGridView, setIsGridView] = useState(true);
+  const [isGridView, setIsGridView] = useState(false);
   const [rating, setRating] = useState<number | undefined>();
   const [categories, setCategories] = useState<string[] | undefined>();
   const [nearbySalons, setNearbySalons] = useState<NearbySalon[]>([]);
@@ -264,6 +265,9 @@ const ExploreScreen: React.FC = () => {
           : `${nearbySalon.distance.toFixed(1)} km`
         : undefined;
 
+      console.log('distance:', distanceText);
+      console.log('travelTime:', nearbySalon?.travelTime);
+
       return {
         ...salon,
         distance: distanceText,
@@ -333,7 +337,7 @@ const ExploreScreen: React.FC = () => {
           </View>
           <View style={localStyles.salonInfo}>
             <Text style={localStyles.salonName}>{item.name}</Text>
-            <View style={localStyles.locationContainer}>
+            {/* <View style={localStyles.locationContainer}>
               <Icon
                 name="location-on"
                 size={15}
@@ -347,7 +351,7 @@ const ExploreScreen: React.FC = () => {
                     }`
                   : 'Distance unavailable'}
               </Text>
-            </View>
+            </View> */}
           </View>
         </TouchableOpacity>
       </View>
@@ -355,111 +359,158 @@ const ExploreScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <View style={styles.mainContainer}>
-        <View style={styles.container}>
-          <SearchBarWithMenu
-            onSearchChange={handleSearch}
-            onMenuPress={handleMenuPress}
-          />
-
-          <Text style={styles.resultCount}>
-            {salonsData?.salons?.length || 0} {t.explore.results}
-          </Text>
-
-          <View
-            style={[
-              styles.filterSortContainer,
-              {flexDirection: !isRTL ? 'row' : 'row-reverse'},
-            ]}>
-            <TouchableOpacity
-              style={styles.filterOption}
-              onPress={handleFilterPress}>
-              <Icon name="filter-list" size={20} color={Colors.white} />
-              <Text style={styles.optionText}>{t.explore.filters}</Text>
-            </TouchableOpacity>
-            {/* <TouchableOpacity style={styles.sortOption} onPress={handleSortPress}>
-            <Icon name="swap-vert" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{getSortByText()}</Text>
-          </TouchableOpacity> */}
-            {/* <TouchableOpacity style={styles.gridOption} onPress={handleViewToggle}>
-            <Icon 
-              name={isGridView ? "view-list" : "grid-view"} 
-              size={20} 
-              color={Colors.white} 
+    <View style={{flex: 1}}>
+      <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
+      <SafeAreaView style={{flex: 1}}>
+        <View style={styles.mainContainer}>
+          <View style={styles.container}>
+            <SearchBarWithMenu
+              onSearchChange={handleSearch}
+              onMenuPress={handleMenuPress}
             />
-          </TouchableOpacity> */}
-          </View>
 
-          {isLoading ? (
+            <Text style={styles.resultCount}>
+              {salonsData?.salons?.length || 0} {t.explore.results}
+            </Text>
+
             <View
-              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <ActivityIndicator size="large" color={Colors.gold} />
+              style={[
+                styles.filterSortContainer,
+                {flexDirection: !isRTL ? 'row' : 'row-reverse'},
+              ]}>
+              <TouchableOpacity
+                style={styles.filterOption}
+                onPress={handleFilterPress}>
+                <Icon name="filter-list" size={20} color={Colors.white} />
+                <Text style={styles.optionText}>{t.explore.filters}</Text>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
+              style={styles.sortOption}
+              onPress={handleSortPress}>
+              <Icon name="swap-vert" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{getSortByText()}</Text>
+            </TouchableOpacity> */}
+              <TouchableOpacity
+                style={styles.gridOption}
+                onPress={handleViewToggle}>
+                <Icon
+                  name={isGridView ? 'view-list' : 'grid-view'}
+                  size={20}
+                  color={Colors.white}
+                />
+              </TouchableOpacity>
             </View>
-          ) : error ? (
-            <View
-              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <Text style={{color: Colors.red}}>{t.explore.error}</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={mappedSalons}
-              keyExtractor={item => item.id.toString()}
-              numColumns={isGridView ? 2 : 1}
-              key={isGridView ? 'grid' : 'list'}
-              showsVerticalScrollIndicator={false}
-              columnWrapperStyle={isGridView ? styles.cardWrapper : undefined}
-              renderItem={
-                isGridView
-                  ? renderSalonItem
-                  : ({
-                      item,
-                    }: {
-                      item: Salon & {
-                        distance?: string;
-                        travelTime?: string;
-                        distanceValue?: number;
-                      };
-                    }) => (
-                      <View style={styles.listItemContainer}>
-                        <TouchableOpacity
-                          style={styles.listCard}
-                          onPress={() => handleCardPress(item)}>
-                          <Image
-                            source={
-                              item.image_url
-                                ? {uri: item.image_url}
-                                : require('../../../assets/images/beautician1.png')
-                            }
-                            style={styles.listCardImage}
-                            resizeMode="cover"
-                          />
-                          <View style={styles.listCardInfo}>
-                            <Text style={styles.listCardName} numberOfLines={1}>
-                              {item.name}
-                            </Text>
-                            <Text
-                              style={styles.listCardProfession}
-                              numberOfLines={1}>
-                              {item.bio || t.explore.defaultProfession}
-                            </Text>
-                            <View style={styles.listCardRating}>
-                              <Icon name="star" size={16} color="#fafe35ff" />
-                              <Text style={styles.listCardRatingText}>
-                                {getAverageRating(item).toFixed(1)}
+
+            {isLoading ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color={Colors.gold} />
+              </View>
+            ) : error ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{color: Colors.red}}>{t.explore.error}</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={mappedSalons}
+                keyExtractor={item => item.id.toString()}
+                numColumns={isGridView ? 2 : 1}
+                key={isGridView ? 'grid' : 'list'}
+                showsVerticalScrollIndicator={false}
+                columnWrapperStyle={isGridView ? styles.cardWrapper : undefined}
+                renderItem={
+                  isGridView
+                    ? renderSalonItem
+                    : ({
+                        item,
+                      }: {
+                        item: Salon & {
+                          distance?: string;
+                          travelTime?: string;
+                          distanceValue?: number;
+                        };
+                      }) => (
+                        <View style={styles.listItemContainer}>
+                          <TouchableOpacity
+                            style={styles.listCard}
+                            onPress={() => handleCardPress(item)}>
+                            <Image
+                              source={
+                                item.image_url
+                                  ? {uri: item.image_url}
+                                  : require('../../../assets/images/beautician1.png')
+                              }
+                              style={styles.listCardImage}
+                              resizeMode="cover"
+                            />
+                            <View style={styles.listCardInfo}>
+                              <Text
+                                style={styles.listCardName}
+                                numberOfLines={1}>
+                                {item.name}
                               </Text>
+                              <Text
+                                style={styles.listCardProfession}
+                                numberOfLines={1}>
+                                {item.bio || t.explore.defaultProfession}
+                              </Text>
+                              <View style={styles.salonMetaRow}>
+                                <View style={styles.listCardRating}>
+                                  <Icon
+                                    name="star"
+                                    size={16}
+                                    color="#fafe35ff"
+                                  />
+                                  <Text style={styles.listCardRatingText}>
+                                    {getAverageRating(item).toFixed(1)}
+                                  </Text>
+                                </View>
+                                <View style={styles.listCardRating}>
+                                  <Icon
+                                    name="access-time"
+                                    size={16}
+                                    // color="#fafe35ff"
+                                  />
+                                  <Text style={styles.listCardRatingText}>
+                                    {item.travelTime}
+                                  </Text>
+                                </View>
+                                <View style={styles.listCardRating}>
+                                  <Icon
+                                    name="place"
+                                    size={16}
+                                    // color="#fafe35ff"
+                                  />
+                                  <Text style={styles.listCardRatingText}>
+                                    {item.distance}
+                                  </Text>
+                                </View>
+                              </View>
                             </View>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                    )
-              }
-            />
-          )}
+                          </TouchableOpacity>
+                        </View>
+                      )
+                }
+              />
+            )}
+          </View>
+          <Footer />
         </View>
-        <Footer />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 };
 

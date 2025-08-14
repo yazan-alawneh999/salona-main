@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Colors from '../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useTranslation } from '../../contexts/TranslationContext';
+import {useTranslation} from '../../contexts/TranslationContext';
 interface ProfileHeaderProps {
   image: any; // Profile image
   name: string; // Name of the profile
   title?: string; // Profile title
   rating?: number; // Rating (out of 5)
   reviews?: number; // Number of reviews
-  email?:string;
+  email?: string;
   favorite?: boolean; // Is this profile a favorite?
   back?: boolean;
   onBackPress?: () => void; // Back button callback
@@ -28,44 +28,62 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onBackPress,
   onFavoritePress,
   favorite,
-  isProvider=true,
-  back=true,
-  isUser=false
+  isProvider = true,
+  back = true,
+  isUser = false,
+  onShare,
 }) => {
-  const { t , isRTL } = useTranslation();
+  const {t, isRTL} = useTranslation();
   return (
     <View style={styles.container}>
-     {back && (
-      <TouchableOpacity
-        onPress={onBackPress}
-        style={[styles.backButton, isRTL ? styles.backButtonRTL : styles.backButtonLTR]}
-      >
-        <Icon name={isRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={Colors.white} />
-      </TouchableOpacity>
-    )}
+      {back && (
+        <TouchableOpacity
+          onPress={onBackPress}
+          style={[
+            styles.backButton,
+            isRTL ? styles.backButtonRTL : styles.backButtonLTR,
+          ]}>
+          <Icon
+            name={isRTL ? 'arrow-forward' : 'arrow-back'}
+            size={24}
+            color={Colors.white}
+          />
+        </TouchableOpacity>
+      )}
 
-    {isProvider && !isUser && (
       <TouchableOpacity
-        onPress={onFavoritePress}
-        style={[styles.favoriteButton, isRTL ? styles.favoriteButtonRTL : styles.favoriteButtonLTR]}
-      >
-        <Icon
-          name={favorite ? 'favorite' : 'favorite-border'}
-          size={24}
-          color={favorite ? Colors.red : Colors.white}
-        />
+        onPress={onShare}
+        style={[
+          styles.shareButton,
+          isRTL ? styles.backButtonRTL : styles.backButtonLTR,
+        ]}>
+        <Icon name="ios-share" size={24} color={Colors.white} />
       </TouchableOpacity>
-    )}
+      {isProvider && !isUser && (
+        <TouchableOpacity
+          onPress={onFavoritePress}
+          style={[
+            styles.favoriteButton,
+            isRTL ? styles.favoriteButtonRTL : styles.favoriteButtonLTR,
+          ]}>
+          <Icon
+            name={favorite ? 'favorite' : 'favorite-border'}
+            size={24}
+            color={favorite ? Colors.red : Colors.white}
+          />
+        </TouchableOpacity>
+      )}
+
       <View style={styles.profileImageWrapper}>
-        <Image 
+        <Image
           source={
             !isProvider
               ? require('../../assets/images/prettyLogo.png')
               : typeof image === 'string'
-                ? { uri: image }
-                : image
+              ? {uri: image}
+              : image
           }
-          style={styles.profileImage} 
+          style={styles.profileImage}
         />
       </View>
 
@@ -94,6 +112,12 @@ const styles = StyleSheet.create({
     top: 20,
     zIndex: 2,
   },
+  shareButton: {
+    position: 'absolute',
+    top: 20,
+    start: 60,
+    zIndex: 2,
+  },
   backButtonLTR: {
     left: 20,
   },
@@ -112,7 +136,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   profileImageWrapper: {
-    marginTop:60,
+    marginTop: 60,
     width: 100,
     height: 100,
     borderRadius: 50,

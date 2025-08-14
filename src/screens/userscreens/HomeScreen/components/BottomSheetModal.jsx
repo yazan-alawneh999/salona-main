@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
-    marginStart: 20,
+    marginHorizontal: 20,
   },
   content: {
     padding: 16,

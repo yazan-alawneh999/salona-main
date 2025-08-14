@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {FlatList, View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import {
+  FlatList,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from '../../../../contexts/TranslationContext';
 import {useLocation} from '../../../userscreens/EditLocation/hooks/useLocation';
@@ -18,22 +25,20 @@ const DeliveryLocationSheet = ({
 
   const handleGetCurrentLocation = async () => {
     setLoading(true);
-    
+
     try {
       console.log('Getting current location using useLocation hook...');
       const location = await getCurrentLocation();
-      
+
       if (!location) {
         console.log('No location received from getCurrentLocation');
-        Alert.alert(
-          t.home.locationError,
-          t.home.locationPermissionError,
-          [{text: 'OK'}]
-        );
+        Alert.alert(t.home.locationError, t.home.locationPermissionError, [
+          {text: 'OK'},
+        ]);
         setLoading(false);
         return;
       }
-      
+
       console.log('Location received:', location);
 
       try {
@@ -46,7 +51,7 @@ const DeliveryLocationSheet = ({
 
         if (data.results && data.results[0]) {
           console.log('Address found, creating location object...');
-          
+
           // Create a location object with current coordinates and address
           const currentLocationData = {
             id: 'current-location',
@@ -54,10 +59,13 @@ const DeliveryLocationSheet = ({
             latitude: location.latitude,
             longitude: location.longitude,
           };
-          
+
           setCurrentLocation(currentLocationData);
           setLoading(false);
-          console.log('Current location set successfully with address:', data.results[0].formatted_address);
+          console.log(
+            'Current location set successfully with address:',
+            data.results[0].formatted_address,
+          );
         } else {
           console.log('No address found for coordinates');
           // Fallback to coordinates only
@@ -67,7 +75,7 @@ const DeliveryLocationSheet = ({
             latitude: location.latitude,
             longitude: location.longitude,
           };
-          
+
           setCurrentLocation(currentLocationData);
           setLoading(false);
         }
@@ -80,17 +88,15 @@ const DeliveryLocationSheet = ({
           latitude: location.latitude,
           longitude: location.longitude,
         };
-        
+
         setCurrentLocation(currentLocationData);
         setLoading(false);
       }
     } catch (error) {
       console.error('Error in handleGetCurrentLocation:', error);
-      Alert.alert(
-        t.home.locationError,
-        t.home.locationPermissionError,
-        [{text: 'OK'}]
-      );
+      Alert.alert(t.home.locationError, t.home.locationPermissionError, [
+        {text: 'OK'},
+      ]);
       setLoading(false);
     }
   };
@@ -121,15 +127,13 @@ const DeliveryLocationSheet = ({
           color="#000"
           style={styles.footerIcon}
         />
-                 <Text style={styles.footerText}>
-           {t.home.differentLocation}
-         </Text>
-        <Icon
+        <Text style={styles.footerText}>{t.home.differentLocation}</Text>
+        {/* <Icon
           name={isRTL ? 'chevron-back' : 'chevron-forward'}
           size={20}
           color="#ddd"
           style={styles.footerIcon}
-        />
+        /> */}
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -139,17 +143,24 @@ const DeliveryLocationSheet = ({
         <Icon
           name="location"
           size={20}
-          color={loading ? "#ccc" : "#000"}
+          color={loading ? '#ccc' : '#000'}
           style={styles.footerIcon}
         />
         <View style={styles.footerTextContainer}>
-           <Text style={[styles.footerText, loading && styles.footerTextDisabled]}>
-             {loading ? t.home.gettingLocation : (currenctLocation?.description || t.home.currentLocation)}
-           </Text>
-           <Text style={[styles.footerSubText, loading && styles.footerTextDisabled]}>
-             {currenctLocation?.description || t.home.currentLocation}
-           </Text>
-         </View>
+          <Text
+            style={[styles.footerText, loading && styles.footerTextDisabled]}>
+            {loading
+              ? t.home.gettingLocation
+              : currenctLocation?.description || t.home.useCurrentLocation}
+          </Text>
+          {/* <Text
+            style={[
+              styles.footerSubText,
+              loading && styles.footerTextDisabled,
+            ]}>
+            {currenctLocation?.description || t.home.currentLocation}
+          </Text> */}
+        </View>
         {loading && (
           <Icon
             name="refresh"

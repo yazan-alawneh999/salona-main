@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import {StyleSheet} from 'react-native';
 import Colors from '../../../constants/Colors';
 
 // Font family mapping for Maitree weights
@@ -14,12 +14,16 @@ const Fonts = {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
+  },
+  salonMetaRow: {
+    flexDirection: 'row',
+    gap: 40,
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
-    padding: 20,
+    // backgroundColor: Colors.black,
+    paddingHorizontal: 20,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -34,7 +38,7 @@ const styles = StyleSheet.create({
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     backgroundColor: Colors.black,
     borderColor: Colors.white,
     borderWidth: 1,
@@ -98,23 +102,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   listItemContainer: {
-    marginBottom: 15,
+    paddingBottom: 15,
     width: '100%',
   },
   listCard: {
     width: '100%',
-    height: 120,
+    // height: 120,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
     backgroundColor: Colors.black,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.white,
+
+    // Android shadow
+    elevation: 2, // Increase from 2 for more prominent shadow
+
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   listCardImage: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 10,
   },
   listCardInfo: {
@@ -124,18 +138,21 @@ const styles = StyleSheet.create({
   listCardName: {
     color: Colors.white,
     fontSize: 16,
+    alignSelf: 'flex-start',
     fontFamily: 'Maitree-Medium',
-    marginBottom: 4,
+    // marginBottom: 4,
   },
   listCardProfession: {
     color: Colors.softGray,
     fontSize: 14,
+    alignSelf: 'flex-start',
     fontFamily: 'Maitree-Regular',
     marginBottom: 8,
   },
   listCardRating: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
   },
   listCardRatingText: {
     color: Colors.white,

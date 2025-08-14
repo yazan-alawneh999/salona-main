@@ -199,7 +199,7 @@ const HomeScreen: React.FC = () => {
         ? {
             latitude: selectedAddress.latitude,
             longitude: selectedAddress.longitude,
-            radius: 10,
+            radius: 20,
           }
         : skip,
       {

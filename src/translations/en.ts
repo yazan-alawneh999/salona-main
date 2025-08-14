@@ -101,6 +101,9 @@ export const en = {
     welcomeCreateAccount: 'Welcome please create your account',
   },
   editProfile: {
+    Name: 'Name',
+    description: 'Description',
+    phone: 'Phone',
     updateProfileSuccess: {
       updateProfile: 'Update Profile',
       updateProfileMessage: 'Your profile has been updated successfully!',
@@ -543,6 +546,7 @@ export const en = {
     defaultProfession: 'Salon',
   },
   home: {
+    useCurrentLocation: 'Current Location',
     location: 'Location',
     currency: 'JOD',
     offers: 'Offers For You',
