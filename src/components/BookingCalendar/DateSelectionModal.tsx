@@ -18,15 +18,18 @@ import baseStyles from './DateSelectionModal.styles';
 import successModalStyles from './successModal.styles';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { useGetAvailabilityQuery, useCreateAppointmentMutation } from '../../redux/api/salonApi';
-import { useGetUserAddressesQuery } from '../../redux/api/addressApi';
-import { format } from 'date-fns';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {
+  useGetAvailabilityQuery,
+  useCreateAppointmentMutation,
+} from '../../redux/api/salonApi';
+import {useGetUserAddressesQuery} from '../../redux/api/addressApi';
+import {format} from 'date-fns';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../constants/Colors';
-import {notificationService } from '../../services/notificationService';
+import {notificationService} from '../../services/notificationService';
 import {useTranslation} from '../../contexts/TranslationContext';
-import { arSA } from 'date-fns/locale';
+import {arSA} from 'date-fns/locale';
 
 interface DateSelectionModalProps {
   visible: boolean;
@@ -37,30 +40,40 @@ interface DateSelectionModalProps {
   onBookingSuccess?: () => void; // New prop for handling booking success
 }
 
-const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedServices = [], onBookingSuccess}: DateSelectionModalProps) => {
+const DateSelectionModal = ({
+  visible,
+  onClose,
+  salonId,
+  totalDuration,
+  selectedServices = [],
+  onBookingSuccess,
+}: DateSelectionModalProps) => {
   const {t} = useTranslation();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [chooseLocationModalVisible, setChooseLocationModalVisible] = useState(false);
+  const [chooseLocationModalVisible, setChooseLocationModalVisible] =
+    useState(false);
   const navigation = useNavigation<any>();
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [isBooking, setIsBooking] = useState(false);
   const [appointmentNotes, setAppointmentNotes] = useState<string>('');
-  const { isRTL } = useTranslation();
-  const { user, token } = useSelector((state: RootState) => state.auth);
-  const selectedAddress = useSelector((state: RootState) => state.salons.selectedAddress);
-  
+  const {isRTL} = useTranslation();
+  const {user, token} = useSelector((state: RootState) => state.auth);
+  const selectedAddress = useSelector(
+    (state: RootState) => state.salons.selectedAddress,
+  );
+
   // Use the Redux query hook to fetch addresses
-  const { data: addressData, isLoading: isLoadingAddresses } = useGetUserAddressesQuery(undefined, {
-    skip: !token, // Only skip if there's no token
-  });
-  
+  const {data: addressData, isLoading: isLoadingAddresses} =
+    useGetUserAddressesQuery(undefined, {
+      skip: !token, // Only skip if there's no token
+    });
+
   // Extract  from the query result
 
-
-
-  const [createAppointment, { isLoading: isCreatingAppointment }] = useCreateAppointmentMutation();
+  const [createAppointment, {isLoading: isCreatingAppointment}] =
+    useCreateAppointmentMutation();
 
   // Reset states when screen comes into focus
   useFocusEffect(
@@ -72,7 +85,7 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
       return () => {
         // Cleanup if needed
       };
-    }, [])
+    }, []),
   );
 
   // Handle modal cleanup when parent visibility changes
@@ -84,16 +97,14 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
     }
   }, [visible]);
 
-
-
   // Generate dates for the next 7 days
-  const dates = Array.from({ length: 7 }, (_, i) => {
+  const dates = Array.from({length: 7}, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() + i);
     return {
       date,
-      day: format(date, 'dd', { locale: isRTL ? arSA : undefined }),
-      label: format(date, 'EEEE', { locale: isRTL ? arSA : undefined }),
+      day: format(date, 'dd', {locale: isRTL ? arSA : undefined}),
+      label: format(date, 'EEEE', {locale: isRTL ? arSA : undefined}),
     };
   });
 
@@ -106,17 +117,20 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
 
   const formattedDate = formatDateForApi(selectedDate);
 
-
-  const { data: availabilityData, isLoading, error, refetch: refetchAvailability } = useGetAvailabilityQuery(
+  const {
+    data: availabilityData,
+    isLoading,
+    error,
+    refetch: refetchAvailability,
+  } = useGetAvailabilityQuery(
     {
       salonId,
       date: formattedDate,
     },
     {
       skip: !salonId,
-    }
+    },
   );
-
 
   const handleDateSelect = (date: Date) => {
     console.log('Date selected:', date);
@@ -149,7 +163,7 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
   const handleBookAppointment = async () => {
     console.log('=== STARTING BOOKING PROCESS ===');
     console.log('Auth Token:', token ? 'Token exists' : 'No token found');
-    
+
     if (!token) {
       console.error('❌ No authentication token found');
       Alert.alert(
@@ -158,21 +172,23 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
         [
           {
             text: t.booking.errors.ok,
-            onPress: () => navigation.navigate('Login')
-          }
-        ]
+            onPress: () => navigation.navigate('Login'),
+          },
+        ],
       );
       return;
     }
 
-    console.log('Selected Services:', JSON.stringify(selectedServices, null, 2));
+    console.log(
+      'Selected Services:',
+      JSON.stringify(selectedServices, null, 2),
+    );
     console.log('Selected Date:', selectedDate);
     console.log('Selected Slot:', selectedSlot);
     // console.log('Selected Location:', selectedLocation);
     console.log('Salon ID:', salonId);
     console.log('Total Duration:', totalDuration);
 
- 
     if (!selectedSlot) {
       console.log('❌ Booking failed: No time slot selected');
       Alert.alert(t.booking.errors.noTimeSlot);
@@ -181,15 +197,23 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
 
     // Process selected services based on its type
     let servicesArray = [];
-    
+
     if (Array.isArray(selectedServices)) {
       servicesArray = selectedServices;
-    } else if (typeof selectedServices === 'object' && selectedServices !== null) {
+    } else if (
+      typeof selectedServices === 'object' &&
+      selectedServices !== null
+    ) {
       // Convert object to array of services
-      servicesArray = Object.values(selectedServices).filter(service => service !== false);
+      servicesArray = Object.values(selectedServices).filter(
+        service => service !== false,
+      );
     }
 
-    console.log('Processed services array:', JSON.stringify(servicesArray, null, 2));
+    console.log(
+      'Processed services array:',
+      JSON.stringify(servicesArray, null, 2),
+    );
 
     if (servicesArray.length === 0) {
       console.log('❌ Booking failed: No services selected');
@@ -200,54 +224,59 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
     try {
       console.log('🔄 Starting API call to book appointment...');
       setIsBooking(true);
-      
+
       // Get the selected slot's start time
       const appointmentTime = selectedSlot.split('-')[0];
       console.log('Appointment time from slot:', appointmentTime);
-      
+
       // Format the date for the API (YYYY-MM-DD)
       const appointmentDay = format(selectedDate, 'yyyy-MM-dd');
       console.log('Formatted appointment day:', appointmentDay);
-      
+
       // Get the service IDs from the selectedServices prop
       const serviceIds = servicesArray.map(service => {
         const id = parseInt(service.id, 10);
-        console.log('Processing service:', { name: service.name, id });
+        console.log('Processing service:', {name: service.name, id});
         return id;
       });
       console.log('Service IDs to be sent:', serviceIds);
-      
+
       const bookingData = {
         salon_id: salonId,
         address_id: selectedAddress?.id,
         appointment_day: appointmentDay,
         appointment_time: appointmentTime,
         note: appointmentNotes,
-        services: serviceIds
+        services: serviceIds,
       };
-      
+
       // Log the complete request details
       console.log('=== API REQUEST DETAILS ===');
       console.log('Endpoint: createAppointment');
       console.log('Headers:', {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
       });
       console.log('Request Body:', JSON.stringify(bookingData, null, 2));
       console.log('=== END API REQUEST DETAILS ===');
-      
+
       // Use RTK Query mutation instead of axios
       const result = await createAppointment(bookingData).unwrap();
-      
+
       console.log('✅ Appointment booked successfully!');
       console.log('📥 API Response:', JSON.stringify(result, null, 2));
-      
+
       // Schedule notification for the appointment
       if (result.success) {
-        const appointmentDateTime = new Date(`${appointmentDay}T${appointmentTime}`);
-        console.log('Creating notification for:', appointmentDateTime.toISOString());
-        
+        const appointmentDateTime = new Date(
+          `${appointmentDay}T${appointmentTime}`,
+        );
+        console.log(
+          'Creating notification for:',
+          appointmentDateTime.toISOString(),
+        );
+
         const notificationData = {
           appointmentId: result.id?.toString() || 'pending',
           salonName: 'Your Salon', // Replace with actual salon name if available
@@ -255,29 +284,32 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
           services: servicesArray.map(service => service.name),
           // address: selectedLocation
         };
-        
-        console.log('Notification data:', JSON.stringify(notificationData, null, 2));
+
+        console.log(
+          'Notification data:',
+          JSON.stringify(notificationData, null, 2),
+        );
         // await notificationService.scheduleAppointmentNotification(notificationData);
         console.log('✅ Appointment notification scheduled');
       }
-      
+
       // Clear selected slot after successful booking
       setSelectedSlot(null);
-      
+
       // Call onBookingSuccess if provided
       if (onBookingSuccess) {
         onBookingSuccess();
       }
-      
+
       // Refetch availability data after successful booking
       await refetchAvailability();
-      
+
       // Close the location modal and show success modal
       // setChooseLocationModalVisible(false);
       setSuccessModalVisible(true);
     } catch (error: any) {
       console.error('❌ Error booking appointment:', error);
-      
+
       // Log the complete error details
       console.error('=== ERROR DETAILS ===');
       console.error('Error type:', typeof error);
@@ -294,12 +326,12 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
         console.log('❌ Authentication error: Session expired');
         console.log('Current token:', token);
         console.log('Token length:', token?.length);
-        
+
         // Try to parse the HTML error to get more details
         try {
           const errorHtml = error.error;
           console.log('Error HTML:', errorHtml);
-          
+
           // Extract any useful information from the HTML error
           const errorMatch = errorHtml.match(/SQLSTATE\[.*?\]: (.*?)\n/);
           if (errorMatch) {
@@ -308,19 +340,25 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
         } catch (parseError) {
           console.log('Could not parse error HTML:', parseError);
         }
-        
+
         const errorResponse = {
           status: 'error',
           code: 'SESSION_EXPIRED',
-          message: 'There was an error processing your booking. Please try again.',
+          message:
+            'There was an error processing your booking. Please try again.',
           details: {
             type: 'database_error',
             action: 'retry_booking',
-            tokenStatus: token ? 'Token exists but may be invalid' : 'No token found'
-          }
+            tokenStatus: token
+              ? 'Token exists but may be invalid'
+              : 'No token found',
+          },
         };
-        console.log('📤 Error Response:', JSON.stringify(errorResponse, null, 2));
-        
+        console.log(
+          '📤 Error Response:',
+          JSON.stringify(errorResponse, null, 2),
+        );
+
         Alert.alert(
           t.booking.errors.bookingFailed,
           t.booking.errors.bookingFailedMessage,
@@ -330,23 +368,24 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
               onPress: () => {
                 // Just close the alert, don't navigate to login
                 // The user can try booking again
-              }
-            }
-          ]
+              },
+            },
+          ],
         );
       } else {
         const errorResponse = {
           status: 'error',
           code: 'BOOKING_FAILED',
-          message: 'There was an error booking your appointment. Please try again.',
-          details: error
+          message:
+            'There was an error booking your appointment. Please try again.',
+          details: error,
         };
-        console.log('📤 Error Response:', JSON.stringify(errorResponse, null, 2));
-        
-        Alert.alert(
-          t.booking.errors.bookingFailed,
-          errorResponse.message
+        console.log(
+          '📤 Error Response:',
+          JSON.stringify(errorResponse, null, 2),
         );
+
+        Alert.alert(t.booking.errors.bookingFailed, errorResponse.message);
       }
     } finally {
       console.log('=== BOOKING PROCESS COMPLETED ===');
@@ -356,24 +395,28 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
 
   const renderTimeSlots = () => {
     if (isLoading) {
-      return <Text style={baseStyles.loadingText}>{t.booking.timeSlots.loadingSlots}</Text>;
+      return (
+        <Text style={baseStyles.loadingText}>
+          {t.booking.timeSlots.loadingSlots}
+        </Text>
+      );
     }
 
     if (error) {
-      return <Text style={baseStyles.noSlotsText}>{t.booking.timeSlots.errorSlots}</Text>;
+      return (
+        <Text style={baseStyles.noSlotsText}>
+          {t.booking.timeSlots.errorSlots}
+        </Text>
+      );
     }
 
     if (!availabilityData?.periods) {
       return (
         <View style={baseStyles.slotsContainer}>
           <Text style={baseStyles.slotTitle}>
-            {t.booking.availableSlots} {t.booking.for} {format(
-              selectedDate,
-              'EEEE',
-              { locale: isRTL ? arSA : undefined }
-            )}
+            {t.booking.availableSlots} {t.booking.for}{' '}
+            {format(selectedDate, 'EEEE', {locale: isRTL ? arSA : undefined})}
           </Text>
-          
         </View>
       );
     }
@@ -384,26 +427,28 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
     return (
       <View style={baseStyles.slotsContainer}>
         <Text style={baseStyles.slotTitle}>
-          {t.booking.availableSlots} {t.booking.for} {format(
-            selectedDate,
-            'EEEE',
-            { locale: isRTL ? arSA : undefined }
-          )}
+          {t.booking.availableSlots} {t.booking.for}{' '}
+          {format(selectedDate, 'EEEE', {locale: isRTL ? arSA : undefined})}
         </Text>
-        { allSlots.length === 0 && (  
+        {allSlots.length === 0 && (
           <>
-          <View style={styles.noSlotsContainer}>
-            <Icon name="event-busy" size={40} color={Colors.gold} />
-            <Text style={[baseStyles.noSlotsText, styles.noSlotsMessage]}>
-              {t.booking.timeSlots.noSlotsForDay}
-            </Text>
-          </View>
+            <View style={styles.noSlotsContainer}>
+              <Icon name="event-busy" size={40} color={Colors.gold} />
+              <Text style={[baseStyles.noSlotsText, styles.noSlotsMessage]}>
+                {t.booking.timeSlots.noSlotsForDay}
+              </Text>
+            </View>
           </>
         )}
         <Text style={baseStyles.timeRangeText}>
-          {formatTimeAMPM(availabilityData.opening_time)} - {formatTimeAMPM(availabilityData.closing_time)}
+          {formatTimeAMPM(availabilityData.opening_time)} -{' '}
+          {formatTimeAMPM(availabilityData.closing_time)}
         </Text>
-        <View style={[baseStyles.slotButtonsContainer, { flexDirection: !isRTL ? 'row' : 'row-reverse', flexWrap: 'wrap' }]}> 
+        <View
+          style={[
+            baseStyles.slotButtonsContainer,
+            {flexDirection: !isRTL ? 'row' : 'row-reverse', flexWrap: 'wrap'},
+          ]}>
           {allSlots.map(slot => {
             const slotKey = `${slot.start}-${slot.end}`;
             const isAvailable = slot.available !== false;
@@ -415,7 +460,8 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
                 style={[
                   baseStyles.slotButton,
                   selectedSlot === slotKey && baseStyles.selectedSlotButton,
-                  (!isAvailable || !isSelectable || isBooked) && baseStyles.slotButtonDisabled,
+                  (!isAvailable || !isSelectable || isBooked) &&
+                    baseStyles.slotButtonDisabled,
                 ]}
                 disabled={!isAvailable || !isSelectable || isBooked}
                 onPress={() => handleSlotSelect(slotKey)}>
@@ -423,7 +469,8 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
                   style={[
                     baseStyles.slotText,
                     selectedSlot === slotKey && baseStyles.selectedSlotText,
-                    (!isAvailable || !isSelectable || isBooked) && baseStyles.slotTextDisabled,
+                    (!isAvailable || !isSelectable || isBooked) &&
+                      baseStyles.slotTextDisabled,
                   ]}>
                   {slot.start}
                 </Text>
@@ -502,13 +549,16 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
         transparent
         onRequestClose={onClose}>
         <View style={styles.modalContainer}>
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}>
+            <View
+              style={[
+                styles.modalHeader,
+                {flexDirection: isRTL ? 'row-reverse' : 'row'},
+              ]}>
               <Text style={styles.modalTitle}>{t.booking.selectDate}</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={onClose}
-              >
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Icon name="close" size={28} color={Colors.white} />
               </TouchableOpacity>
             </View>
@@ -523,25 +573,30 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={item => item.date.toISOString()}
                 inverted={isRTL}
-                contentContainerStyle={isRTL ? { flexDirection: 'row' } : undefined}
+                contentContainerStyle={
+                  isRTL ? {flexDirection: 'row'} : undefined
+                }
                 renderItem={({item}) => (
                   <TouchableOpacity
                     style={[
                       styles.dateButton,
-                      selectedDate.getDate() === item.date.getDate() && styles.selectedDateButton,
+                      selectedDate.getDate() === item.date.getDate() &&
+                        styles.selectedDateButton,
                     ]}
                     onPress={() => handleDateSelect(item.date)}>
                     <Text
                       style={[
                         styles.dateText,
-                        selectedDate.getDate() === item.date.getDate() && styles.selectedDateText,
+                        selectedDate.getDate() === item.date.getDate() &&
+                          styles.selectedDateText,
                       ]}>
                       {item.day}
                     </Text>
                     <Text
                       style={[
                         styles.dayText,
-                        selectedDate.getDate() === item.date.getDate() && styles.selectedDateText,
+                        selectedDate.getDate() === item.date.getDate() &&
+                          styles.selectedDateText,
                       ]}>
                       {item.label}
                     </Text>
@@ -553,10 +608,15 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
             {renderTimeSlots()}
 
             <View style={styles.notesContainer}>
-              <Text style={styles.notesLabel}>{t.booking.notes || 'Notes'}</Text>
+              <Text style={styles.notesLabel}>
+                {t.booking.notes || 'Notes'}
+              </Text>
               <TextInput
                 style={styles.notesInput}
-                placeholder={t.booking.notesPlaceholder || 'Add any notes for your appointment...'}
+                placeholder={
+                  t.booking.notesPlaceholder ||
+                  'Add any notes for your appointment...'
+                }
                 placeholderTextColor={Colors.white}
                 multiline
                 numberOfLines={3}
@@ -576,7 +636,7 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
               {isBooking ? (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={Colors.gold} />
-                  <Text style={[styles.bookNowButtonText, { marginLeft: 10 }]}>
+                  <Text style={[styles.bookNowButtonText, {marginLeft: 10}]}>
                     {t.booking.booking || 'Booking...'}
                   </Text>
                 </View>
@@ -691,7 +751,10 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
               source={require('../../assets/images/check-icon.png')}
               style={styles.iconImage}
             />
-            <Text style={styles.slotText}>{t.booking.success.location}: {selectedAddress?.description ?? t.booking.success.notAvailable}</Text>
+            <Text style={styles.slotText}>
+              {t.booking.success.location}:{' '}
+              {selectedAddress?.description ?? t.booking.success.notAvailable}
+            </Text>
             <TouchableOpacity
               style={styles.bookNowButton}
               onPress={async () => {
@@ -701,7 +764,9 @@ const DateSelectionModal = ({visible, onClose, salonId, totalDuration, selectedS
                 navigation.navigate('HomeScreen');
                 onClose();
               }}>
-              <Text style={styles.bookNowButtonText}>{t.booking.success.homePage}</Text>
+              <Text style={styles.bookNowButtonText}>
+                {t.booking.success.homePage}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -839,13 +904,16 @@ const locationStyles = StyleSheet.create({
 });
 
 // Helper to get the date object for a given weekday name
-function getDateForWeekday(weekdayName: string | undefined, locale: any = undefined) {
+function getDateForWeekday(
+  weekdayName: string | undefined,
+  locale: any = undefined,
+) {
   if (!weekdayName) return null;
   const today = new Date();
   for (let i = 0; i < 7; i++) {
     const date = new Date();
     date.setDate(today.getDate() + i);
-    const name = format(date, 'EEEE', { locale });
+    const name = format(date, 'EEEE', {locale});
     if (name.toLowerCase() === weekdayName.toLowerCase()) {
       return date;
     }

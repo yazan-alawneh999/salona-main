@@ -50,7 +50,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           />
         </TouchableOpacity>
       )}
-
+      {/* 
       <TouchableOpacity
         onPress={onShare}
         style={[
@@ -58,7 +58,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           isRTL ? styles.backButtonRTL : styles.backButtonLTR,
         ]}>
         <Icon name="ios-share" size={24} color={Colors.white} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {isProvider && !isUser && (
         <TouchableOpacity
           onPress={onFavoritePress}
