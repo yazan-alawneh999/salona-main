@@ -12,6 +12,7 @@ import {
   PermissionsAndroid,
   TextInput,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -693,6 +694,11 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.mainContainer}>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content" // or 'dark-content' depending on background
+      />
       {/* <View style={styles.container}> */}
       {/* Address Selection Modal */}
       {openModal()}

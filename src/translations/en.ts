@@ -629,6 +629,21 @@ export const en = {
       homePage: 'Home Page',
       notAvailable: 'N/A',
     },
+    reviewModal: {
+      title: 'Review & Confirm',
+      discountCode: 'Discount code',
+      add: 'Add',
+      subtotal: 'Subtotal',
+      discounts: 'Discounts',
+      total: 'Total',
+      payNow: 'Pay now',
+      payAtCenter: 'Pay at center',
+      paymentMethod: 'Payment method',
+      notes: 'Notes',
+      notesPlaceholder: 'Add comments or special requests',
+      confirm: 'Confirm',
+      confirming: 'Confirming booking...'
+    },
     errors: {
       authenticationMessage: 'Please log in again to continue.',
       ok: 'OK',

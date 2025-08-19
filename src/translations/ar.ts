@@ -571,6 +571,21 @@ export const ar = {
       homePage: 'الصفحة الرئيسية',
       notAvailable: 'غير متاح',
     },
+    reviewModal: {
+      title: 'مراجعة وتأكيد',
+      discountCode: 'رمز الخصم',
+      add: 'إضافة',
+      subtotal: 'المجموع الفرعي',
+      discounts: 'الخصومات',
+      total: 'الإجمالي',
+      payNow: 'الدفع الآن',
+      payAtCenter: 'الدفع في المركز',
+      paymentMethod: 'طريقة الدفع',
+      notes: 'ملاحظات',
+      notesPlaceholder: 'إضافة تعليقات أو طلبات خاصة بالحجز',
+      confirm: 'تأكيد',
+      confirming: 'جاري تأكيد الحجز...'
+    },
     errors: {
       authenticationMessage: 'الرجاء تسجيل الدخول مرة أخرى للاستمرار.',
       ok: 'موافق',

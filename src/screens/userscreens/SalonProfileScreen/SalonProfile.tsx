@@ -11,6 +11,7 @@ import {
   Dimensions,
   ImageBackground,
   Share,
+  TextInput,
 } from 'react-native';
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -34,6 +35,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/store';
 import PortfolioGrid from './components/PortfolioGrid ';
 import PackagesList from './components/Packages';
+// import ReviewConfirmModal from './components/ReviewConfirmModal';
 
 type SalonProfileRouteProp = RouteProp<
   {
@@ -87,6 +89,7 @@ const SalonProfileScreen = () => {
   const selectedAddress = useSelector(
     (state: RootState) => state.salons.selectedAddress,
   );
+
   console.log('Selected address from Redux:', selectedAddress);
 
   console.log('Salon from route params:', salon);
@@ -202,6 +205,7 @@ const SalonProfileScreen = () => {
 
   const handleBookingSuccess = () => {
     setSelectedServices({});
+    // setModalVisible(true);
   };
 
   const renderContent = () => {
@@ -513,6 +517,12 @@ const SalonProfileScreen = () => {
     }
   }, [salonData]); // ✅ add dependencies here
 
+  // const handleConfirm = useCallback(() => {
+  //   // Handle booking confirmation logic here
+  //   handleBookingSuccess();
+  //   setReviewModalVisible(false);
+  //   // setModalVisible(false);
+  // }, []);
   return (
     <View style={{flex: 1, position: 'relative'}}>
       <ImageBackground
@@ -563,6 +573,16 @@ const SalonProfileScreen = () => {
         </ScrollView>
         <Footer />
         {renderModal()}
+        {/* <ReviewConfirmModal
+          visible={reviewModalVisible}
+          onClose={handleCloseModal}
+          onConfirm={handleConfirm}
+          selectedServices={Object.values(selectedServices)}
+          // discountCode={'DISCOUNT10'}
+          discountAmount={5.0}
+          paymentMethod="الدفع في المركز"
+          isRTL={true}
+        /> */}
         <DateSelectionModal
           visible={dateModalVisible}
           onClose={() => setDateModalVisible(false)}

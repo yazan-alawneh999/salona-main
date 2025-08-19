@@ -1,10 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  Service, 
-  Salon, 
-  SalonResponse, 
-  CreateServiceRequest, 
+import {
+  Service,
+  Salon,
+  SalonResponse,
+  CreateServiceRequest,
   DeleteServiceRequest,
   CreatePackageRequest,
   UpdatePackageRequest,
@@ -15,7 +15,12 @@ import {
   Package,
   Address,
 } from '../../types/salon';
-import { setOnlineStatus } from '../slices/authSlice';
+import {setOnlineStatus} from '../slices/authSlice';
+type CreateAppointmentResponse = {
+  message: string;
+  appointment_id: number;
+  total_amount: number;
+};
 
 // Add interface for nearby salon
 export interface NearbySalon {
@@ -36,7 +41,10 @@ const API_BASE_URL = 'https://spa.dev2.prodevr.com/api';
 const prepareHeaders = async (headers: Headers) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    console.log('Token from storage:', token ? 'Token exists' : 'No token found');
+    console.log(
+      'Token from storage:',
+      token ? 'Token exists' : 'No token found',
+    );
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -46,8 +54,6 @@ const prepareHeaders = async (headers: Headers) => {
     return headers;
   }
 };
-
-
 
 export interface TimeSlot {
   start: string;
@@ -113,13 +119,13 @@ export const salonApi = createApi({
     prepareHeaders,
   }),
   tagTypes: ['Salon', 'Appointments', 'Service', 'Address'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     getSalonById: builder.query<SalonResponse, number>({
-      query: (id) => `salons/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Salon', id }],
+      query: id => `salons/${id}`,
+      providesTags: (result, error, id) => [{type: 'Salon', id}],
       transformResponse: (response: any) => {
         return {
-          salons: response.salon
+          salons: response.salon,
         };
       },
     }),
@@ -131,43 +137,49 @@ export const salonApi = createApi({
         },
       }),
     }),
-    createService: builder.mutation<{ services: Service[] }, CreateServiceRequest>({
-      query: ({ salonId, services }) => ({
+    createService: builder.mutation<
+      {services: Service[]},
+      CreateServiceRequest
+    >({
+      query: ({salonId, services}) => ({
         url: `salons/${salonId}/create-service`,
         method: 'POST',
-        body: { services },
+        body: {services},
       }),
-      invalidatesTags: (result, error, { salonId }) => [
-        { type: 'Salon', id: salonId }
+      invalidatesTags: (result, error, {salonId}) => [
+        {type: 'Salon', id: salonId},
       ],
     }),
-    updateService: builder.mutation<{ services: Service[] }, UpdateServiceRequest>({
-      query: ({ salonId, services }) => ({
+    updateService: builder.mutation<
+      {services: Service[]},
+      UpdateServiceRequest
+    >({
+      query: ({salonId, services}) => ({
         url: `salons/${salonId}/update-service`,
         method: 'POST',
-        body: { services },
+        body: {services},
       }),
-      invalidatesTags: (result, error, { salonId }) => [
-        { type: 'Salon', id: salonId }
+      invalidatesTags: (result, error, {salonId}) => [
+        {type: 'Salon', id: salonId},
       ],
     }),
     deleteService: builder.mutation<void, DeleteServiceRequest>({
-      query: ({ salonId, serviceId }) => ({
+      query: ({salonId, serviceId}) => ({
         url: `salons/${salonId}/delete-service`,
         method: 'POST',
-        body: { services: [{ id: serviceId }] },
+        body: {services: [{id: serviceId}]},
       }),
-      invalidatesTags: (result, error, { salonId }) => [
-        { type: 'Salon', id: salonId }
+      invalidatesTags: (result, error, {salonId}) => [
+        {type: 'Salon', id: salonId},
       ],
     }),
-    createPackage: builder.mutation<{ success: boolean }, CreatePackageRequest>({
-      query: (packageData) => ({
+    createPackage: builder.mutation<{success: boolean}, CreatePackageRequest>({
+      query: packageData => ({
         url: 'salons/create-package',
         method: 'POST',
         body: packageData,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
           await queryFulfilled;
           // Refetch salon data to get updated packages
@@ -177,13 +189,13 @@ export const salonApi = createApi({
         }
       },
     }),
-    updatePackage: builder.mutation<{ success: boolean }, UpdatePackageRequest>({
-      query: ({ salonId, packageId, package: packageData }) => ({
+    updatePackage: builder.mutation<{success: boolean}, UpdatePackageRequest>({
+      query: ({salonId, packageId, package: packageData}) => ({
         url: `salons/${salonId}/update-package/${packageId}`,
         method: 'POST',
         body: packageData,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
           await queryFulfilled;
           // Refetch salon data to get updated packages
@@ -193,12 +205,12 @@ export const salonApi = createApi({
         }
       },
     }),
-    deletePackage: builder.mutation<{ success: boolean }, DeletePackageRequest>({
-      query: ({ salonId, packageId }) => ({
+    deletePackage: builder.mutation<{success: boolean}, DeletePackageRequest>({
+      query: ({salonId, packageId}) => ({
         url: `salons/${salonId}/delete-package`,
         method: 'POST',
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
           await queryFulfilled;
           // Refetch salon data to get updated packages
@@ -208,13 +220,16 @@ export const salonApi = createApi({
         }
       },
     }),
-    updateAvailability: builder.mutation<SalonResponse, UpdateAvailabilityRequest>({
+    updateAvailability: builder.mutation<
+      SalonResponse,
+      UpdateAvailabilityRequest
+    >({
       query: ({id, opening_time, closing_time, is_open}) => ({
         url: `salons/1/update-availabilities`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         body: {
           id,
@@ -226,50 +241,56 @@ export const salonApi = createApi({
       invalidatesTags: (result, error, {id}) => [{type: 'Salon', id}],
     }),
     updateSalonCategories: builder.mutation<
-      { success: boolean },
-      { salonId: number; categoryIds: number[] }
+      {success: boolean},
+      {salonId: number; categoryIds: number[]}
     >({
-      query: ({ salonId, categoryIds }) => ({
+      query: ({salonId, categoryIds}) => ({
         url: `salons/${salonId}/categories`,
         method: 'PUT',
-        body: { category_ids: categoryIds },
+        body: {category_ids: categoryIds},
       }),
-      invalidatesTags: (result, error, { salonId }) => [{ type: 'Salon', id: salonId }],
+      invalidatesTags: (result, error, {salonId}) => [
+        {type: 'Salon', id: salonId},
+      ],
     }),
     getAvailability: builder.query<SalonAvailability, GetAvailabilityRequest>({
-      query: ({ salonId, date }) => ({
+      query: ({salonId, date}) => ({
         url: `salons/${salonId}/availability`,
         method: 'POST',
-        body: { date },
+        body: {date},
       }),
     }),
-    getAppointments: builder.query<{
-      appointments: Array<{
-        
-        id: number;
-        appointment_day: string;
-        appointment_time: string;
-        status: string;
-        total_amount: string;
-        salon: {
+    getAppointments: builder.query<
+      {
+        appointments: Array<{
           id: number;
-          name: string;
-          image_url: string | null;
-        };
-        services: Array<{
-          id: number;
-          service: string;
-          price: string;
-          time: string;
+          appointment_day: string;
+          appointment_time: string;
+          status: string;
+          total_amount: string;
+          salon: {
+            id: number;
+            name: string;
+            image_url: string | null;
+          };
+          services: Array<{
+            id: number;
+            service: string;
+            price: string;
+            time: string;
+          }>;
         }>;
-      }>;
-    }, { status?: 'booked' | 'completed' | 'cancelled' }>({
-      query: ({ status }) => {
-        const url = `${API_BASE_URL}/appointments${status ? `?status=${status}` : ''}`;
+      },
+      {status?: 'booked' | 'completed' | 'cancelled'}
+    >({
+      query: ({status}) => {
+        const url = `${API_BASE_URL}/appointments${
+          status ? `?status=${status}` : ''
+        }`;
         console.log('Making appointments request to:', url);
         console.log('Request headers:', {
-          'Authorization': 'Bearer [token]', // Don't log actual token
-          'Content-Type': 'application/json'
+          Authorization: 'Bearer [token]', // Don't log actual token
+          'Content-Type': 'application/json',
         });
         return {
           url: `appointments${status ? `?status=${status}` : ''}`,
@@ -277,9 +298,9 @@ export const salonApi = createApi({
         };
       },
       providesTags: ['Appointments'],
-      async onQueryStarted(arg, { queryFulfilled }) {
+      async onQueryStarted(arg, {queryFulfilled}) {
         try {
-          const { data } = await queryFulfilled;
+          const {data} = await queryFulfilled;
           console.log('Appointments API response:', data);
         } catch (error: any) {
           console.error('Error in appointments query:', {
@@ -290,20 +311,23 @@ export const salonApi = createApi({
             request: {
               url: error.meta?.request?.url,
               method: error.meta?.request?.method,
-              headers: error.meta?.request?.headers
-            }
+              headers: error.meta?.request?.headers,
+            },
           });
         }
       },
     }),
-    uploadAssets: builder.mutation<{ success: boolean }, { salonId: number; assets: FormData }>({
-      query: ({ salonId, assets }) => ({
+    uploadAssets: builder.mutation<
+      {success: boolean},
+      {salonId: number; assets: FormData}
+    >({
+      query: ({salonId, assets}) => ({
         url: `salons/${salonId}/assets`,
         method: 'POST',
         body: assets,
         formData: true,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
           await queryFulfilled;
           dispatch(salonApi.util.invalidateTags(['Salon']));
@@ -312,42 +336,62 @@ export const salonApi = createApi({
         }
       },
     }),
-    toggleFavoriteAddress: builder.mutation<void, { addressId: string; isFavorite: boolean }>({
-      query: ({ addressId, isFavorite }) => ({
+    toggleFavoriteAddress: builder.mutation<
+      void,
+      {addressId: string; isFavorite: boolean}
+    >({
+      query: ({addressId, isFavorite}) => ({
         url: '/addresses/favorite',
         method: 'PATCH',
-        body: { addressId, isFavorite }
+        body: {addressId, isFavorite},
       }),
-      invalidatesTags: ['Address']
+      invalidatesTags: ['Address'],
     }),
-    createAppointment: builder.mutation<{ success: boolean; id?: number }, CreateAppointmentRequest>({
-      query: (appointmentData) => ({
+    createAppointment: builder.mutation<
+      { success: boolean; id?: number; appointment_id?: number; message?: string; total_amount?: number },
+      CreateAppointmentRequest
+    >({
+      query: appointmentData => ({
         url: 'users/appointments',
         method: 'POST',
         body: appointmentData,
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
       }),
+      transformResponse: (response: any) => {
+        const appointment_id = response?.appointment_id ?? response?.id;
+        const success = !!appointment_id || response?.success === true;
+        return {
+          success,
+          id: appointment_id ?? response?.id,
+          appointment_id,
+          message: response?.message,
+          total_amount: response?.total_amount,
+        };
+      },
       invalidatesTags: ['Appointments'],
-      async onQueryStarted(arg, { queryFulfilled }) {
+      async onQueryStarted(arg, {queryFulfilled}) {
         try {
-          const { data } = await queryFulfilled;
-          console.log('Appointment created successfully:', data);
+          const {data} = await queryFulfilled;
+          console.log('Appointment created successfully (normalized):', data);
         } catch (error: any) {
           console.error('Error creating appointment:', {
             message: error.message,
             status: error.status,
             data: error.data,
-            originalError: error.originalError
+            originalError: error.originalError,
           });
           throw error;
         }
       },
     }),
-    getCategories: builder.query<{ success: boolean; categories: Category[] }, void>({
+    getCategories: builder.query<
+      {success: boolean; categories: Category[]},
+      void
+    >({
       query: () => ({
         url: 'categories',
         method: 'GET',
@@ -365,9 +409,9 @@ export const salonApi = createApi({
       },
       providesTags: ['Salon'],
     }),
-    toggleFavoriteSalon: builder.mutation<void, { salon_id: number }>({
-      query: (body) => {
-        console.log('Toggling favorite for salon:', body.salon_id );
+    toggleFavoriteSalon: builder.mutation<void, {salon_id: number}>({
+      query: body => {
+        console.log('Toggling favorite for salon:', body.salon_id);
         return {
           url: 'favorite-salon',
           method: 'POST',
@@ -376,27 +420,33 @@ export const salonApi = createApi({
       },
       invalidatesTags: ['Salon'],
     }),
-    contactUs: builder.mutation<{ success: boolean }, { email: string; note: string }>({
-      query: (body) => ({
+    contactUs: builder.mutation<
+      {success: boolean},
+      {email: string; note: string}
+    >({
+      query: body => ({
         url: 'new-contact-us',
         method: 'POST',
         body,
       }),
     }),
-    deleteUser: builder.mutation<{ success: boolean }, void>({
+    deleteUser: builder.mutation<{success: boolean}, void>({
       query: () => ({
         url: 'delete-user',
         method: 'DELETE',
       }),
     }),
-    toggleSalonStatus: builder.mutation<{ is_online: boolean; message: string; success: boolean }, void>({
+    toggleSalonStatus: builder.mutation<
+      {is_online: boolean; message: string; success: boolean},
+      void
+    >({
       query: () => ({
         url: 'salons/toggle-status',
         method: 'PUT',
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, {dispatch, queryFulfilled}) {
         try {
-          const { data } = await queryFulfilled;
+          const {data} = await queryFulfilled;
           // Dispatch action to update is_online in auth state
           dispatch(setOnlineStatus(data.is_online));
         } catch (error) {
@@ -404,56 +454,73 @@ export const salonApi = createApi({
         }
       },
     }),
-    updateAddress: builder.mutation<{ success: boolean; message: string; }, UpdateAddressRequest>({
-      query: ({ id, ...updateData }) => ({
+    updateAddress: builder.mutation<
+      {success: boolean; message: string},
+      UpdateAddressRequest
+    >({
+      query: ({id, ...updateData}) => ({
         url: `update-address/${id}`,
         method: 'GET',
         params: updateData,
       }),
       invalidatesTags: ['Address'],
     }),
-    markAppointmentAsRead: builder.mutation<{ success: boolean }, number>({
-      query: (appointmentId) => ({
+    markAppointmentAsRead: builder.mutation<{success: boolean}, number>({
+      query: appointmentId => ({
         url: `salons/mark-appointment-read/${appointmentId}`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       }),
       invalidatesTags: ['Appointments'],
     }),
-    getPackages: builder.query<{ success: boolean; packages: { data: Package[] } }, void>({
+    getPackages: builder.query<
+      {success: boolean; packages: {data: Package[]}},
+      void
+    >({
       query: () => ({
         url: 'salons/get-package',
         method: 'GET',
       }),
       providesTags: ['Package'],
     }),
-    getAddresses: builder.query<{ addresses: Address[] }, void>({
+    getAddresses: builder.query<{addresses: Address[]}, void>({
       query: () => ({
         url: 'addresses',
         method: 'GET',
       }),
       providesTags: ['Address'],
     }),
-    getNearbySalons: builder.query<{ success: boolean; salons: NearbySalon[] }, { latitude: number; longitude: number; radius?: number }>({
-      query: ({ latitude, longitude, radius = 10 }) => ({
+    getNearbySalons: builder.query<
+      {success: boolean; salons: NearbySalon[]},
+      {latitude: number; longitude: number; radius?: number}
+    >({
+      query: ({latitude, longitude, radius = 10}) => ({
         url: `nearby-salons?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
         method: 'GET',
       }),
       providesTags: ['Salon'],
     }),
-    createAddress: builder.mutation<{ address: Address }, { description: string; is_favorite: boolean; latitude: string; longitude: string }>({
-      query: (addressData) => ({
+    createAddress: builder.mutation<
+      {address: Address},
+      {
+        description: string;
+        is_favorite: boolean;
+        latitude: string;
+        longitude: string;
+      }
+    >({
+      query: addressData => ({
         url: 'new-address',
         method: 'POST',
         body: addressData,
       }),
       invalidatesTags: ['Address'],
     }),
-    updatePrimaryAddress: builder.mutation<{ success: boolean }, number>({
-      query: (addressId) => ({
+    updatePrimaryAddress: builder.mutation<{success: boolean}, number>({
+      query: addressId => ({
         url: `update-primary-address/${addressId}`,
         method: 'PUT',
       }),

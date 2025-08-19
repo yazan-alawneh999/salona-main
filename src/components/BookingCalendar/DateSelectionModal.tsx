@@ -30,6 +30,7 @@ import Colors from '../../constants/Colors';
 import {notificationService} from '../../services/notificationService';
 import {useTranslation} from '../../contexts/TranslationContext';
 import {arSA} from 'date-fns/locale';
+import ReviewConfirmModal from '../../screens/userscreens/SalonProfileScreen/components/ReviewConfirmModal';
 
 interface DateSelectionModalProps {
   visible: boolean;
@@ -63,6 +64,17 @@ const DateSelectionModal = ({
   const selectedAddress = useSelector(
     (state: RootState) => state.salons.selectedAddress,
   );
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const handleOpenModal = () => {
+    // Ensure only review modal is visible
+    setSuccessModalVisible(false);
+    setChooseLocationModalVisible(false);
+    setReviewModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setReviewModalVisible(false);
+  };
 
   // Use the Redux query hook to fetch addresses
   const {data: addressData, isLoading: isLoadingAddresses} =
@@ -93,6 +105,7 @@ const DateSelectionModal = ({
     if (!visible) {
       setChooseLocationModalVisible(false);
       setSuccessModalVisible(false);
+      handleCloseModal();
       setSelectedLocation('');
     }
   }, [visible]);
@@ -151,14 +164,269 @@ const DateSelectionModal = ({
     return true;
   };
 
-  const handleBookNow = () => {
+  const confirmBook = () => {
     if (selectedSlot) {
-      setIsBooking(true);
-      // setChooseLocationModalVisible(true);
-      // Temporarily comment out location selection
-      handleBookAppointment();
+      // Process services into array *here* before opening the review modal
+      let servicesArray: any[] = [];
+
+      if (Array.isArray(selectedServices)) {
+        servicesArray = selectedServices;
+      } else if (
+        typeof selectedServices === 'object' &&
+        selectedServices !== null
+      ) {
+        servicesArray = Object.values(selectedServices).filter(
+          service => service !== false,
+        );
+      }
+
+      setSerivcesArr(servicesArray);
+      handleOpenModal();
     }
   };
+
+  const handleBookNow = (notesFromReview?: string) => {
+    if (!selectedSlot) return;
+    if (typeof notesFromReview === 'string') {
+      setAppointmentNotes(notesFromReview);
+    }
+    // Keep review modal open while booking
+    setIsBooking(true);
+    handleBookAppointment();
+  };
+  // const handleConfirm = () => {
+  //   // Handle booking confirmation logic here
+  //   setSuccessModalVisible(true);
+  // };
+
+  const [servicesArr, setSerivcesArr] = useState([]);
+
+  const resetBookingState = () => {
+    setSelectedSlot(null);
+    setAppointmentNotes('');
+    setSelectedLocation('');
+    setSerivcesArr([]);
+    setIsBooking(false);
+  };
+  // const handleBookAppointment = async () => {
+  //   console.log('=== STARTING BOOKING PROCESS ===');
+  //   console.log('Auth Token:', token ? 'Token exists' : 'No token found');
+
+  //   if (!token) {
+  //     console.error('❌ No authentication token found');
+  //     Alert.alert(
+  //       t.booking.errors.authentication,
+  //       t.booking.errors.authenticationMessage,
+  //       [
+  //         {
+  //           text: t.booking.errors.ok,
+  //           onPress: () => navigation.navigate('Login'),
+  //         },
+  //       ],
+  //     );
+  //     return;
+  //   }
+
+  //   console.log(
+  //     'Selected Services:',
+  //     JSON.stringify(selectedServices, null, 2),
+  //   );
+  //   console.log('Selected Date:', selectedDate);
+  //   console.log('Selected Slot:', selectedSlot);
+  //   // console.log('Selected Location:', selectedLocation);
+  //   console.log('Salon ID:', salonId);
+  //   console.log('Total Duration:', totalDuration);
+
+  //   if (!selectedSlot) {
+  //     console.log('❌ Booking failed: No time slot selected');
+  //     Alert.alert(t.booking.errors.noTimeSlot);
+  //     return;
+  //   }
+
+  //   // Process selected services based on its type
+  //   let servicesArray = [];
+
+  //   if (Array.isArray(selectedServices)) {
+  //     servicesArray = selectedServices;
+  //   } else if (
+  //     typeof selectedServices === 'object' &&
+  //     selectedServices !== null
+  //   ) {
+  //     // Convert object to array of services
+  //     servicesArray = Object.values(selectedServices).filter(
+  //       service => service !== false,
+  //     );
+  //   }
+
+  //   console.log(
+  //     'Processed services array:',
+  //     JSON.stringify(servicesArray, null, 2),
+  //   );
+
+  //   if (servicesArray.length === 0) {
+  //     console.log('❌ Booking failed: No services selected');
+  //     Alert.alert(t.booking.errors.noServices);
+  //     return;
+  //   }
+
+  //   try {
+  //     console.log('🔄 Starting API call to book appointment...');
+  //     setIsBooking(true);
+
+  //     // Get the selected slot's start time
+  //     const appointmentTime = selectedSlot.split('-')[0];
+  //     console.log('Appointment time from slot:', appointmentTime);
+
+  //     // Format the date for the API (YYYY-MM-DD)
+  //     const appointmentDay = format(selectedDate, 'yyyy-MM-dd');
+  //     console.log('Formatted appointment day:', appointmentDay);
+
+  //     // Get the service IDs from the selectedServices prop
+  //     const serviceIds = servicesArray.map(service => {
+  //       const id = parseInt(service.id, 10);
+  //       console.log('Processing service:', {name: service.name, id});
+  //       return id;
+  //     });
+  //     console.log('Service IDs to be sent:', serviceIds);
+
+  //     const bookingData = {
+  //       salon_id: salonId,
+  //       address_id: selectedAddress?.id,
+  //       appointment_day: appointmentDay,
+  //       appointment_time: appointmentTime,
+  //       note: appointmentNotes,
+  //       services: serviceIds,
+  //     };
+
+  //     // Log the complete request details
+  //     console.log('=== API REQUEST DETAILS ===');
+  //     console.log('Endpoint: createAppointment');
+  //     console.log('Headers:', {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //       Accept: 'application/json',
+  //     });
+  //     console.log('Request Body:', JSON.stringify(bookingData, null, 2));
+  //     console.log('=== END API REQUEST DETAILS ===');
+
+  //     // Use RTK Query mutation instead of axios
+  //     // const result = await createAppointment(bookingData).unwrap();
+  //     const response = await createAppointment(bookingData).unwrap();
+
+  //     console.log('📥 API Response:', JSON.stringify(response, null, 2));
+
+  //     if (response && response.appointment_id) {
+  //       const appointmentDateTime = new Date(
+  //         `${appointmentDay}T${appointmentTime}`,
+  //       );
+
+  //       const notificationData = {
+  //         appointmentId: response.appointment_id.toString(),
+  //         salonName: 'Your Salon',
+  //         appointmentTime: appointmentDateTime.toISOString(),
+  //         services: servicesArray.map(service => service.name),
+  //       };
+
+  //       console.log(
+  //         'Notification data:',
+  //         JSON.stringify(notificationData, null, 2),
+  //       );
+
+  //       setReviewModalVisible(false);
+  //       setSuccessModalVisible(true);
+  //       setSelectedSlot(null);
+
+  //       if (onBookingSuccess) {
+  //         onBookingSuccess();
+  //       }
+
+  //       await refetchAvailability();
+  //     }
+  //   } catch (error: any) {
+  //     console.error('❌ Error booking appointment:', error);
+
+  //     // Log the complete error details
+  //     console.error('=== ERROR DETAILS ===');
+  //     console.error('Error type:', typeof error);
+  //     console.error('Error keys:', Object.keys(error));
+  //     console.error('Error message:', error?.message);
+  //     console.error('Error response:', error?.response);
+  //     console.error('Error data:', error?.data);
+  //     console.error('Error status:', error?.status);
+  //     console.error('Error originalError:', error?.originalError);
+  //     console.error('=== END ERROR DETAILS ===');
+
+  //     // Check if the error is an authentication error (HTML response instead of JSON)
+  //     if (error?.error?.includes('Unexpected character: <')) {
+  //       console.log('❌ Authentication error: Session expired');
+  //       console.log('Current token:', token);
+  //       console.log('Token length:', token?.length);
+
+  //       // Try to parse the HTML error to get more details
+  //       try {
+  //         const errorHtml = error.error;
+  //         console.log('Error HTML:', errorHtml);
+
+  //         // Extract any useful information from the HTML error
+  //         const errorMatch = errorHtml.match(/SQLSTATE\[.*?\]: (.*?)\n/);
+  //         if (errorMatch) {
+  //           console.log('Database error:', errorMatch[1]);
+  //         }
+  //       } catch (parseError) {
+  //         console.log('Could not parse error HTML:', parseError);
+  //       }
+
+  //       const errorResponse = {
+  //         status: 'error',
+  //         code: 'SESSION_EXPIRED',
+  //         message:
+  //           'There was an error processing your booking. Please try again.',
+  //         details: {
+  //           type: 'database_error',
+  //           action: 'retry_booking',
+  //           tokenStatus: token
+  //             ? 'Token exists but may be invalid'
+  //             : 'No token found',
+  //         },
+  //       };
+  //       console.log(
+  //         '📤 Error Response:',
+  //         JSON.stringify(errorResponse, null, 2),
+  //       );
+
+  //       Alert.alert(
+  //         t.booking.errors.bookingFailed,
+  //         t.booking.errors.bookingFailedMessage,
+  //         [
+  //           {
+  //             text: t.booking.errors.ok,
+  //             onPress: () => {
+  //               // Just close the alert, don't navigate to login
+  //               // The user can try booking again
+  //             },
+  //           },
+  //         ],
+  //       );
+  //     } else {
+  //       const errorResponse = {
+  //         status: 'error',
+  //         code: 'BOOKING_FAILED',
+  //         message:
+  //           'There was an error booking your appointment. Please try again.',
+  //         details: error,
+  //       };
+  //       console.log(
+  //         '📤 Error Response:',
+  //         JSON.stringify(errorResponse, null, 2),
+  //       );
+
+  //       Alert.alert(t.booking.errors.bookingFailed, errorResponse.message);
+  //     }
+  //   } finally {
+  //     console.log('=== BOOKING PROCESS COMPLETED ===');
+  //     setIsBooking(false);
+  //   }
+  // };
 
   const handleBookAppointment = async () => {
     console.log('=== STARTING BOOKING PROCESS ===');
@@ -241,6 +509,11 @@ const DateSelectionModal = ({
       });
       console.log('Service IDs to be sent:', serviceIds);
 
+      if (!selectedAddress?.id) {
+        Alert.alert(t.booking.errors.location, t.booking.errors.noLocation);
+        return;
+      }
+
       const bookingData = {
         salon_id: salonId,
         address_id: selectedAddress?.id,
@@ -264,13 +537,26 @@ const DateSelectionModal = ({
       // Use RTK Query mutation instead of axios
       const result = await createAppointment(bookingData).unwrap();
 
-      console.log('✅ Appointment booked successfully!');
       console.log('📥 API Response:', JSON.stringify(result, null, 2));
+
+      // Ensure API confirmed success before proceeding
+      if (!result || result.success !== true) {
+        console.warn('Booking not confirmed by API');
+        Alert.alert(
+          t.booking.errors.bookingFailed,
+          t.booking.errors.bookingFailedMessage,
+          [{text: t.booking.errors.ok}],
+        );
+        return;
+      }
+
+      console.log('✅ Appointment booked successfully!');
 
       // Schedule notification for the appointment
       if (result.success) {
-        const appointmentDateTime = new Date(
-          `${appointmentDay}T${appointmentTime}`,
+        const appointmentDateTime = buildAppointmentDateTime(
+          selectedDate,
+          appointmentTime,
         );
         console.log(
           'Creating notification for:',
@@ -293,8 +579,8 @@ const DateSelectionModal = ({
         console.log('✅ Appointment notification scheduled');
       }
 
-      // Clear selected slot after successful booking
-      setSelectedSlot(null);
+      // Reset booking state after successful booking
+      resetBookingState();
 
       // Call onBookingSuccess if provided
       if (onBookingSuccess) {
@@ -304,8 +590,9 @@ const DateSelectionModal = ({
       // Refetch availability data after successful booking
       await refetchAvailability();
 
-      // Close the location modal and show success modal
-      // setChooseLocationModalVisible(false);
+      // Close other modals and show success modal
+      setReviewModalVisible(false);
+      setChooseLocationModalVisible(false);
       setSuccessModalVisible(true);
     } catch (error: any) {
       console.error('❌ Error booking appointment:', error);
@@ -365,10 +652,7 @@ const DateSelectionModal = ({
           [
             {
               text: t.booking.errors.ok,
-              onPress: () => {
-                // Just close the alert, don't navigate to login
-                // The user can try booking again
-              },
+              onPress: () => {},
             },
           ],
         );
@@ -376,8 +660,7 @@ const DateSelectionModal = ({
         const errorResponse = {
           status: 'error',
           code: 'BOOKING_FAILED',
-          message:
-            'There was an error booking your appointment. Please try again.',
+          message: t.booking.errors.bookingFailedMessage,
           details: error,
         };
         console.log(
@@ -385,14 +668,16 @@ const DateSelectionModal = ({
           JSON.stringify(errorResponse, null, 2),
         );
 
-        Alert.alert(t.booking.errors.bookingFailed, errorResponse.message);
+        Alert.alert(
+          t.booking.errors.bookingFailed,
+          t.booking.errors.bookingFailedMessage,
+        );
       }
     } finally {
       console.log('=== BOOKING PROCESS COMPLETED ===');
       setIsBooking(false);
     }
   };
-
   const renderTimeSlots = () => {
     if (isLoading) {
       return (
@@ -629,20 +914,22 @@ const DateSelectionModal = ({
               style={[
                 styles.bookNowButton,
                 !selectedSlot && styles.bookNowButtonDisabled,
-                isBooking && styles.bookNowButtonLoading,
+                // isBooking && styles.bookNowButtonLoading,
               ]}
-              disabled={!selectedSlot || isBooking}
-              onPress={handleBookNow}>
-              {isBooking ? (
+              // disabled={!selectedSlot || isBooking}
+              disabled={!selectedSlot}
+              onPress={confirmBook}>
+              {/* onPress={handleBookNow}> */}
+              {/* {isBooking ? (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={Colors.gold} />
                   <Text style={[styles.bookNowButtonText, {marginLeft: 10}]}>
                     {t.booking.booking || 'Booking...'}
                   </Text>
                 </View>
-              ) : (
-                <Text style={styles.bookNowButtonText}>{t.booking.book}</Text>
-              )}
+              ) : ( */}
+              <Text style={styles.bookNowButtonText}>{t.booking.book}</Text>
+              {/* )} */}
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -732,7 +1019,7 @@ const DateSelectionModal = ({
       */}
 
       <Modal
-        visible={successModalVisible && visible}
+        visible={successModalVisible}
         animationType="fade"
         transparent
         onRequestClose={() => setSuccessModalVisible(false)}>
@@ -759,8 +1046,10 @@ const DateSelectionModal = ({
               style={styles.bookNowButton}
               onPress={async () => {
                 setSuccessModalVisible(false);
+                handleCloseModal();
                 // Refetch availability data before navigating
                 await refetchAvailability();
+                resetBookingState();
                 navigation.navigate('HomeScreen');
                 onClose();
               }}>
@@ -771,6 +1060,18 @@ const DateSelectionModal = ({
           </View>
         </View>
       </Modal>
+
+      <ReviewConfirmModal
+        visible={reviewModalVisible}
+        onClose={handleCloseModal}
+        onConfirm={handleBookNow}
+        isBooking={isBooking}
+        selectedServices={servicesArr}
+        discountAmount={0.0}
+        paymentMethod={t.booking.reviewModal.payAtCenter}
+        isRTL={isRTL}
+        initialNotes={appointmentNotes}
+      />
     </>
   );
 };
@@ -932,5 +1233,37 @@ const formatTimeAMPM = (time: string) => {
   if (hour === 0) hour = 12;
   return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
 };
+
+// Safe builder for appointment Date object across JS engines (Hermes)
+function buildAppointmentDateTime(dateOnly: Date, timeStr: string): Date {
+  const time = timeStr.trim();
+  // Normalize time formats: supports "HH:mm", "HH:mm:ss", "hh:mm AM/PM"
+  let hours = 0;
+  let minutes = 0;
+  let normalized = time.toUpperCase();
+
+  const hasAmPm = normalized.includes('AM') || normalized.includes('PM');
+  if (hasAmPm) {
+    normalized = normalized.replace(/\s+/g, ''); // e.g. 09:00AM
+    const am = normalized.endsWith('AM');
+    const pm = normalized.endsWith('PM');
+    const clock = normalized.replace(/AM|PM/, '');
+    const parts = clock.split(':');
+    hours = parseInt(parts[0], 10);
+    minutes = parseInt(parts[1] || '0', 10);
+    if (pm && hours < 12) hours += 12;
+    if (am && hours === 12) hours = 0;
+  } else {
+    // 24h format, may include seconds
+    const parts = normalized.split(':');
+    hours = parseInt(parts[0], 10);
+    minutes = parseInt(parts[1] || '0', 10);
+  }
+
+  const year = dateOnly.getFullYear();
+  const monthIndex = dateOnly.getMonth();
+  const day = dateOnly.getDate();
+  return new Date(year, monthIndex, day, hours, minutes, 0, 0);
+}
 
 export default DateSelectionModal;
