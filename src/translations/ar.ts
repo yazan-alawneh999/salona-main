@@ -85,6 +85,7 @@ export const ar = {
       signupFailed: 'فشل إنشاء الحساب',
       invalidPhoneNumber: 'رقم الهاتف يجب أن يكون 9 أو 10 أرقام',
       registrationFailed: 'فشل إنشاء الحساب',
+      passwordTooShort: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.',
     },
     name: 'الاسم',
     email: 'البريد الإلكتروني',
@@ -584,7 +585,11 @@ export const ar = {
       notes: 'ملاحظات',
       notesPlaceholder: 'إضافة تعليقات أو طلبات خاصة بالحجز',
       confirm: 'تأكيد',
-      confirming: 'جاري تأكيد الحجز...'
+      confirming: 'جاري تأكيد الحجز...',
+      services: 'خدمات',
+      hour: 'س',
+      minute: 'د',
+      and: 'و'
     },
     errors: {
       authenticationMessage: 'الرجاء تسجيل الدخول مرة أخرى للاستمرار.',

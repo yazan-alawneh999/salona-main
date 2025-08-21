@@ -16,6 +16,7 @@ import ProviderFooter from '../../../components/ProviderFooter/ProviderFooter';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from '../../../contexts/TranslationContext';
 import { Notification, NotificationsResponse } from './types';
+import Colors from '../../../constants/Colors';
 
 
 const ProviderNotificationsScreen: React.FC = () => {
@@ -247,7 +248,7 @@ const ProviderNotificationsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>

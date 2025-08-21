@@ -3,12 +3,13 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   FlatList,
   ScrollView,
   Modal,
   I18nManager,
+  StatusBar,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/store';
@@ -27,10 +28,6 @@ import AboutTab from './components/AboutTab';
 import ServicesTab from './components/ServicesTab';
 import PortfolioTab from './components/PortfolioTab';
 import ReviewsTab from './components/ReviewsTab';
-import {useSalonPackages} from './hooks/useSalonPackages';
-import PackagesTab from './components/PackagesTab';
-import AddPackageModal from '../../../components/AddPackageModal/AddPackageModal';
-import EditPackageModal from '../../../components/EditPackageModal/EditPackageModal';
 import {Service} from '../../../types/salon';
 import {useTranslation} from '../../../contexts/TranslationContext';
 
@@ -61,19 +58,6 @@ const ProviderSalonProfileScreen = () => {
     toggleService,
   } = useSalonServices(salonId, salonData);
 
-  const {
-    selectedPackages,
-    handleEditPackage,
-    handleDeletePackage,
-    handleAddPackage,
-    togglePackage,
-  } = useSalonPackages(salonId, salonData);
-
-  const [isAddPackageModalVisible, setAddPackageModalVisible] = useState(false);
-  const [isEditPackageModalVisible, setEditPackageModalVisible] =
-    useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
-
   const handleEditServicePress = (service: any) => {
     setSelectedService(service);
     setEditModalVisible(true);
@@ -98,19 +82,6 @@ const ProviderSalonProfileScreen = () => {
       0,
     );
     return {serviceFees, totalPrice: totalPrice + serviceFees};
-  };
-
-  const handleEditPackagePress = (pkg: any) => {
-    setSelectedPackage(pkg);
-    setEditPackageModalVisible(true);
-  };
-
-  const handleAddPackagePress = () => {
-    setAddPackageModalVisible(true);
-  };
-
-  const handlePackageModalClose = () => {
-    setAddPackageModalVisible(false);
   };
 
   const handleAvailabilityUpdate = () => {
@@ -139,18 +110,6 @@ const ProviderSalonProfileScreen = () => {
             onToggleService={toggleService}
             onEditService={handleEditServicePress}
             onDeleteService={handleDeleteService}
-            onContinue={() => setModalVisible(true)}
-          />
-        );
-      case 'Packages':
-        return (
-          <PackagesTab
-            packages={salonData.salons.packages}
-            selectedPackages={selectedPackages}
-            onAddPackage={handleAddPackagePress}
-            onTogglePackage={togglePackage}
-            onEditPackage={handleEditPackagePress}
-            onDeletePackage={handleDeletePackage}
             onContinue={() => setModalVisible(true)}
           />
         );
@@ -233,127 +192,101 @@ const ProviderSalonProfileScreen = () => {
   };
 
   return (
-    <View style={[styles.container, isRTL && {direction: 'rtl'}]}>
-      <ScrollView>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.welcomeText}>{t.salonProfile.welcome}</Text>
-            <Text style={styles.nameText}>{user?.name || 'Provider'}</Text>
+    <SafeAreaView style={{flex: 1, backgroundColor: Colors.black}}>
+      <StatusBar 
+        backgroundColor={Colors.black}
+        barStyle="light-content"
+        translucent={true}
+      />
+      <View style={[styles.container, isRTL && {direction: 'rtl'}]}>
+        <ScrollView>
+          <View style={styles.header}>
+            <View style={styles.headerLeft}>
+              <Text style={styles.welcomeText}>{t.salonProfile.welcome}</Text>
+              <Text style={styles.nameText}>{user?.name || 'Provider'}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleNotificationPress}>
+              <Icon name="notifications" size={24} color={Colors.gold} />
+            </TouchableOpacity>
           </View>
 
-          <Image
-            source={require('../../../assets/images/prettyLogo.png')}
-            style={styles.logo}
-            resizeMode="contain"
+          <ProfileHeader
+            image={salonData?.salons?.image_url}
+            name={salonData?.salons?.name || ''}
+            title={t.salonProfile.salonType}
+            rating={salonData?.salons?.ratings_received?.[0]?.rate || 0}
+            reviews={salonData?.salons?.ratings_received?.length || 0}
+            back={false}
+            onBackPress={() => navigation.goBack()}
+            onFavoritePress={() => console.log(t.salonProfile.addToFavorites)}
+            isProvider={false}
           />
 
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={handleNotificationPress}>
-            <Icon name="notifications" size={24} color={Colors.gold} />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.tabs}>
+            {[
+              {key: 'About', label: t.salonProfile.tabs.about},
+              {key: 'Services', label: t.salonProfile.tabs.services},
+              {key: 'Portfolio', label: t.salonProfile.tabs.portfolio},
+              {key: 'Reviews', label: t.salonProfile.tabs.reviews},
+            ].map(tab => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tab, activeTab === tab.key && styles.activeTab]}
+                onPress={() => setActiveTab(tab.key)}>
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === tab.key && styles.activeTabText,
+                  ]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        <ProfileHeader
-          image={salonData?.salons?.image_url}
-          name={salonData?.salons?.name || ''}
-          title={t.salonProfile.salonType}
-          rating={salonData?.salons?.ratings_received?.[0]?.rate || 0}
-          reviews={salonData?.salons?.ratings_received?.length || 0}
-          back={false}
-          onBackPress={() => navigation.goBack()}
-          onFavoritePress={() => console.log(t.salonProfile.addToFavorites)}
-          isProvider={false}
-        />
+          <View style={styles.content}>{renderContent()}</View>
+          {renderModal()}
 
-        <View style={styles.tabs}>
-          {[
-            {key: 'About', label: t.salonProfile.tabs.about},
-            {key: 'Services', label: t.salonProfile.tabs.services},
-            {key: 'Packages', label: t.salonProfile.tabs.packages},
-            {key: 'Portfolio', label: t.salonProfile.tabs.portfolio},
-            {key: 'Reviews', label: t.salonProfile.tabs.reviews},
-          ].map(tab => (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tab, activeTab === tab.key && styles.activeTab]}
-              onPress={() => setActiveTab(tab.key)}>
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === tab.key && styles.activeTabText,
-                ]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={styles.content}>{renderContent()}</View>
-        {renderModal()}
-
-        <DateSelectionModal
-          visible={dateModalVisible}
-          onClose={() => setDateModalVisible(false)}
-          onDateSelected={() => {
-            setDateModalVisible(false);
-            console.log('Proceed to next step with selected date and time');
-          }}
-        />
-
-        <AddServiceModal
-          visible={isAddModalVisible}
-          onClose={handleModalClose}
-          onSubmit={handleAddService}
-          title={t.salonProfile.modals.addService}
-          submitText={t.salonProfile.modals.submit}
-          closeText={t.salonProfile.modals.close}
-        />
-
-        <EditServiceModal
-          visible={isEditModalVisible}
-          onClose={() => setEditModalVisible(false)}
-          onSubmit={data => handleEditService(selectedService.id, data)}
-          defaultValues={
-            selectedService
-              ? {
-                  name: selectedService.service,
-                  description: selectedService.description,
-                  price: selectedService.price,
-                  time: selectedService.time,
-                }
-              : undefined
-          }
-        />
-
-        <AddPackageModal
-          visible={isAddPackageModalVisible}
-          onClose={handlePackageModalClose}
-          onSubmit={handleAddPackage}
-          availableServices={salonData?.salons?.services || []}
-          title={t.salonProfile.modals.addPackage}
-          submitText={t.salonProfile.modals.submit}
-          closeText={t.salonProfile.modals.close}
-        />
-
-        {selectedPackage && (
-          <EditPackageModal
-            visible={isEditPackageModalVisible}
-            onClose={() => {
-              setEditPackageModalVisible(false);
-              setSelectedPackage(null);
+          <DateSelectionModal
+            visible={dateModalVisible}
+            onClose={() => setDateModalVisible(false)}
+            onDateSelected={() => {
+              setDateModalVisible(false);
+              console.log('Proceed to next step with selected date and time');
             }}
-            onSubmit={data => handleEditPackage(selectedPackage.id, data)}
-            availableServices={salonData?.salons?.services || []}
-            defaultValues={selectedPackage}
-            title={t.salonProfile.modals.editPackage}
+          />
+
+          <AddServiceModal
+            visible={isAddModalVisible}
+            onClose={handleModalClose}
+            onSubmit={handleAddService}
+            title={t.salonProfile.modals.addService}
             submitText={t.salonProfile.modals.submit}
             closeText={t.salonProfile.modals.close}
           />
-        )}
-      </ScrollView>
-      <ProviderFooter />
-    </View>
+
+          <EditServiceModal
+            visible={isEditModalVisible}
+            onClose={() => setEditModalVisible(false)}
+            onSubmit={data => handleEditService(selectedService.id, data)}
+            defaultValues={
+              selectedService
+                ? {
+                    name: selectedService.service,
+                    description: selectedService.description,
+                    price: selectedService.price,
+                    time: selectedService.time,
+                  }
+                : undefined
+            }
+          />
+        </ScrollView>
+        <ProviderFooter />
+      </View>
+    </SafeAreaView>
   );
 };
 

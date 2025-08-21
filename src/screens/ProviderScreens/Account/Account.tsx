@@ -9,7 +9,9 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import styles from './Account.styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -227,171 +229,174 @@ const ProviderAccountScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, isRTL && { direction: 'rtl' }]}>
-      <ScrollView>
-        <ProfileHeader
-          isProvider={false}
-          image={user?.image || require('../../../assets/images/eyebrow.png')}
-          name={user?.name || 'Guest'}
-          email={user?.email}
-          onBackPress={() => navigation.goBack()}
-          back={false}
-        />
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.account.myAccount}</Text>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={() => handleOptionPress('Service Fee')}>
-            <Icon name="attach-money" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{t.account.serviceFee}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={() => handleOptionPress('Language')}>
-            <Icon name="language" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{t.account.language}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={() => handleOptionPress('Privacy Policy')}>
-            <Icon name="policy" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{t.account.privacyPolicy}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={() => handleOptionPress('Terms of Service')}>
-            <Icon name="description" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{t.account.termsOfService}</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+      <View style={[styles.container, isRTL && { direction: 'rtl' }]}>
+        <ScrollView>
+          <ProfileHeader
+            isProvider={false}
+            image={user?.image || require('../../../assets/images/eyebrow.png')}
+            name={user?.name || 'Guest'}
+            email={user?.email}
+            onBackPress={() => navigation.goBack()}
+            back={false}
+          />
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t.account.myAccount}</Text>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={() => handleOptionPress('Service Fee')}>
+              <Icon name="attach-money" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{t.account.serviceFee}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={() => handleOptionPress('Language')}>
+              <Icon name="language" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{t.account.language}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={() => handleOptionPress('Privacy Policy')}>
+              <Icon name="policy" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{t.account.privacyPolicy}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={() => handleOptionPress('Terms of Service')}>
+              <Icon name="description" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{t.account.termsOfService}</Text>
+            </TouchableOpacity>
 
-          <Text style={styles.sectionTitle}>{t.account.notifications}</Text>
+            <Text style={styles.sectionTitle}>{t.account.notifications}</Text>
+            
+            <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
+            <Switch
+                value={pushNotifications}
+                onValueChange={togglePushNotifications}
+                trackColor={{false: Colors.softGray, true: Colors.green}}
+                thumbColor={pushNotifications ? Colors.green : Colors.softGray}
+              />
+              {/* <Icon name="notifications-none" size={20} color={Colors.gold} /> */}
+              <Text style={[styles.optionText]}>{t.account.pushNotifications}</Text>
           
-          <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
-          <Switch
-              value={pushNotifications}
-              onValueChange={togglePushNotifications}
-              trackColor={{false: Colors.softGray, true: Colors.green}}
-              thumbColor={pushNotifications ? Colors.green : Colors.softGray}
-            />
-            {/* <Icon name="notifications-none" size={20} color={Colors.gold} /> */}
-            <Text style={[styles.optionText]}>{t.account.pushNotifications}</Text>
-        
-          </View>
-          <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
-            <Switch
-              value={promotionalNotifications}
-              onValueChange={togglePromotionalNotifications}
-              trackColor={{false: Colors.softGray, true: Colors.green}}
-              thumbColor={
-                promotionalNotifications ? Colors.green : Colors.softGray
-              }
-            />
-            <Text style={styles.optionText}>{t.account.promotionalNotifications}</Text>
-          </View>
-          <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
-            {/* <Icon name="notifications-none" size={20} color={Colors.gold} /> */}
-            <Switch
-              value={isOnline}
-              onValueChange={toggleAvailability}
-              trackColor={{false: Colors.softGray, true: Colors.green}}
-              thumbColor={isOnline ? Colors.green : Colors.softGray}
-              disabled={isTogglingStatus}
-            />
-            <Text style={styles.optionText}>{t.account.availableNow}</Text>
-          </View>
-
-          {/* <Text style={styles.sectionTitle}>{t.account.accountSettings}</Text> */}
-          {/* <TouchableOpacity
-            style={styles.option}
-            onPress={() => navigation.navigate('EditPersonalInfo')}
-          > */}
-            {/* <Text style={styles.optionText}>{t.account.editPersonalInfo}</Text>
-            <Icon name="chevron-right" size={24} color={Colors.softGray} />
-          </TouchableOpacity>
-           */}
-          {/* <TouchableOpacity
-            style={styles.option}
-            onPress={() => navigation.navigate('ServiceAreaSettings')}
-          >
-            <Text style={styles.optionText}>{t.account.serviceAreaSettings}</Text>
-            <Icon name="chevron-right" size={24} color={Colors.softGray} />
-          </TouchableOpacity> */}
-
-          <Text style={styles.sectionTitle}>{t.account.more}</Text>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={() => handleOptionPress('Help Center')}>
-            <Icon name="help-outline" size={20} color={Colors.gold} />
-            <Text style={styles.optionText}>{t.account.helpCenter}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-            onPress={confirmLogout}>
-            <Icon name="logout" size={20} color={Colors.red} />
-            <Text style={[styles.optionText, styles.logoutText]}>{t.account.logout}</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-      <ProviderFooter />
-      
-      <LogoutModal
-        visible={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={handleLogoutConfirm}
-      />
-      
-      <LanguageChangeModal
-        visible={showLanguageModal}
-        onClose={() => setShowLanguageModal(false)}
-        onConfirm={handleLanguageChangeConfirm}
-        currentLanguage={language}
-        newLanguage={newLanguage}
-      />
-
-      <Modal
-        visible={showServiceFeeModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowServiceFeeModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader && isRTL ? styles.modalHeaderRTL : styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t.account.updateServiceFee}</Text>
-              <TouchableOpacity onPress={() => setShowServiceFeeModal(false)}>
-                <Icon name="close" size={24} color={Colors.white} />
-              </TouchableOpacity>
             </View>
-            {isLoadingFee ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator color={Colors.gold} size="small" />
-                <Text style={styles.loadingText}>{t.account.pleaseWait}</Text>
-              </View>
-            ) : (
-              <>
-                <Text style={styles.currentFeeText}>
-                  {t.account.currentServiceFee}: {serviceFee || '0'}
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  value={serviceFee}
-                  onChangeText={setServiceFee}
-                  placeholder={t.account.enterServiceFee}
-                  keyboardType="numeric"
-                  placeholderTextColor={Colors.softGray}
-                />
-                <TouchableOpacity
-                  style={styles.updateButton}
-                  onPress={handleServiceFeeUpdate}
-                >
-                  <Text style={styles.updateButtonText}>{t.account.update}</Text>
-                </TouchableOpacity>
-              </>
-            )}
+            <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
+              <Switch
+                value={promotionalNotifications}
+                onValueChange={togglePromotionalNotifications}
+                trackColor={{false: Colors.softGray, true: Colors.green}}
+                thumbColor={
+                  promotionalNotifications ? Colors.green : Colors.softGray
+                }
+              />
+              <Text style={styles.optionText}>{t.account.promotionalNotifications}</Text>
+            </View>
+            <View style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}>
+              {/* <Icon name="notifications-none" size={20} color={Colors.gold} /> */}
+              <Switch
+                value={isOnline}
+                onValueChange={toggleAvailability}
+                trackColor={{false: Colors.softGray, true: Colors.green}}
+                thumbColor={isOnline ? Colors.green : Colors.softGray}
+                disabled={isTogglingStatus}
+              />
+              <Text style={styles.optionText}>{t.account.availableNow}</Text>
+            </View>
+
+            {/* <Text style={styles.sectionTitle}>{t.account.accountSettings}</Text> */}
+            {/* <TouchableOpacity
+              style={styles.option}
+              onPress={() => navigation.navigate('EditPersonalInfo')}
+            > */}
+              {/* <Text style={styles.optionText}>{t.account.editPersonalInfo}</Text>
+              <Icon name="chevron-right" size={24} color={Colors.softGray} />
+            </TouchableOpacity>
+             */}
+            {/* <TouchableOpacity
+              style={styles.option}
+              onPress={() => navigation.navigate('ServiceAreaSettings')}
+            >
+              <Text style={styles.optionText}>{t.account.serviceAreaSettings}</Text>
+              <Icon name="chevron-right" size={24} color={Colors.softGray} />
+            </TouchableOpacity> */}
+
+            <Text style={styles.sectionTitle}>{t.account.more}</Text>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={() => handleOptionPress('Help Center')}>
+              <Icon name="help-outline" size={20} color={Colors.gold} />
+              <Text style={styles.optionText}>{t.account.helpCenter}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              onPress={confirmLogout}>
+              <Icon name="logout" size={20} color={Colors.red} />
+              <Text style={[styles.optionText, styles.logoutText]}>{t.account.logout}</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </ScrollView>
+        <ProviderFooter />
+        
+        <LogoutModal
+          visible={showLogoutModal}
+          onClose={() => setShowLogoutModal(false)}
+          onConfirm={handleLogoutConfirm}
+        />
+        
+        <LanguageChangeModal
+          visible={showLanguageModal}
+          onClose={() => setShowLanguageModal(false)}
+          onConfirm={handleLanguageChangeConfirm}
+          currentLanguage={language}
+          newLanguage={newLanguage}
+        />
+
+        <Modal
+          visible={showServiceFeeModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowServiceFeeModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader && isRTL ? styles.modalHeaderRTL : styles.modalHeader}>
+                <Text style={styles.modalTitle}>{t.account.updateServiceFee}</Text>
+                <TouchableOpacity onPress={() => setShowServiceFeeModal(false)}>
+                  <Icon name="close" size={24} color={Colors.white} />
+                </TouchableOpacity>
+              </View>
+              {isLoadingFee ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator color={Colors.gold} size="small" />
+                  <Text style={styles.loadingText}>{t.account.pleaseWait}</Text>
+                </View>
+              ) : (
+                <>
+                  <Text style={styles.currentFeeText}>
+                    {t.account.currentServiceFee}: {serviceFee || '0'}
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    value={serviceFee}
+                    onChangeText={setServiceFee}
+                    placeholder={t.account.enterServiceFee}
+                    keyboardType="numeric"
+                    placeholderTextColor={Colors.softGray}
+                  />
+                  <TouchableOpacity
+                    style={styles.updateButton}
+                    onPress={handleServiceFeeUpdate}
+                  >
+                    <Text style={styles.updateButtonText}>{t.account.update}</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </SafeAreaView>
   );
 };
 

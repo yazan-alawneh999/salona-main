@@ -36,29 +36,32 @@ const useRegister = () => {
 
   const handleRegister = async (data: RegisterData) => {
     try {
-      console.log('data when trying to register', data);
+      console.log('🔍 DEBUG: Sending registration data:', data);
       const response = await register(data).unwrap();
-      console.log('response when trying to register', response);
-      // dispatch(setUser({
-      //   name: response.user.name,
-      //   email: response.user.email,
-      //   // token: response.token,
-      //   id: response.user.id,
-      //   // isActive: response.user.is_active === 1,
-      //   type: response.user.type || '',
-      //   isAuthenticated: false,
-      // }));
+      console.log('🔍 DEBUG: Registration response received:', response);
       
-    //  Alert.alert(t.signup.success.registrationSuccessful, t.signup.success.loginToContinue);
-
+      // Check if response has the expected structure
+      if (!response.uuid) {
+        console.error('🔍 DEBUG: No UUID in response:', response);
+        throw new Error('No verification token received from server');
+      }
+      
       return { 
         success: true, 
         response 
       };
     } catch (error: any) {
-      console.log('REGISTER ERROR:', error);
+      console.error('🔍 DEBUG: REGISTER ERROR:', error);
+      console.error('🔍 DEBUG: Error details:', {
+        status: error?.status,
+        data: error?.data,
+        message: error?.message,
+        originalError: error
+      });
+      
       let errorMessage = 'An error occurred. Please try again.';
       const errors = error?.data?.errors || error?.errors;
+      
       if (errors) {
         if (errors.email) {
           errorMessage = t.signup.error.emailAlreadyTaken;
@@ -67,8 +70,14 @@ const useRegister = () => {
         } else if (errors.password) {
           errorMessage = t.signup.error.passwordsDoNotMatch;
         }
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
-      Alert.alert(t.signup.error.registrationFailed , errorMessage);
+      
+      console.error('🔍 DEBUG: Final error message:', errorMessage);
+      
       return { 
         success: false, 
         error: errorMessage 

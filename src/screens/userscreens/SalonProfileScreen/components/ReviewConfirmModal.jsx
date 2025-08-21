@@ -1,361 +1,3 @@
-// import React, {useState, useCallback, useMemo} from 'react';
-// import {
-//   Modal,
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   StyleSheet,
-//   ScrollView,
-//   Dimensions,
-//   StatusBar,
-//   SafeAreaView,
-// } from 'react-native';
-
-// const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-
-// const ReviewConfirmModal = ({visible, onClose, onConfirm}) => {
-//   const [notes, setNotes] = useState('');
-
-//   // Memoize order data to prevent unnecessary re-renders
-//   const orderData = useMemo(
-//     () => ({
-//       discountCode: 'إضافة',
-//       subtotal: '55.00 د.أ',
-//       discount: '-10 د.أ',
-//       total: '45 د.أ',
-//       payNow: '0 د.أ',
-//       payAtCenter: '45 د.أ',
-//       paymentMethod: 'الدفع في المركز',
-//       serviceTime: 'خدمتان 2 • 2 س و30 د',
-//     }),
-//     [],
-//   );
-
-//   const handleConfirm = useCallback(() => {
-//     onConfirm?.(notes);
-//   }, [notes, onConfirm]);
-
-//   const handleClose = useCallback(() => {
-//     onClose?.();
-//   }, [onClose]);
-
-//   if (!visible) return null;
-
-//   return (
-//     <Modal
-//       visible={visible}
-//       animationType="slide"
-//       presentationStyle="pageSheet"
-//       onRequestClose={handleClose}>
-//       <StatusBar barStyle="dark-content" />
-//       <SafeAreaView style={styles.container}>
-//         {/* Header */}
-//         <View style={styles.header}>
-//           <TouchableOpacity
-//             style={styles.closeButton}
-//             onPress={handleClose}
-//             activeOpacity={0.7}>
-//             <Text style={styles.closeIcon}>✕</Text>
-//           </TouchableOpacity>
-
-//           <Text style={styles.headerTitle}>مراجعة وتأكيد</Text>
-
-//           <View style={styles.headerRight} />
-//         </View>
-
-//         <ScrollView
-//           style={styles.scrollView}
-//           showsVerticalScrollIndicator={false}
-//           bounces={false}>
-//           {/* Discount Code Section */}
-//           <View style={styles.section}>
-//             <View style={styles.row}>
-//               <TouchableOpacity style={styles.addButton}>
-//                 <Text style={styles.addButtonText}>
-//                   {orderData.discountCode}
-//                 </Text>
-//               </TouchableOpacity>
-//               <Text style={styles.sectionTitle}>رمز الخصم</Text>
-//             </View>
-//           </View>
-
-//           {/* Order Summary */}
-//           <View style={styles.section}>
-//             <View style={styles.summaryRow}>
-//               <Text style={styles.summaryValue}>{orderData.subtotal}</Text>
-//               <Text style={styles.summaryLabel}>المجموع الفرعي</Text>
-//             </View>
-
-//             <View style={styles.summaryRow}>
-//               <Text style={styles.summaryValue}>{orderData.discount}</Text>
-//               <Text style={styles.summaryLabel}>الخصومات</Text>
-//             </View>
-//           </View>
-
-//           <View style={styles.divider} />
-
-//           {/* Total Section */}
-//           <View style={styles.section}>
-//             <View style={styles.totalRow}>
-//               <Text style={styles.totalValue}>{orderData.total}</Text>
-//               <Text style={styles.totalLabel}>الإجمالي</Text>
-//             </View>
-
-//             <View style={styles.summaryRow}>
-//               <Text style={[styles.summaryValue, styles.greenText]}>
-//                 {orderData.payNow}
-//               </Text>
-//               <Text style={[styles.summaryLabel, styles.greenText]}>
-//                 الدفع الآن
-//               </Text>
-//             </View>
-
-//             <View style={styles.summaryRow}>
-//               <Text style={styles.summaryValue}>{orderData.payAtCenter}</Text>
-//               <Text style={styles.summaryLabel}>الدفع في المركز</Text>
-//             </View>
-//           </View>
-
-//           {/* Payment Method */}
-//           <View style={styles.section}>
-//             <Text style={styles.sectionHeader}>طريقة الدفع</Text>
-//             <View style={styles.paymentMethodContainer}>
-//               <View style={styles.paymentMethodIcon}>
-//                 <Text style={styles.cardIcon}>💳</Text>
-//               </View>
-//               <Text style={styles.paymentMethodText}>
-//                 {orderData.paymentMethod}
-//               </Text>
-//             </View>
-//           </View>
-
-//           {/* Notes Section */}
-//           <View style={styles.section}>
-//             <Text style={styles.sectionHeader}>ملاحظات</Text>
-//             <View style={styles.notesContainer}>
-//               <Text style={styles.notesPlaceholder}>
-//                 إضافة تعليقات أو طلبات خاصة بالحجز
-//               </Text>
-//             </View>
-//           </View>
-
-//           {/* Service Time */}
-//           <View style={styles.serviceTimeContainer}>
-//             <Text style={styles.serviceTime}>{orderData.serviceTime}</Text>
-//             <Text style={styles.totalPrice}>{orderData.total}</Text>
-//           </View>
-//         </ScrollView>
-
-//         {/* Confirm Button */}
-//         <View style={styles.footer}>
-//           <TouchableOpacity
-//             style={styles.confirmButton}
-//             onPress={handleConfirm}
-//             activeOpacity={0.8}>
-//             <Text style={styles.confirmButtonText}>تأكيد</Text>
-//           </TouchableOpacity>
-//         </View>
-//       </SafeAreaView>
-//     </Modal>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#FFFFFF',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//     paddingHorizontal: 20,
-//     paddingVertical: 15,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#F0F0F0',
-//   },
-//   closeButton: {
-//     width: 32,
-//     height: 32,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   closeIcon: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '300',
-//   },
-//   headerTitle: {
-//     fontSize: 18,
-//     fontWeight: '600',
-//     color: '#333333',
-//     textAlign: 'center',
-//   },
-//   headerRight: {
-//     width: 32,
-//   },
-//   scrollView: {
-//     flex: 1,
-//   },
-//   section: {
-//     paddingHorizontal: 20,
-//     paddingVertical: 16,
-//   },
-//   row: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//   },
-//   sectionTitle: {
-//     fontSize: 16,
-//     color: '#333333',
-//     fontWeight: '500',
-//   },
-//   addButton: {
-//     backgroundColor: '#F8F9FA',
-//     paddingHorizontal: 16,
-//     paddingVertical: 8,
-//     borderRadius: 20,
-//     borderWidth: 1,
-//     borderColor: '#E9ECEF',
-//   },
-//   addButtonText: {
-//     fontSize: 14,
-//     color: '#6C757D',
-//   },
-//   summaryRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 12,
-//   },
-//   summaryLabel: {
-//     fontSize: 16,
-//     color: '#333333',
-//   },
-//   summaryValue: {
-//     fontSize: 16,
-//     color: '#333333',
-//     fontWeight: '500',
-//   },
-//   greenText: {
-//     color: '#28A745',
-//   },
-//   divider: {
-//     height: 1,
-//     backgroundColor: '#F0F0F0',
-//     marginHorizontal: 20,
-//   },
-//   totalRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 16,
-//   },
-//   totalLabel: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '600',
-//   },
-//   totalValue: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '700',
-//   },
-//   sectionHeader: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '600',
-//     marginBottom: 16,
-//   },
-//   paymentMethodContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#F8F9FA',
-//     padding: 16,
-//     borderRadius: 12,
-//     borderWidth: 1,
-//     borderColor: '#E9ECEF',
-//   },
-//   paymentMethodIcon: {
-//     width: 40,
-//     height: 40,
-//     backgroundColor: '#FFFFFF',
-//     borderRadius: 8,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     marginRight: 12,
-//   },
-//   cardIcon: {
-//     fontSize: 20,
-//   },
-//   paymentMethodText: {
-//     fontSize: 16,
-//     color: '#333333',
-//     fontWeight: '500',
-//   },
-//   notesContainer: {
-//     backgroundColor: '#F8F9FA',
-//     borderRadius: 12,
-//     padding: 16,
-//     minHeight: 120,
-//     borderWidth: 1,
-//     borderColor: '#E9ECEF',
-//   },
-//   notesPlaceholder: {
-//     fontSize: 14,
-//     color: '#6C757D',
-//     textAlign: 'right',
-//   },
-//   serviceTimeContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     paddingHorizontal: 20,
-//     paddingVertical: 16,
-//     backgroundColor: '#F8F9FA',
-//     marginTop: 16,
-//   },
-//   serviceTime: {
-//     fontSize: 14,
-//     color: '#6C757D',
-//   },
-//   totalPrice: {
-//     fontSize: 18,
-//     color: '#333333',
-//     fontWeight: '700',
-//   },
-//   footer: {
-//     paddingHorizontal: 20,
-//     paddingVertical: 16,
-//     paddingBottom: 32,
-//     backgroundColor: '#FFFFFF',
-//     borderTopWidth: 1,
-//     borderTopColor: '#F0F0F0',
-//   },
-//   confirmButton: {
-//     backgroundColor: '#28A745',
-//     borderRadius: 12,
-//     paddingVertical: 16,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 2,
-//     },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-//     elevation: 3,
-//   },
-//   confirmButtonText: {
-//     fontSize: 18,
-//     color: '#FFFFFF',
-//     fontWeight: '600',
-//   },
-// });
-
-// export default ReviewConfirmModal;
 import React, {useState, useCallback, useMemo} from 'react';
 import {
   Modal,
@@ -382,12 +24,15 @@ const ReviewConfirmModal = ({
   selectedServices = [],
   // discountCode = null,
   discountAmount = 0,
-  paymentMethod = 'الدفع في المركز',
+  paymentMethod,
   isRTL = true,
   isBooking,
   initialNotes = '',
 }) => {
   const {t} = useTranslation();
+  
+  // Set default payment method if not provided
+  const defaultPaymentMethod = paymentMethod || t.booking.reviewModal.payAtCenter;
   const [notes, setNotes] = useState('');
 
   React.useEffect(() => {
@@ -409,45 +54,49 @@ const ReviewConfirmModal = ({
     const discount = discountAmount >= 0 ? discountAmount : 10; // Default discount
     const total = Math.max(0, subtotal - discount);
 
-    // Calculate total duration in hours
+    // Calculate total duration in minutes
     const totalMinutes =
       selectedServices.length > 0
         ? selectedServices.reduce(
             (sum, service) => sum + (service.duration || 0),
             0,
-          ) / 60
+          )
         : 150; // Default 2.5 hours (150 minutes)
 
-    const totalHours = totalMinutes / 60;
-    const hours = Math.floor(totalHours);
-    const remainingMinutes = Math.round((totalHours - hours) * 60);
+    // Format duration properly - convert to hours and minutes
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
 
     let durationText = '';
-    if (hours > 0 && remainingMinutes > 0) {
-      durationText = `${hours} س و${remainingMinutes} د`;
+    if (hours > 0 && minutes > 0) {
+      // Format: "2 hr and 30 min" or "2 س و30 د"
+      durationText = `${hours} ${t.booking.reviewModal.hour} ${t.booking.reviewModal.and} ${minutes} ${t.booking.reviewModal.minute}`;
     } else if (hours > 0) {
-      durationText = `${hours} س`;
-    } else if (totalHours > 0) {
-      durationText = `${totalHours.toFixed(1)} س`;
+      // Format: "2 hr" or "2 س"
+      durationText = `${hours} ${t.booking.reviewModal.hour}`;
+    } else if (minutes > 0) {
+      // Format: "30 min" or "30 د"
+      durationText = `${minutes} ${t.booking.reviewModal.minute}`;
     } else {
-      durationText = '2 س و30 د'; // Default fallback
+      // Default fallback: "2 hr and 30 min" or "2 س و30 د"
+      durationText = `2 ${t.booking.reviewModal.hour} ${t.booking.reviewModal.and} 30 ${t.booking.reviewModal.minute}`;
     }
 
     const servicesCount =
       selectedServices.length > 0 ? selectedServices.length : 2;
-    const serviceTime = `خدمتان ${servicesCount} • ${durationText}`;
+    const serviceTime = `${t.booking.reviewModal.services} ${servicesCount} • ${durationText}`;
 
     return {
-      subtotal: `${subtotal.toFixed(0)} د.أ`,
-      discount: `${discount.toFixed(0)}- د.أ`,
-      total: `${total.toFixed(0)} د.أ`,
-      payNow: '0 د.أ',
-      payAtCenter: `${total.toFixed(0)} د.أ`,
-      paymentMethod,
+      subtotal: `${subtotal.toFixed(0)} ${t.home.currency}`,
+      discount: `${discount.toFixed(0)}- ${t.home.currency}`,
+      total: `${total.toFixed(0)} ${t.home.currency}`,
+      payNow: `0 ${t.home.currency}`,
+      payAtCenter: `${total.toFixed(0)} ${t.home.currency}`,
+      paymentMethod: defaultPaymentMethod,
       serviceTime,
       totalAmount: total,
     };
-  }, [selectedServices, discountAmount, paymentMethod]);
+  }, [selectedServices, discountAmount, defaultPaymentMethod, t]);
 
   // const handleConfirm = useCallback(() => {
   //   const bookingData = {
@@ -568,7 +217,7 @@ const ReviewConfirmModal = ({
                 <View style={styles.paymentMethodIcon}>
                   <Text style={styles.cardIcon}>🏪</Text>
                 </View>
-                <Text style={styles.paymentMethodText}>{paymentMethod}</Text>
+                <Text style={styles.paymentMethodText}>{orderData.paymentMethod}</Text>
               </View>
             </View>
 

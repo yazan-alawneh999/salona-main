@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
@@ -155,6 +156,7 @@ const ChatListScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t.chatList.title}</Text>
         <TouchableOpacity onPress={loadChats}>

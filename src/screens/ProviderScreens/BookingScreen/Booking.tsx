@@ -9,7 +9,9 @@ import {
   Platform,
   Alert,
   Linking,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../../constants/Colors';
 import styles from './Booking.styles';
 import BookingCard from '../../../components/BookingCard/BookingCard';
@@ -252,54 +254,57 @@ const ProviderBookings = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t.providerBookings.title}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>{t.providerBookings.title}</Text>
+        </View>
+
+        <View style={[styles.tabContainer]}>
+          {(['booked', 'completed', 'cancelled'] as const).map(tab => {
+            // Calculate unread count for each tab
+            const tabUnreadCount = data?.appointments?.filter(app => 
+              app.is_read === 0 && app.status === tab
+            ).length || 0;
+
+            return (
+              <TouchableOpacity
+                key={tab}
+                style={[styles.tab, activeTab === tab && styles.activeTab]}
+                onPress={() => setActiveTab(tab)}>
+                <View style={styles.tabContent}>
+                  <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                    {t.providerBookings.tabs[tab]}
+                  </Text>
+                  {tabUnreadCount > 0 && (
+                    <View style={styles.unreadBadge}>
+                      <Text style={styles.unreadBadgeText}>{tabUnreadCount}</Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <FlatList
+          data={filteredAppointments as any}
+          renderItem={renderBookingCard}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                {t.providerBookings.noAppointments.replace('{status}', t.providerBookings.tabs[activeTab])}
+              </Text>
+            </View>
+          }
+        />
+
+        <ProviderFooter/>
       </View>
-
-      <View style={[styles.tabContainer]}>
-        {(['booked', 'completed', 'cancelled'] as const).map(tab => {
-          // Calculate unread count for each tab
-          const tabUnreadCount = data?.appointments?.filter(app => 
-            app.is_read === 0 && app.status === tab
-          ).length || 0;
-
-          return (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tab, activeTab === tab && styles.activeTab]}
-              onPress={() => setActiveTab(tab)}>
-              <View style={styles.tabContent}>
-                <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                  {t.providerBookings.tabs[tab]}
-                </Text>
-                {tabUnreadCount > 0 && (
-                  <View style={styles.unreadBadge}>
-                    <Text style={styles.unreadBadgeText}>{tabUnreadCount}</Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      <FlatList
-        data={filteredAppointments as any}
-        renderItem={renderBookingCard}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              {t.providerBookings.noAppointments.replace('{status}', t.providerBookings.tabs[activeTab])}
-            </Text>
-          </View>
-        }
-      />
-
-      <ProviderFooter/>
-    </View>
+    </SafeAreaView>
   );
 };
 

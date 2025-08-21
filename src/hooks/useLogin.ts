@@ -112,21 +112,34 @@ const useLogin = () => {
       return { success: true, response };
     } catch (error: any) {
       console.error('❌ Login error:', error);
+      console.error('❌ Full error object:', JSON.stringify(error, null, 2));
       
       // Handle different types of errors
       let errorMessage = 'There was a problem logging in. Please try again.';
       
       if (error.status === 401) {
         errorMessage = 'Invalid email or password. Please check your credentials.';
+        console.error('🔍 DEBUG: 401 Unauthorized - Invalid credentials');
       } else if (error.status === 500) {
         errorMessage = 'Server error. Please try again later.';
+        console.error('🔍 DEBUG: 500 Server Error');
       } else if (error.message?.includes('invalid JSON')) {
         errorMessage = 'Server communication error. Please try again later.';
+        console.error('🔍 DEBUG: Invalid JSON response');
       } else if (error.data?.message) {
         errorMessage = error.data.message;
+        console.error('🔍 DEBUG: Backend error message:', error.data.message);
+      } else if (error.message) {
+        errorMessage = error.message;
+        console.error('🔍 DEBUG: Error message:', error.message);
       }
       
-      console.error('❌ Error details:', errorMessage);
+      // Log the response data if available
+      if (error.data) {
+        console.error('🔍 DEBUG: Backend response data:', error.data);
+      }
+      
+      console.error('❌ Final error message:', errorMessage);
       
       Alert.alert(t.login.errors.loginFailed, errorMessage);
       

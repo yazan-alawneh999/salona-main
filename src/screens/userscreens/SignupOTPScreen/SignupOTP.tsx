@@ -7,7 +7,9 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../../constants/Colors';
 import styles from './SignupOTP.styles';
@@ -60,64 +62,67 @@ const SignupOTPScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View style={styles.backButtonCircle}>
-            <Icon name="arrow-back" size={20} color={Colors.black} />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.title}>{t.signup.verifyYourAccount}</Text>
-      </View>
-
-      <View style={styles.content}>
-        <Text style={styles.instruction}>
-          {t.signup.enterTheOtpSentToYourEmailToVerifyYourAccount}
-        </Text>
-
-        <OtpInput
-          numberOfDigits={6}
-          focusColor={Colors.gold}
-          autoFocus={true}
-          blurOnFilled={true}
-          hideStick={true}
-          onTextChange={(text) => setOtpCode(text)}
-          theme={{
-            containerStyle: styles.otpContainer,
-            pinCodeContainerStyle: styles.pinCodeContainer,
-            pinCodeTextStyle: styles.pinCodeText,
-            focusStickStyle: styles.focusStick,
-            focusedPinCodeContainerStyle: styles.activePinCodeContainer,
-            placeholderTextStyle: styles.placeholderText,
-            filledPinCodeContainerStyle: styles.filledPinCodeContainer,
-            disabledPinCodeContainerStyle: styles.disabledPinCodeContainer,
-          }}
-        />
-
-        <TouchableOpacity 
-          style={[styles.submitButton, isLoading && styles.submitButtonDisabled]} 
-          onPress={handleConfirm}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={Colors.white} size="small" />
-          ) : (
-            <Text style={styles.submitButtonText}>{t.signup.submit}</Text>
-          )}
-        </TouchableOpacity>
-
-        {/* <Text style={styles.timerText}>
-          {timer > 0 ? `Resend in 00:${timer < 10 ? `0${timer}` : timer}` : ''}
-        </Text>
-        {timer === 0 && (
-          <TouchableOpacity onPress={handleResend}>
-            <Text style={styles.resendText}>Resend OTP</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={Colors.customWhite} barStyle="dark-content" />
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <View style={styles.backButtonCircle}>
+              <Icon name="arrow-back" size={20} color={Colors.black} />
+            </View>
           </TouchableOpacity>
-        )} */}
-      </View>
-    </KeyboardAvoidingView>
+          <Text style={styles.title}>{t.signup.verifyYourAccount}</Text>
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.instruction}>
+            {t.signup.enterTheOtpSentToYourEmailToVerifyYourAccount}
+          </Text>
+
+          <OtpInput
+            numberOfDigits={6}
+            focusColor={Colors.gold}
+            autoFocus={true}
+            blurOnFilled={true}
+            hideStick={true}
+            onTextChange={(text) => setOtpCode(text)}
+            theme={{
+              containerStyle: styles.otpContainer,
+              pinCodeContainerStyle: styles.pinCodeContainer,
+              pinCodeTextStyle: styles.pinCodeText,
+              focusStickStyle: styles.focusStick,
+              focusedPinCodeContainerStyle: styles.activePinCodeContainer,
+              placeholderTextStyle: styles.placeholderText,
+              filledPinCodeContainerStyle: styles.filledPinCodeContainer,
+              disabledPinCodeContainerStyle: styles.disabledPinCodeContainer,
+            }}
+          />
+
+          <TouchableOpacity 
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]} 
+            onPress={handleConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={Colors.white} size="small" />
+            ) : (
+              <Text style={styles.submitButtonText}>{t.signup.submit}</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* <Text style={styles.timerText}>
+            {timer > 0 ? `Resend in 00:${timer < 10 ? `0${timer}` : timer}` : ''}
+          </Text>
+          {timer === 0 && (
+            <TouchableOpacity onPress={handleResend}>
+              <Text style={styles.resendText}>Resend OTP</Text>
+            </TouchableOpacity>
+          )} */}
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

@@ -174,6 +174,26 @@ const styles = StyleSheet.create({
     color: Colors.customBlack,
     marginHorizontal: width * 0.01,
   },
+  passwordInputContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  passwordInputField: {
+    paddingRight: 50, // Make room for the eye icon
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: '50%',
+    transform: [{translateY: -10}],
+    padding: 5,
+  },
+  errorText: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
+  },
 });
 
 export default styles;

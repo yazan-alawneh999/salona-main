@@ -10,6 +10,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     paddingHorizontal: 20,
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

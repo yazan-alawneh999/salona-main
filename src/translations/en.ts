@@ -83,6 +83,7 @@ export const en = {
       emailAlreadyTaken: 'The email has already been taken.',
       phoneNumberAlreadyTaken: 'The phone number has already been taken.',
       registrationFailed: 'Registration failed',
+      passwordTooShort: 'Password must be at least 8 characters long.',
     },
     name: 'Name',
     email: 'Email',
@@ -642,7 +643,11 @@ export const en = {
       notes: 'Notes',
       notesPlaceholder: 'Add comments or special requests',
       confirm: 'Confirm',
-      confirming: 'Confirming booking...'
+      confirming: 'Confirming booking...',
+      services: 'services',
+      hour: 'hr',
+      minute: 'min',
+      and: 'and'
     },
     errors: {
       authenticationMessage: 'Please log in again to continue.',

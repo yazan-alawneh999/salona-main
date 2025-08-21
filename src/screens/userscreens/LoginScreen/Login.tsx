@@ -39,11 +39,25 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
       return;
     }
 
-    const result = await handleLogin({email, password});
+    console.log('🔍 DEBUG: Attempting login with:', {
+      email,
+      passwordLength: password.length
+    });
 
-    if (result.success) {
-      // Navigation will be handled by the navigation system based on user type
-      // No need to manually navigate here
+    try {
+      const result = await handleLogin({email, password});
+      
+      console.log('🔍 DEBUG: Login result:', result);
+      
+      if (result.success) {
+        console.log('🔍 DEBUG: Login successful');
+        // Navigation will be handled by the navigation system based on user type
+        // No need to manually navigate here
+      } else {
+        console.log('🔍 DEBUG: Login failed:', result.error);
+      }
+    } catch (error) {
+      console.error('🔍 DEBUG: Login error caught:', error);
     }
   };
 
