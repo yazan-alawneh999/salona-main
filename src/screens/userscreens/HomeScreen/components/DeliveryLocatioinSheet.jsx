@@ -254,6 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     paddingHorizontal: 12,
+    color: '#000',
   },
   footerTextDisabled: {
     color: '#ccc',

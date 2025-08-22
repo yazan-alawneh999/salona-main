@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    paddingHorizontal: 8,
   },
   searchInputWrapper: {
     flex: 1,
@@ -432,12 +433,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flexDirection: 'row',
     backgroundColor: Colors.black,
-
     alignItems: 'center',
+    paddingHorizontal: 12,
+    minHeight: 45,
   },
   input: {
     padding: 8,
     color: Colors.white,
+    fontSize: 14,
+    fontFamily: Fonts.regular,
+    flex: 1,
   },
   searchIcon: {
     paddingLeft: 10,

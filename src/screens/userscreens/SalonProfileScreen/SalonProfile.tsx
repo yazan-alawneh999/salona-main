@@ -271,9 +271,6 @@ const SalonProfileScreen = () => {
         const reviews = salonData?.salons?.ratings_received || [];
         console.log('Reviews Data:', reviews);
 
-      case 'Packages':
-        return renderPackages();
-
         if (!reviews || reviews.length === 0) {
           return (
             <View style={modalStyles.emptyContainer}>
@@ -550,7 +547,7 @@ const SalonProfileScreen = () => {
               back={true}
             />
             <View style={[styles.tabs, isRTL && styles.tabsRTL]}>
-              {['Services', 'Portfolio', 'Reviews', 'Packages'].map(tab => (
+              {['Services', 'Portfolio', 'Reviews'].map(tab => (
                 <TouchableOpacity
                   key={tab}
                   style={[styles.tab, activeTab === tab && styles.activeTab]}

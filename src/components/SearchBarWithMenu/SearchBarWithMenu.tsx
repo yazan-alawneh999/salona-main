@@ -31,7 +31,7 @@ const SearchBarWithMenu: React.FC<SearchBarWithMenuProps> = ({
         <TextInput
           style={styles.searchInput}
           placeholder={t.searchBarWithMenu.placeholder} 
-          placeholderTextColor={Colors.white}
+          placeholderTextColor={Colors.hardGray}
           onChangeText={onSearchChange}
           value={value}
           onSubmitEditing={onSearchSubmit}

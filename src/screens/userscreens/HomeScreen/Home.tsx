@@ -159,6 +159,13 @@ const HomeScreen: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
   const {t, isRTL} = useTranslation();
+  
+  // Debug translation loading
+  console.log('HomeScreen - Translation loaded:', {
+    search_here: t.home.search_here,
+    currentLanguage: t ? 'loaded' : 'not loaded',
+    isRTL
+  });
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
     lng: number;
@@ -510,10 +517,8 @@ const HomeScreen: React.FC = () => {
 
     return (
       <View style={styles.packageContainer}>
-        <TouchableOpacity
-          style={styles.packageCard}
-          activeOpacity={0.95}
-          onPress={handlePress}>
+        <View
+          style={styles.packageCard}>
           <View style={styles.packageImageContainer}>
             <Image
               source={image}
@@ -527,9 +532,9 @@ const HomeScreen: React.FC = () => {
             {/* Gradient Overlay */}
             <View style={styles.packageGradient} />
 
-            {/* Discount Badge */}
+            {/* Discount Badge - Removed OFF and Price Labels */}
             {/* {pkg.discount_percentage > 0 && ( */}
-            <View style={styles.badgesContainer}>
+            {/* <View style={styles.badgesContainer}>
               <View style={styles.discountBadge}>
                 <Text style={styles.discountText}>
                   {pkg.discount_percentage}% OFF
@@ -540,7 +545,7 @@ const HomeScreen: React.FC = () => {
                   {pkg.amount} {t.home.currency}
                 </Text>
               </View>
-            </View>
+            </View> */}
             {/* )} */}
 
             {/* Content */}
@@ -573,50 +578,54 @@ const HomeScreen: React.FC = () => {
                 )}
               </View>
 
-              {/* Action Button */}
-              <View style={styles.packageAction}>
+              {/* Action Button - Hidden */}
+              {/* <View style={styles.packageAction}>
                 <View style={styles.actionButton}>
                   <Text style={styles.actionText}>{t.home.viewDetails}</Text>
                   <Icon name="chevron-forward" size={16} color={Colors.black} />
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
       </View>
     );
   });
 
   const SearchBar = useCallback(
-    () => (
-      <View style={styles.searchContainer}>
-        <View style={styles.searchSection}>
-          <TouchableOpacity
-            style={styles.searchField}
-            onPress={handleGoSearch}
-            activeOpacity={0.9}>
-            <Icon
-              style={styles.searchIcon}
-              name="search-outline"
-              size={20}
-              color={Colors.gold}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t.home.search_here}
-              editable={false} // prevent typing
-              pointerEvents="none" // prevent touch
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.optionButton}
-            activeOpacity={0.9}
-            onPress={handleGoFilter}>
-            <Icon name="options-outline" size={26} color={Colors.gold} />
-          </TouchableOpacity>
+    () => {
+      console.log('SearchBar render - search_here translation:', t.home.search_here);
+      return (
+        <View style={styles.searchContainer}>
+          <View style={styles.searchSection}>
+            <TouchableOpacity
+              style={styles.searchField}
+              onPress={handleGoSearch}
+              activeOpacity={0.9}>
+              <Icon
+                style={styles.searchIcon}
+                name="search-outline"
+                size={20}
+                color={Colors.gold}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={t.home.search_here}
+                placeholderTextColor={Colors.hardGray}
+                editable={false} // prevent typing
+                pointerEvents="none" // prevent touch
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.optionButton}
+              activeOpacity={0.9}
+              onPress={handleGoFilter}>
+              <Icon name="options-outline" size={26} color={Colors.gold} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    ),
+      );
+    },
     [handleGoSearch, handleGoFilter, t.home.search_here],
   );
 
@@ -636,7 +645,7 @@ const HomeScreen: React.FC = () => {
               currentLocation
                 ? {
                     id: 'current-location',
-                    description: 'Current Location',
+                    description: t.home.currentLocation,
                     latitude: currentLocation.lat,
                     longitude: currentLocation.lng,
                   }

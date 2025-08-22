@@ -511,6 +511,7 @@ export const ar = {
     savedLocations: 'المواقع المحفوظة',
     deliverToDifferentLocation: 'توصيل إلى موقع مختلف',
     deliverToCurrentLocation: 'توصيل إلى الموقع الحالي',
+    useCurrentLocation: 'استخدام الموقع الحالي',
 
     gettingLocation: 'جاري تحديد الموقع...',
     gettingAddress: 'جاري الحصول على العنوان...',
