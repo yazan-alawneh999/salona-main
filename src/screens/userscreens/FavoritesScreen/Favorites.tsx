@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Footer from '../../../components/Footer/Footer';
@@ -60,17 +61,23 @@ const FavoritesScreen: React.FC = () => {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color={Colors.gold} />
-      </View>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+        <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+        <View style={[styles.container, styles.centerContent]}>
+          <ActivityIndicator size="large" color={Colors.gold} />
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <Text style={styles.errorText}>{t.favorites.error}</Text>
-      </View>
+      <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+        <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+        <View style={[styles.container, styles.centerContent]}>
+          <Text style={styles.errorText}>{t.favorites.error}</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -104,27 +111,30 @@ const FavoritesScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, !isRTL && styles.headerRTL]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color={Colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t.favorites.title}</Text>
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+      <View style={styles.container}>
+        <View style={[styles.header, !isRTL && styles.headerRTL]}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t.favorites.title}</Text>
+        </View>
 
-      <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderSalonItem}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{t.favorites.noFavorites}</Text>
-          </View>
-        )}
-      />
-      <Footer />
-    </View>
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderSalonItem}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>{t.favorites.noFavorites}</Text>
+            </View>
+          )}
+        />
+        <Footer />
+      </View>
+    </SafeAreaView>
   );
 };
 

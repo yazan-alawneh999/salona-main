@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       gap: 10,
       padding: 16,
+      paddingTop: 20,
       backgroundColor: Colors.black,
       borderBottomWidth: 1,
       borderBottomColor: 'rgba(255, 255, 255, 0.1)',
@@ -48,6 +49,17 @@ const styles = StyleSheet.create({
       fontSize: 16,
       textAlign: 'center',
       fontFamily: 'Maitree-Regular',
+    },
+    ratingContainerRTL: {
+      flexDirection: 'row-reverse',
+    },
+    ratingTextRTL: {
+      marginLeft: 0,
+      marginRight: 4,
+    },
+    reviewsTextRTL: {
+      marginLeft: 0,
+      marginRight: 4,
     },
   });
 
