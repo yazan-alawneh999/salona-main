@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Maitree-Regular',
     marginBottom: 4,
     opacity: 0.9,
+    alignSelf: 'flex-start',
   },
   nameText: {
     fontSize: 24,
