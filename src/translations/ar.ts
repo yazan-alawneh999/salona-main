@@ -401,7 +401,7 @@ export const ar = {
       cancel: 'إلغاء',
       confirm: 'تأكيد',
       back: 'رجوع',
-      checkout: 'إنهاء',
+      checkout: ' إنهاء الحجز',
     },
     modals: {
       cancel: {

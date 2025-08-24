@@ -11,7 +11,9 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CancelAppointmentModal from '../../../components/CancelAppointmentModal/CancelAppointmentModal';
@@ -82,13 +84,13 @@ const ProviderReviewBookingScreen: React.FC<Props> = ({ route, navigation }) => 
       setAppointmentData(bookingDetails);
       
       // Check if the booking is cancelled
-      if (bookingDetails.status === 'cancelled') {
+      if ((bookingDetails as any).status === 'cancelled') {
         setIsCancelled(true);
       }
       
       // Set address directly from bookingDetails
-      if (bookingDetails.address ) { 
-        setAddress(bookingDetails.address);
+      if ((bookingDetails as any).address ) { 
+        setAddress((bookingDetails as any).address);
       } else {
         console.log('ℹ️ No address found in booking details');
         setAddressError('No address information available for this appointment.');
@@ -419,14 +421,36 @@ console.log('user appointment name', appointmentData?.user?.name);
 
   if (loadingAppointment) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            {t.reviewBooking.title}
-          </Text>
+          {isRTL ? (
+            <>
+              <View style={styles.spacer} />
+              <Text style={styles.headerTitle}>
+                {t.reviewBooking.title}
+              </Text>
+                             <TouchableOpacity 
+                 style={styles.backButton}
+                 onPress={() => navigation.goBack()}
+               >
+                <Icon name="arrow-forward" size={24} color={Colors.white} />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-back" size={24} color={Colors.white} />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>
+                {t.reviewBooking.title}
+              </Text>
+              <View style={styles.spacer} />
+            </>
+          )}
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.white} />
@@ -435,20 +459,42 @@ console.log('user appointment name', appointmentData?.user?.name);
           </Text>
         </View>
         <ProviderFooter />
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (appointmentError) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            {t.reviewBooking.title}
-          </Text>
+          {isRTL ? (
+            <>
+              <View style={styles.spacer} />
+              <Text style={styles.headerTitle}>
+                {t.reviewBooking.title}
+              </Text>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-forward" size={24} color={Colors.white} />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Icon name="arrow-back" size={24} color={Colors.white} />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>
+                {t.reviewBooking.title}
+              </Text>
+              <View style={styles.spacer} />
+            </>
+          )}
         </View>
           <View style={styles.errorContainer}>
           <Icon name="error-outline" size={48} color={Colors.red} />
@@ -465,21 +511,43 @@ console.log('user appointment name', appointmentData?.user?.name);
           </TouchableOpacity>
         </View>
         <ProviderFooter />
-      </View>
+      </SafeAreaView>
     );
   }
 
-  return (
-    
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {t.reviewBooking.title}
-        </Text>
-      </View>
+    return (
+     
+     <SafeAreaView style={styles.container} edges={['top']}>
+       <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+       <View style={styles.header}>
+         {isRTL ? (
+           <>
+             <View style={styles.spacer} />
+             <Text style={styles.headerTitle}>
+               {t.reviewBooking.title}
+             </Text>
+             <TouchableOpacity 
+               style={styles.backButton}
+               onPress={() => navigation.goBack()}
+             >
+               <Icon name="arrow-forward" size={24} color={Colors.white} />
+             </TouchableOpacity>
+           </>
+         ) : (
+           <>
+             <TouchableOpacity 
+               style={styles.backButton}
+               onPress={() => navigation.goBack()}
+             >
+               <Icon name="arrow-back" size={24} color={Colors.white} />
+             </TouchableOpacity>
+             <Text style={styles.headerTitle}>
+               {t.reviewBooking.title}
+             </Text>
+             <View style={styles.spacer} />
+           </>
+         )}
+       </View>
 
       <ScrollView style={styles.content}>
         <View style={styles.bookingCard}>
@@ -544,12 +612,16 @@ console.log('user appointment name', appointmentData?.user?.name);
             {t.reviewBooking.phone.title}
           </Text>
           <TouchableOpacity 
-            style={[styles.phoneButton]}
+            style={[styles.phoneButton, isRTL && styles.phoneButtonRTL]}
             onPress={handlePhoneCall}
             disabled={!appointmentData?.user?.phone_number}
           >
-            
-            <Icon name="phone" size={20} color={Colors.white} />
+            <Icon 
+              name="phone" 
+              size={20} 
+              color={Colors.white} 
+              style={isRTL ? { marginLeft: 10, marginRight: 0 } : { marginRight: 10, marginLeft: 0 }}
+            />
             <Text style={[styles.phoneText, isRTL && styles.phoneTextRTL]}>
               {appointmentData?.user?.phone_number 
                 ? `${t.reviewBooking.phone.call} ${appointmentData.user.phone_number}`
@@ -599,31 +671,15 @@ console.log('user appointment name', appointmentData?.user?.name);
                 {address.description}
               </Text>
               
-              <View style={styles.mapButtonsContainer}>
               <TouchableOpacity 
-                  style={styles.mapButton}
-                onPress={() => {
-                  const { latitude, longitude } = address;
-                  const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-                  Linking.openURL(url);
-                }}
+                style={styles.mapButton}
+                onPress={openGoogleMapsDirections}
               >
-                <Icon name="map" size={20} color={Colors.black} />
-                  <Text style={styles.mapButtonText}>
-                    {t.reviewBooking.location.viewMap}
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.mapButton, styles.directionsButton]}
-                  onPress={openGoogleMapsDirections}
-                >
-                  <Icon name="directions" size={20} color={Colors.black} />
-                  <Text style={styles.mapButtonText}>
-                    {t.reviewBooking.location.getDirections}
-                  </Text>
+                <Icon name="directions" size={20} color={Colors.black} />
+                <Text style={styles.mapButtonText}>
+                  {t.reviewBooking.location.getDirections}
+                </Text>
               </TouchableOpacity>
-              </View>
             </View>
           ) : (
             <Text style={styles.noAddressText}>
@@ -638,7 +694,7 @@ console.log('user appointment name', appointmentData?.user?.name);
           <TouchableOpacity
             style={[styles.button, styles.checkoutButton]}
             onPress={handleCheckoutPress}>
-            <Text style={styles.buttonText}>
+            <Text style={styles.checkoutButtonText}>
               {t.reviewBooking.actions.checkout}
             </Text>
           </TouchableOpacity>
@@ -665,7 +721,7 @@ console.log('user appointment name', appointmentData?.user?.name);
       />
 
       <ProviderFooter />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -681,12 +737,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingTop: 20,
   },
+  backButton: {
+    padding: 5,
+  },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
     fontSize: 18,
     fontFamily: 'Maitree-Medium',
     color: Colors.white,
+  },
+  spacer: {
+    width: 34, // Same width as backButton (24px icon + 10px padding)
   },
   content: {
     flex: 1,
@@ -826,29 +888,20 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 12,
   },  
-  mapButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 15,
-  },
   mapButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.gold,
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  directionsButton: {
-    backgroundColor: Colors.gold,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 15,
   },
   mapButtonText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Maitree-Medium',
     color: Colors.black,
-    marginLeft: 8,
+    marginLeft: 10,
   },
   noAddressText: {
     fontSize: 14,
@@ -876,7 +929,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Maitree-Medium',
   },
   checkoutButton: {
-    backgroundColor: Colors.gold,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: Colors.gold,
+  },
+  checkoutButtonText: {
+    color: Colors.gold,
+    fontSize: 11,
+    fontFamily: 'Maitree-Medium',
   },
   cancelButton: {
     backgroundColor: '#FF0404',
@@ -917,15 +977,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Maitree-Regular',
     color: Colors.white,
     marginLeft: 10,
-    marginRight: 10,
   },
   phoneContainerRTL: {
     // RTL specific styles if needed
   },
   phoneButtonRTL: {
+    flexDirection: 'row-reverse',
   },
   phoneTextRTL: {
     marginRight: 10,
+    marginLeft: 0,
   },
   noteContainer: {
     marginTop: 20,
