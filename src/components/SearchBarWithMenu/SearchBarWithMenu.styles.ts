@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+    marginTop: 20,
     height: 45,
   },
   searchInputWrapper: {
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 15,
     minHeight: 45,
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   searchInput: {
     flex: 1,
@@ -30,6 +31,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Maitree-Regular',
     paddingVertical: 0,
     textAlignVertical: 'center',
+    lineHeight: 20,
   },
   menuIconWrapper: {
     marginLeft: 10,
