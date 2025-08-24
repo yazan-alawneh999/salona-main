@@ -7,7 +7,9 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Colors from '../../../constants/Colors';
 import {useNavigation} from '@react-navigation/native';
@@ -26,9 +28,7 @@ const EditProfileScreen: React.FC = () => {
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
-    password: '',
     mobileNumber: '',
-    address: '',
   });
   const { t, isRTL } = useTranslation();
   const handleInputChange = (field: string, value: string) => {
@@ -46,17 +46,11 @@ const EditProfileScreen: React.FC = () => {
         return;
       }
 
-      // Validate phone number: must be 9 or 10 digits
-      const isValidPhone = /^\d{9,10}$/.test(profileData.mobileNumber);
-      if (!isValidPhone) {
-        Alert.alert(t.editProfile.error.invalidPhoneNumber || 'Invalid phone number.');
-        return;
-      }
+
 
       const requestPayload = {
         name: profileData.fullName,
         email: profileData.email,
-        phone_number: `+962${profileData.mobileNumber}`,
       };
       
       console.log('Making API request with payload:', requestPayload);
@@ -110,18 +104,20 @@ const EditProfileScreen: React.FC = () => {
   }, [user]);
 
   return (
-    <KeyboardAvoidingView
-    style={{ flex: 1 }}
-    behavior={Platform.OS === "ios" ? "padding" : undefined}
-    keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} 
-  >
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color={Colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t.editProfile.title}</Text>
-      </View>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} 
+      >
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name="arrow-back" size={24} color={Colors.white} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{t.editProfile.title}</Text>
+          </View>
 
       <View style={styles.profilePictureContainer}>
         <Image
@@ -139,27 +135,31 @@ const EditProfileScreen: React.FC = () => {
           onChangeText={value => handleInputChange('fullName', value)}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, styles.disabledInput]}
           placeholder={t.editProfile.email}
           placeholderTextColor={Colors.hardGray}
-          keyboardType="email-address"
           value={profileData.email}
-          onChangeText={value => handleInputChange('email', value)}
+          editable={false}
         />
-        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.softGray, borderRadius: 12, backgroundColor: Colors.black, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 15 }}>
+        <TouchableOpacity 
+          style={[styles.phoneInputContainer, styles.disabledInput]}
+          onPress={() => {
+            // Show toast message that mobile can't be changed
+            Alert.alert(
+              'Mobile Number Restricted',
+              'Mobile number can only be changed by a supervisor. Please contact support if you need to update your mobile number.',
+              [{ text: 'OK' }]
+            );
+          }}
+          activeOpacity={0.7}
+        >
           <Text style={{ fontSize: 22, marginRight: 6 }}>🇯🇴</Text>
-          <Text style={{ fontSize: 16, marginHorizontal: 6, color: Colors.white }}>+962</Text>
-          <Text style={{ fontSize: 16, color: Colors.white }}>0</Text>
-          <TextInput
-            style={{ flex: 1, color: Colors.white, fontSize: 16, padding: 0, backgroundColor: 'transparent' }}
-            keyboardType="number-pad"
-            value={profileData.mobileNumber}
-            onChangeText={value => handleInputChange('mobileNumber', value.replace(/[^0-9]/g, ''))}
-            placeholder="7XXXXXXXX"
-            placeholderTextColor={Colors.hardGray}
-            maxLength={10}
-          />
-        </View>
+          <Text style={{ fontSize: 16, marginHorizontal: 6, color: Colors.softGray }}>+962</Text>
+          <Text style={{ fontSize: 16, color: Colors.softGray }}>0</Text>
+          <Text style={{ flex: 1, color: Colors.softGray, fontSize: 16, padding: 0 }}>
+            {profileData.mobileNumber || '7XXXXXXXX'}
+          </Text>
+        </TouchableOpacity>
       </View>
    
       <TouchableOpacity
@@ -170,8 +170,9 @@ const EditProfileScreen: React.FC = () => {
           {isLoading ? t.editProfile.updatingProfile : t.editProfile.updateProfile}
         </Text>
       </TouchableOpacity>
-    </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

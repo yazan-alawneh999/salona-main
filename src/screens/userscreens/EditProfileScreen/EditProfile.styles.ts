@@ -42,6 +42,22 @@ const styles = StyleSheet.create({
       color: Colors.white,
       fontFamily: 'Maitree-Regular',
     },
+    disabledInput: {
+      borderColor: Colors.softGray,
+      color: Colors.softGray,
+      backgroundColor: Colors.black,
+    },
+    phoneInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: Colors.softGray,
+      borderRadius: 12,
+      backgroundColor: Colors.black,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      marginBottom: 15,
+    },
     updateButton: {
       backgroundColor: Colors.gold,
       paddingVertical: 15,
