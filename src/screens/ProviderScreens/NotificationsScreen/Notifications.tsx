@@ -156,13 +156,13 @@ const ProviderNotificationsScreen: React.FC = () => {
   const getNotificationIcon = (title: string) => {
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('appointment') || lowerTitle.includes('موعد')) {
-      return require('../../../assets/icons/salon.png');
+      return 'event'; // Calendar icon for appointments
     } else if (lowerTitle.includes('product') || lowerTitle.includes('منتج')) {
-      return require('../../../assets/icons/product.png');
+      return 'inventory'; // Inventory icon for products
     } else if (lowerTitle.includes('offer') || lowerTitle.includes('عرض')) {
-      return require('../../../assets/icons/offers.png');
+      return 'local-offer'; // Offer icon for offers
     } else {
-      return require('../../../assets/icons/salon.png'); // Default icon
+      return 'notifications'; // Default notification icon
     }
   };
 
@@ -208,7 +208,10 @@ const ProviderNotificationsScreen: React.FC = () => {
         message={item.message_en}
         time={formatTimeAgo(item.created_at)}
         isUnread={item.is_read === 0}
-        cancelReason={item.data?.cancel_reason}
+        title_ar={item.title_ar}
+        title_en={item.title_en}
+        message_ar={item.message_ar}
+        message_en={item.message_en}
       />
     );
   };

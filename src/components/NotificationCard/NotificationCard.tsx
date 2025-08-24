@@ -49,8 +49,15 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   const displayTitle = isRTL ? title_ar : title_en;
   const displayMessage = isRTL ? message_ar : message_en;
 
-  // Parse the data string to get cancel reason
-  const parsedData = data ? JSON.parse(data) : null;
+  // Parse the data string to get cancel reason (if available)
+  const parsedData = data ? (() => {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.warn('Failed to parse notification data:', e);
+      return null;
+    }
+  })() : null;
   const cancelReason = parsedData?.cancel_reason;
 
   return (
