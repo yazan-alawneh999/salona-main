@@ -91,10 +91,11 @@ const DeliveryLocationSheet = ({
             longitude: location.longitude,
           };
 
+          // Call setCurrentLocation to handle the current location selection
           setCurrentLocation(currentLocationData);
           setLoading(false);
           console.log(
-            'Current location set successfully with address:',
+            'Current location selected successfully with address:',
             data.results[0].formatted_address,
           );
         } else {
@@ -107,6 +108,7 @@ const DeliveryLocationSheet = ({
             longitude: location.longitude,
           };
 
+          // Call setCurrentLocation to handle the current location selection
           setCurrentLocation(currentLocationData);
           setLoading(false);
         }
@@ -120,6 +122,7 @@ const DeliveryLocationSheet = ({
           longitude: location.longitude,
         };
 
+        // Call setCurrentLocation to handle the current location selection
         setCurrentLocation(currentLocationData);
         setLoading(false);
       }

@@ -287,9 +287,20 @@ const HomeScreen: React.FC = () => {
     [dispatch, updatePrimaryAddress],
   );
 
-  const handleCurrentLocationSelect = useCallback(() => {
-    if (currentLocation) {
-      // Create a proper address object for current location
+  const handleCurrentLocationSelect = useCallback((locationData) => {
+    if (locationData) {
+      // Use the location data passed from the sheet
+      const currentLocationAddress = {
+        id: locationData.id || 'current-location',
+        description: locationData.description || 'Current Location',
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        isPrimary: false,
+        isFavorite: false,
+      };
+      handleAddressSelect(currentLocationAddress);
+    } else if (currentLocation) {
+      // Fallback to existing currentLocation if no data passed
       const currentLocationAddress = {
         id: 'current-location',
         description: 'Current Location',

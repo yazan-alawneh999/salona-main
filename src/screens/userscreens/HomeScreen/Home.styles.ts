@@ -130,14 +130,12 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   scrollView: {
-    backgroundColor: Colors.gold,
+    backgroundColor: Colors.black,
     flex: 1,
   },
   scrollContent: {
     paddingBottom: 15,
     backgroundColor: Colors.black,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
   },
   sectionSpacing: {
     marginBottom: 15,
