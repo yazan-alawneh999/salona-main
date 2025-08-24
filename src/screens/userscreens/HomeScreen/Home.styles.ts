@@ -136,6 +136,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 15,
     backgroundColor: Colors.black,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   sectionSpacing: {
     marginBottom: 15,
