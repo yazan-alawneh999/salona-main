@@ -23,6 +23,37 @@ const DeliveryLocationSheet = ({
   const [loading, setLoading] = useState(false);
   const {getCurrentLocation} = useLocation();
 
+  // Dynamic styles based on RTL
+  const dynamicStyles = {
+    footerButton: {
+      flexDirection: isRTL ? 'row-reverse' : 'row',
+      alignItems: 'flex-start',
+      gap: 12,
+      backgroundColor: '#fff',
+      borderColor: '#ddd',
+      borderWidth: 0.5,
+      padding: 12,
+      borderRadius: 8,
+    },
+    footerTextContainer: {
+      flex: 1,
+      alignItems: isRTL ? 'flex-end' : 'flex-start',
+    },
+    footerText: {
+      fontSize: 14,
+      fontWeight: '600',
+      paddingHorizontal: 12,
+      color: '#000',
+      textAlign: isRTL ? 'right' : 'left',
+    },
+    footerTextDisabled: {
+      color: '#ccc',
+    },
+    footerButtonDisabled: {
+      opacity: 0.6,
+    },
+  };
+
   const handleGetCurrentLocation = async () => {
     setLoading(true);
 
@@ -120,14 +151,16 @@ const DeliveryLocationSheet = ({
 
   const renderFooter = () => (
     <View style={styles.footer}>
-      <TouchableOpacity style={styles.footerButton} onPress={addNewAddress}>
+      <TouchableOpacity style={dynamicStyles.footerButton} onPress={addNewAddress}>
         <Icon
           name="navigate-outline"
           size={20}
           color="#000"
           style={styles.footerIcon}
         />
-        <Text style={styles.footerText}>{t.home.differentLocation}</Text>
+        <View style={dynamicStyles.footerTextContainer}>
+          <Text style={dynamicStyles.footerText}>{t.home.differentLocation}</Text>
+        </View>
         {/* <Icon
           name={isRTL ? 'chevron-back' : 'chevron-forward'}
           size={20}
@@ -137,7 +170,7 @@ const DeliveryLocationSheet = ({
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.footerButton, loading && styles.footerButtonDisabled]}
+        style={[dynamicStyles.footerButton, loading && dynamicStyles.footerButtonDisabled]}
         onPress={handleGetCurrentLocation}
         disabled={loading}>
         <Icon
@@ -146,9 +179,9 @@ const DeliveryLocationSheet = ({
           color={loading ? '#ccc' : '#000'}
           style={styles.footerIcon}
         />
-        <View style={styles.footerTextContainer}>
+        <View style={dynamicStyles.footerTextContainer}>
           <Text
-            style={[styles.footerText, loading && styles.footerTextDisabled]}>
+            style={[dynamicStyles.footerText, loading && dynamicStyles.footerTextDisabled]}>
             {loading
               ? t.home.gettingLocation
               : currenctLocation?.description || t.home.useCurrentLocation}
@@ -156,7 +189,7 @@ const DeliveryLocationSheet = ({
           {/* <Text
             style={[
               styles.footerSubText,
-              loading && styles.footerTextDisabled,
+              loading && dynamicStyles.footerTextDisabled,
             ]}>
             {currenctLocation?.description || t.home.currentLocation}
           </Text> */}
@@ -235,32 +268,22 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   footerButton: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    backgroundColor: '#fff',
-    borderColor: '#ddd',
-    borderWidth: 0.5,
-    padding: 12,
-    borderRadius: 8,
+    // This is now handled by dynamicStyles
   },
   footerButtonDisabled: {
-    opacity: 0.6,
+    // This is now handled by dynamicStyles
   },
   footerIcon: {
     marginTop: 2,
   },
   footerText: {
-    fontSize: 14,
-    fontWeight: '600',
-    paddingHorizontal: 12,
-    color: '#000',
+    // This is now handled by dynamicStyles
   },
   footerTextDisabled: {
-    color: '#ccc',
+    // This is now handled by dynamicStyles
   },
   footerTextContainer: {
-    flex: 1,
+    // This is now handled by dynamicStyles
   },
   footerSubText: {
     color: '#666',
