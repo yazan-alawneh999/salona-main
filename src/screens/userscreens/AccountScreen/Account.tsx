@@ -192,15 +192,7 @@ const AccountScreen = () => {
         
 
           </View>
-          <View style={[styles.optionWrapper, isRTL && styles.optionRTL]}>
-            <TouchableOpacity
-              style={[styles.option, !isRTL && styles.optionRTL]}
-              onPress={() => navigation.navigate('EditLocationScreen')}>
-                <Icon name="location-on" size={20} color={Colors.gold} />
-                <Text style={[styles.optionText]}>{t.account.editLocation}</Text>
-            </TouchableOpacity>
 
-          </View>
           <View style={[styles.optionWrapper, isRTL && styles.optionRTL]}>
           <TouchableOpacity
             style={[styles.option, !isRTL && styles.optionRTL]}
