@@ -5,9 +5,9 @@ import Colors from '../../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
-import {useSalonAssets} from '../hooks/useSalonAssets';
 import { useTranslation } from '../../../../contexts/TranslationContext';
 import ImageView from 'react-native-image-viewing';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 interface PortfolioTabProps {
   assets: Array<{id: number; file_path: string}>;
@@ -17,7 +17,6 @@ interface PortfolioTabProps {
 const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) => {
   const {user, token} = useSelector((state: RootState) => state.auth);
   const salonId = user?.id;
-  const {handleUploadImages} = useSalonAssets(salonId!);
   const { t, isRTL } = useTranslation();
   
   // Instagram-style grid constants
@@ -29,6 +28,12 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   const [isViewerVisible, setViewerVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentIndexRef = useRef(0);
+  
+  // Optimistic updates for instant display of uploaded images
+  const [optimisticAssets, setOptimisticAssets] = useState<Array<{id: number; file_path: string}>>([]);
+
+  // Combine server assets with optimistic assets for instant display
+  const displayAssets = [...assets, ...optimisticAssets];
 
 // useEffect(() => {
 //   console.log('assets', assets);
@@ -36,6 +41,13 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
 
   const handleDeleteImage = async (assetId: number) => {
     try {
+      // Check if this is an optimistic asset (temporary ID)
+      if (assetId > Date.now()) {
+        // Remove from optimistic assets
+        setOptimisticAssets(prev => prev.filter(asset => asset.id !== assetId));
+        return;
+      }
+
       if (!token) {
         Alert.alert(t.salonProfile.portfolio.uploadError);
         return;
@@ -88,9 +100,79 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   };
 
   const handleDeleteCurrentImage = () => {
-    const assetId = assets[currentIndexRef.current]?.id;
+    const assetId = displayAssets[currentIndexRef.current]?.id;
     if (assetId) {
       handleDeleteImage(assetId);
+    }
+  };
+
+  const handleUploadImages = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 0,
+      });
+
+      if (result.didCancel) {
+        return;
+      }
+
+      if (result.assets && result.assets.length > 0) {
+        // Add optimistic assets immediately for instant display
+        const newOptimisticAssets = result.assets.map((asset, index) => ({
+          id: Date.now() + index, // Temporary ID
+          file_path: asset.uri || '',
+        }));
+        
+        setOptimisticAssets(prev => [...prev, ...newOptimisticAssets]);
+
+        const formData = new FormData();
+        result.assets.forEach((asset, index) => {
+          if (asset.uri) {
+            formData.append('assets[]', {
+              uri: asset.uri,
+              type: asset.type || 'image/jpeg',
+              name: asset.fileName || `image${index}.jpg`,
+            } as any);
+          }
+        });
+
+        // Add the token to the request headers
+        const response = await fetch(`https://spa.dev2.prodevr.com/api/salons/${salonId}/assets`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Upload response:', data);
+        
+        // Clear optimistic assets after successful upload
+        setOptimisticAssets([]);
+        
+        // Show success message
+        Alert.alert(t.salonProfile.portfolio.uploadSuccess || 'Images uploaded successfully!');
+        
+        // Call the callback to refresh assets after successful upload
+        if (onAssetsUpdated) {
+          onAssetsUpdated();
+        }
+        
+        return data;
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      // Clear optimistic assets on error
+      setOptimisticAssets([]);
+      Alert.alert(t.salonProfile.portfolio.uploadError || 'Upload failed', 'Please try again.');
+      throw error;
     }
   };
 
@@ -160,7 +242,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
       <FlatList
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
-        data={assets}
+        data={displayAssets}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         numColumns={numColumns}
@@ -170,7 +252,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
       />
 
       <ImageView
-        images={assets.map(img => ({uri: `https://spa.dev2.prodevr.com/${img.file_path}`}))}
+        images={displayAssets.map(img => ({uri: `https://spa.dev2.prodevr.com/${img.file_path}`}))}
         imageIndex={currentIndex}
         visible={isViewerVisible}
         onRequestClose={() => setViewerVisible(false)}

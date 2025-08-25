@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../redux/store';
 
-export const useSalonAssets = (salonId: number) => {
+export const useSalonAssets = (salonId: number, onAssetsUpdated?: () => void) => {
   const [uploadAssets] = useUploadAssetsMutation();
   const { token } = useSelector((state: RootState) => state.auth);
 
@@ -48,6 +48,11 @@ export const useSalonAssets = (salonId: number) => {
 
         const data = await response.json();
         console.log('Upload response:', data);
+        
+        // Call the callback to refresh assets after successful upload
+        if (onAssetsUpdated) {
+          onAssetsUpdated();
+        }
         
         return data;
       }
