@@ -153,8 +153,8 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   return (
     <View style={[styles.portfolioContainer, isRTL && styles.portfolioContainerRTL]}>
       <StatusBar 
-        backgroundColor={Colors.white} 
-        barStyle="light-content" 
+        backgroundColor={isViewerVisible ?Colors.white : Colors.black} 
+        barStyle={isViewerVisible ? "dark-content" : "light-content"} 
       />
       
       <FlatList
