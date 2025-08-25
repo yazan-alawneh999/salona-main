@@ -267,6 +267,18 @@ const styles = StyleSheet.create({
     padding: 0,
     flex: 1,
   },
+  sectionContainer: {
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.gold,
+    marginBottom: 16,
+    fontFamily: 'Maitree-Bold',
+    textAlign: 'center',
+  },
   row: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -333,6 +345,75 @@ const styles = StyleSheet.create({
   },
   timeContainerRTL: {
     flexDirection: 'row-reverse',
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: Colors.black,
+    borderRadius: 12,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+    borderWidth: 1,
+    borderColor: Colors.gold,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalHeaderRTL: {
+    flexDirection: 'row-reverse',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.white,
+    fontFamily: 'Maitree-Bold',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    color: Colors.white,
+    marginTop: 10,
+    fontSize: 16,
+    fontFamily: 'Maitree-Regular',
+  },
+  currentFeeText: {
+    color: Colors.white,
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: 'center',
+    fontFamily: 'Maitree-Regular',
+  },
+  input: {
+    backgroundColor: Colors.softGray,
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    color: Colors.white,
+    fontSize: 16,
+    fontFamily: 'Maitree-Regular',
+  },
+  updateButton: {
+    backgroundColor: Colors.gold,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  updateButtonText: {
+    color: Colors.black,
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Maitree-Bold',
   },
 });
 
