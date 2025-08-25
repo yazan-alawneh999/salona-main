@@ -20,7 +20,7 @@ const ProviderStack = () => {
   return (
     <SafeAreaProvider>
       <Stack.Navigator
-        initialRouteName="ProviderHome"
+        initialRouteName="ProviderProfile"
         screenOptions={{
           headerShown: false,
         }}>

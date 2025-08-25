@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 15,
+    padding: 0,
   },
   section: {
     marginBottom: 20,
@@ -237,10 +237,12 @@ const styles = StyleSheet.create({
   timeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   editButton: {
     padding: 5,
     marginRight: 10,
+    marginLeft: 10,
   },
   editButtonRTL: {
     marginRight: 0,
@@ -266,10 +268,12 @@ const styles = StyleSheet.create({
   aboutContainer: {
     padding: 0,
     flex: 1,
+    width: '100%',
   },
   sectionContainer: {
     marginBottom: 24,
     paddingHorizontal: 20,
+    width: '100%',
   },
   sectionTitle: {
     fontSize: 20,
@@ -284,19 +288,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     width: '100%',
+    justifyContent: 'space-between',
   },
   label: {
     fontSize: 16,
     color: Colors.white,
     fontWeight: '600',
-    width: '30%',
+    flex: 0.3,
+    textAlign: 'right',
   },
   value: {
     fontSize: 16,
     color: Colors.white,
-    // flex: 1,
-    // marginLeft: 8,
+    // flex: 0.7,
     textAlign: 'left',
+   
   },
   description: {
     fontSize: 14,
@@ -324,7 +330,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: Colors.gold,
-    marginHorizontal: 20,
+    width: '100%',
   },
   buttonText: {
     color: Colors.white,
@@ -333,10 +339,11 @@ const styles = StyleSheet.create({
   },
   // RTL support
   rowRTL: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
   },
   labelRTL: {
     textAlign: 'left',
+    flex: 1,
   },
   valueRTL: {
     textAlign: 'left',
@@ -345,6 +352,7 @@ const styles = StyleSheet.create({
   },
   timeContainerRTL: {
     flexDirection: 'row-reverse',
+    flex: 1,
   },
   // Modal Styles
   modalOverlay: {
