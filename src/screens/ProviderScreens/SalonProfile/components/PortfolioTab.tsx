@@ -22,7 +22,8 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   // Instagram-style grid constants
   const numColumns = 3;
   const screenWidth = Dimensions.get('window').width;
-  const imageSize = (screenWidth - 32) / numColumns; // Account for container padding
+  const containerPadding = 16; // 8px padding on each side
+  const imageSize = (screenWidth - containerPadding) / numColumns; // Account for small padding
 
   // Image viewer state - useState for initial open index, useRef for live tracking
   const [isViewerVisible, setViewerVisible] = useState(false);
@@ -179,12 +180,21 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   const renderItem = ({item, index}: {item: any; index: number}) => {
     return (
       <TouchableOpacity 
-        style={[styles.portfolioItem, { width: imageSize, height: imageSize }]}
+        style={[styles.portfolioItem, { 
+          width: imageSize, 
+          height: imageSize,
+          margin: 1 // Small margin between images
+        }]}
         onPress={() => openViewer(index)}
       >
         <Image
           source={{uri: `https://spa.dev2.prodevr.com/${item.file_path}`}}
-          style={[styles.portfolioImage, { width: imageSize, height: imageSize }]}
+          style={[styles.portfolioImage, { 
+            width: imageSize - 2, // Account for margin
+            height: imageSize - 2,
+            borderRadius: 0, // Remove border radius for full coverage
+            backgroundColor: Colors.softGray // Use existing color for loading background
+          }]}
           resizeMode="cover"
         />
         <TouchableOpacity
@@ -221,7 +231,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
         style={styles.viewerDeleteButton}
         onPress={handleDeleteCurrentImage}
       >
-        <Icon name="delete" size={24} color={Colors.white} />
+        <Icon name="delete" size={24} color={Colors.black} />
       </TouchableOpacity>
       <TouchableOpacity 
         style={styles.viewerCloseButton}
@@ -246,9 +256,10 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         numColumns={numColumns}
-        key={numColumns}
+        key={`${numColumns}-${displayAssets.length}`} // Better key for re-rendering
         contentContainerStyle={[styles.portfolioList, isRTL && styles.portfolioListRTL]}
         showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }} // Ensure FlatList takes full width
       />
 
       <ImageView

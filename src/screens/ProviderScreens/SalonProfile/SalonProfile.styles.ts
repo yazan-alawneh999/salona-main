@@ -126,20 +126,22 @@ const styles = StyleSheet.create({
   },
   portfolioContainer: {
     flex: 1,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 8, // Add small horizontal padding for breathing room
   },
   portfolioContainerRTL: {
     direction: 'rtl',
   },
   portfolioList: {
     paddingBottom: 16,
+    paddingHorizontal: 0, // Ensure no horizontal padding
   },
   portfolioListRTL: {
     direction: 'rtl',
   },
   portfolioItem: {
-    margin: 1,
-    borderRadius: 8,
+    margin: 1, // Match the inline margin for consistency
+    borderRadius: 0, // Remove border radius for full coverage
     overflow: 'hidden',
     position: 'relative',
   },
@@ -420,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   viewerDeleteButton: {
-    backgroundColor: Colors.red,
+    backgroundColor: 'rgba(251, 59, 59, 0.61)',
     padding: 12,
     borderRadius: 25,
     width: 50,
@@ -429,7 +431,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewerCloseButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(195, 192, 192, 0.59)',
     padding: 12,
     borderRadius: 25,
     width: 50,
