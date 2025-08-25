@@ -1,5 +1,5 @@
-import React , {useEffect} from 'react';
-import {View, Image, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
+import React , {useState, useEffect, useRef} from 'react';
+import {View, Image, FlatList, TouchableOpacity, Text, Alert, Dimensions, StatusBar } from 'react-native';
 import styles from '../SalonProfile.styles';
 import Colors from '../../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../../../redux/store';
 import {useSalonAssets} from '../hooks/useSalonAssets';
 import { useTranslation } from '../../../../contexts/TranslationContext';
+import ImageView from 'react-native-image-viewing';
 
 interface PortfolioTabProps {
   assets: Array<{id: number; file_path: string}>;
@@ -18,9 +19,21 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
   const salonId = user?.id;
   const {handleUploadImages} = useSalonAssets(salonId!);
   const { t, isRTL } = useTranslation();
+  
+  // Instagram-style grid constants
+  const numColumns = 3;
+  const screenWidth = Dimensions.get('window').width;
+  const imageSize = (screenWidth - 32) / numColumns; // Account for container padding
+
+  // Image viewer state - useState for initial open index, useRef for live tracking
+  const [isViewerVisible, setViewerVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentIndexRef = useRef(0);
+
 // useEffect(() => {
 //   console.log('assets', assets);
 // }, [assets]); 
+
   const handleDeleteImage = async (assetId: number) => {
     try {
       if (!token) {
@@ -50,6 +63,11 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
         if (onAssetsUpdated) {
           onAssetsUpdated();
         }
+        
+        // Close viewer if it's open
+        if (isViewerVisible) {
+          setViewerVisible(false);
+        }
       } else {
         Alert.alert(t.salonProfile.portfolio.uploadError, t.salonProfile.portfolio.deleteError);
       }
@@ -59,18 +77,32 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
     }
   };
 
+  const openViewer = (index: number) => {
+    setCurrentIndex(index);
+    currentIndexRef.current = index; // Sync both state and ref
+    setViewerVisible(true);
+  };
+
+  const handleImageIndexChange = (index: number) => {
+    currentIndexRef.current = index; // Fast, no re-render
+  };
+
+  const handleDeleteCurrentImage = () => {
+    const assetId = assets[currentIndexRef.current]?.id;
+    if (assetId) {
+      handleDeleteImage(assetId);
+    }
+  };
+
   const renderItem = ({item, index}: {item: any; index: number}) => {
-    const isFullWidth = (index + 1) % 3 === 0;
     return (
-      <View
-        style={[
-          styles.portfolioItem,
-          isFullWidth && styles.portfolioItemFullWidth,
-          isRTL && styles.portfolioItemRTL
-        ]}>
+      <TouchableOpacity 
+        style={[styles.portfolioItem, { width: imageSize, height: imageSize }]}
+        onPress={() => openViewer(index)}
+      >
         <Image
           source={{uri: `https://spa.dev2.prodevr.com/${item.file_path}`}}
-          style={[styles.portfolioImage, isFullWidth && styles.portfolioImageFullWidth]}
+          style={[styles.portfolioImage, { width: imageSize, height: imageSize }]}
           resizeMode="cover"
         />
         <TouchableOpacity
@@ -78,7 +110,7 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
           onPress={() => handleDeleteImage(item.id)}>
           <Icon name="delete" size={20} color={Colors.white} />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -101,17 +133,49 @@ const PortfolioTab: React.FC<PortfolioTabProps> = ({assets, onAssetsUpdated}) =>
     </View>
   );
 
+  const renderImageViewerHeader = () => (
+    <View style={styles.viewerHeader}>
+      <TouchableOpacity 
+        style={styles.viewerDeleteButton}
+        onPress={handleDeleteCurrentImage}
+      >
+        <Icon name="delete" size={24} color={Colors.white} />
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.viewerCloseButton}
+        onPress={() => setViewerVisible(false)}
+      >
+        <Icon name="close" size={24} color={Colors.white} />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={[styles.portfolioContainer, isRTL && styles.portfolioContainerRTL]}>
+      <StatusBar 
+        backgroundColor={Colors.white} 
+        barStyle="light-content" 
+      />
+      
       <FlatList
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
         data={assets}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
-        numColumns={2}
-        key={2}
+        numColumns={numColumns}
+        key={numColumns}
         contentContainerStyle={[styles.portfolioList, isRTL && styles.portfolioListRTL]}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <ImageView
+        images={assets.map(img => ({uri: `https://spa.dev2.prodevr.com/${img.file_path}`}))}
+        imageIndex={currentIndex}
+        visible={isViewerVisible}
+        onRequestClose={() => setViewerVisible(false)}
+        onImageIndexChange={handleImageIndexChange}
+        HeaderComponent={renderImageViewerHeader}
       />
     </View>
   );

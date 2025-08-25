@@ -7,12 +7,15 @@ import {
   Dimensions,
   StyleSheet,
   Image,
+  StatusBar,
 } from 'react-native';
 import ImageView from 'react-native-image-viewing';
+import Colors from '../../../../constants/Colors';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const numColumns = 3;
 const screenWidth = Dimensions.get('window').width;
-const imageSize = screenWidth / numColumns;
+const imageSize = (screenWidth - 32) / numColumns; // Account for container padding
 
 const PortfolioGrid = ({data, tr}) => {
   const assets = data?.salons?.assets || [];
@@ -26,6 +29,17 @@ const PortfolioGrid = ({data, tr}) => {
     setViewerVisible(true);
   };
 
+  const renderImageViewerHeader = () => (
+    <View style={styles.viewerHeader}>
+      <TouchableOpacity 
+        style={styles.viewerCloseButton}
+        onPress={() => setViewerVisible(false)}
+      >
+        <Icon name="close" size={24} color={Colors.white} />
+      </TouchableOpacity>
+    </View>
+  );
+
   if (!portfolioImages || portfolioImages.length === 0) {
     return (
       <View style={modalStyles.emptyContainer}>
@@ -38,19 +52,28 @@ const PortfolioGrid = ({data, tr}) => {
 
   return (
     <View style={styles.portfolioContainer}>
+      <StatusBar 
+        backgroundColor={Colors.white} 
+        barStyle="light-content" 
+      />
+      
       <FlatList
         data={portfolioImages}
         numColumns={numColumns}
         keyExtractor={(item, index) => `portfolio-${item.id}-${index}`}
         renderItem={({item, index}) => (
-          <TouchableOpacity onPress={() => openViewer(index)}>
+          <TouchableOpacity 
+            style={[styles.portfolioItem, { width: imageSize, height: imageSize }]}
+            onPress={() => openViewer(index)}
+          >
             <Image
               source={{uri: item.image_url}}
-              style={styles.image}
+              style={[styles.image, { width: imageSize, height: imageSize }]}
               resizeMode="cover"
             />
           </TouchableOpacity>
         )}
+        showsVerticalScrollIndicator={false}
       />
 
       <ImageView
@@ -58,6 +81,8 @@ const PortfolioGrid = ({data, tr}) => {
         imageIndex={currentIndex}
         visible={isViewerVisible}
         onRequestClose={() => setViewerVisible(false)}
+        onImageIndexChange={setCurrentIndex}
+        HeaderComponent={renderImageViewerHeader}
       />
     </View>
   );
@@ -68,11 +93,32 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
   },
-  image: {
-    width: imageSize,
-    height: imageSize,
+  portfolioItem: {
     margin: 1,
-    backgroundColor: '#eee',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  viewerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  viewerCloseButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 12,
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -138,8 +138,7 @@ const styles = StyleSheet.create({
     direction: 'rtl',
   },
   portfolioItem: {
-    flex: 1,
-    margin: 4,
+    margin: 1,
     borderRadius: 8,
     overflow: 'hidden',
     position: 'relative',
@@ -147,15 +146,9 @@ const styles = StyleSheet.create({
   portfolioItemRTL: {
     direction: 'rtl',
   },
-  portfolioItemFullWidth: {
-    flex: 2,
-  },
   portfolioImage: {
     width: '100%',
-    height: 150,
-  },
-  portfolioImageFullWidth: {
-    height: 200,
+    height: '100%',
   },
   deleteButton: {
     position: 'absolute',
@@ -275,14 +268,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: '100%',
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.gold,
-    marginBottom: 16,
-    fontFamily: 'Maitree-Bold',
-    textAlign: 'center',
-  },
+
   row: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -422,6 +408,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     fontFamily: 'Maitree-Bold',
+  },
+  // Image Viewer Styles
+  viewerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  viewerDeleteButton: {
+    backgroundColor: Colors.red,
+    padding: 12,
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewerCloseButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 12,
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

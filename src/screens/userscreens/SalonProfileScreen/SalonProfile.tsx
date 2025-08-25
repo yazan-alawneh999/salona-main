@@ -12,6 +12,7 @@ import {
   ImageBackground,
   Share,
   TextInput,
+  StatusBar,
 } from 'react-native';
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -522,6 +523,11 @@ const SalonProfileScreen = () => {
   // }, []);
   return (
     <View style={{flex: 1, position: 'relative'}}>
+      <StatusBar 
+        backgroundColor={modalVisible || dateModalVisible ? Colors.black : 'transparent'} 
+        barStyle="light-content"
+        translucent={true}
+      />
       <ImageBackground
         source={require('../../../assets/images/pink-bg.png')}
         style={StyleSheet.absoluteFillObject}
@@ -613,6 +619,10 @@ const modalStyles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     marginTop: Dimensions.get('window').height * 0.3,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalTitle: {
     fontSize: 18,
