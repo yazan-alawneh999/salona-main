@@ -12,6 +12,8 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import styles from './Account.styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -34,11 +36,8 @@ const ProviderAccountScreen: React.FC = () => {
   const [isTogglingStatus, setIsTogglingStatus] = useState<boolean>(false);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false);
-  const [showServiceFeeModal, setShowServiceFeeModal] = useState<boolean>(false);
-  const [serviceFee, setServiceFee] = useState<string>('');
   const [newLanguage, setNewLanguage] = useState<string>('');
   const [isOnline, setIsOnline] = useState<boolean>(false);
-  const [isLoadingFee, setIsLoadingFee] = useState<boolean>(false);
 
   const navigation = useNavigation<NavigationProp<any>>();
   const { t, language, isRTL } = useTranslation();
@@ -125,81 +124,8 @@ const ProviderAccountScreen: React.FC = () => {
     }
   };
 
-  const handleServiceFeeUpdate = async () => {
-    try {
-      if (!token) {
-        Alert.alert(t.account.errorTitle, t.account.authError);
-        return;
-      }
-
-      // Use FormData for form-data body
-      const formData = new FormData();
-      formData.append('service_fee', serviceFee);
-
-      const response = await fetch('https://spa.dev2.prodevr.com/api/update-service-fee', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          // Do NOT set 'Content-Type' header; let fetch set it for FormData
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update service fee: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Service fee update response:', data);
-      if (data.message === 'User updated successfully') {
-        Alert.alert(t.account.success, t.account.serviceFeeUpdated);
-        setShowServiceFeeModal(false);
-        setServiceFee('');
-      } else {
-        throw new Error(data.message || 'Failed to update service fee');
-      }
-    } catch (error) {
-      console.error('Error updating service fee:', error);
-      Alert.alert(t.account.errorTitle, t.account.updateError);
-    }
-  };
-
-  const fetchCurrentServiceFee = async () => {
-    try {
-      setIsLoadingFee(true);
-      if (!token) {
-        Alert.alert(t.account.errorTitle, t.account.authError);
-        return;
-      }
-
-      const response = await fetch('https://spa.dev2.prodevr.com/api/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.message === "user data return successfully" && data.data) {
-        setServiceFee(data.data.service_fee || '0');
-      }
-    } catch (error) {
-      console.error('Error fetching service fee:', error);
-    } finally {
-      setIsLoadingFee(false);
-    }
-  };
-
   const handleOptionPress = (option: string) => {
-    if (option === 'Service Fee') {
-      fetchCurrentServiceFee();
-      setShowServiceFeeModal(true);
-    } else if (option === 'Language') {
+    if (option === 'Language') {
       const newLang = language === 'en' ? 'ar' : 'en';
       setNewLanguage(newLang);
       setShowLanguageModal(true);
@@ -243,12 +169,6 @@ const ProviderAccountScreen: React.FC = () => {
           />
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t.account.myAccount}</Text>
-            <TouchableOpacity
-              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
-              onPress={() => handleOptionPress('Service Fee')}>
-              <Icon name="attach-money" size={20} color={Colors.gold} />
-              <Text style={styles.optionText}>{t.account.serviceFee}</Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
               onPress={() => handleOptionPress('Language')}>
@@ -329,10 +249,16 @@ const ProviderAccountScreen: React.FC = () => {
               <Text style={styles.optionText}>{t.account.helpCenter}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.option, { flexDirection: !isRTL ? 'row-reverse' : 'row' }]}
+              style={styles.logoutButton}
               onPress={confirmLogout}>
-              <Icon name="logout" size={20} color={Colors.red} />
-              <Text style={[styles.optionText, styles.logoutText]}>{t.account.logout}</Text>
+              <LinearGradient
+                colors={['#dc3545', '#b71c1c']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 0}}
+                style={styles.logoutGradient}>
+                <Icon name="power-settings-new" size={20} color={Colors.white} />
+                <Text style={[styles.logoutText, { marginLeft: 10 }]}>{t.account.logout}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -351,50 +277,6 @@ const ProviderAccountScreen: React.FC = () => {
           currentLanguage={language}
           newLanguage={newLanguage}
         />
-
-        <Modal
-          visible={showServiceFeeModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowServiceFeeModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader && isRTL ? styles.modalHeaderRTL : styles.modalHeader}>
-                <Text style={styles.modalTitle}>{t.account.updateServiceFee}</Text>
-                <TouchableOpacity onPress={() => setShowServiceFeeModal(false)}>
-                  <Icon name="close" size={24} color={Colors.white} />
-                </TouchableOpacity>
-              </View>
-              {isLoadingFee ? (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator color={Colors.gold} size="small" />
-                  <Text style={styles.loadingText}>{t.account.pleaseWait}</Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.currentFeeText}>
-                    {t.account.currentServiceFee}: {serviceFee || '0'}
-                  </Text>
-                  <TextInput
-                    style={styles.input}
-                    value={serviceFee}
-                    onChangeText={setServiceFee}
-                    placeholder={t.account.enterServiceFee}
-                    keyboardType="numeric"
-                    placeholderTextColor={Colors.softGray}
-                  />
-                  <TouchableOpacity
-                    style={styles.updateButton}
-                    onPress={handleServiceFeeUpdate}
-                  >
-                    <Text style={styles.updateButtonText}>{t.account.update}</Text>
-                  </TouchableOpacity>
-                </>
-              )}
-            </View>
-          </View>
-        </Modal>
       </View>
     </SafeAreaView>
   );

@@ -197,7 +197,7 @@ export const ar = {
     categories: 'الفئات',
     setCategories: 'تعيين الفئات',
     welcome: 'اهلا وسهلا',
-    salonType: 'صالون شعر والمزيد',
+    salonType: '',
     addToFavorites: 'تمت الإضافة إلى المفضلة',
     tabs: {
       about: 'أوقات الدوام',

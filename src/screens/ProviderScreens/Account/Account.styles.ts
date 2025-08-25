@@ -36,7 +36,31 @@ const styles = StyleSheet.create({
         
       },
       logoutText: {
-        color: Colors.red,
+        color: Colors.white,
+        fontWeight: 'bold',
+        fontFamily: 'Maitree-Bold',
+      },
+      logoutButton: {
+        marginTop: 20,
+        marginBottom: 10,
+        borderRadius: 12,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      logoutGradient: {
+        borderRadius: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        minHeight: 50,
       },
       // Modal styles
       modalOverlay: {
