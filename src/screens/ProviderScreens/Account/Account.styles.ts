@@ -55,12 +55,25 @@ const styles = StyleSheet.create({
       },
       logoutGradient: {
         borderRadius: 12,
+        marginTop: 20,
+        marginBottom: 10,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      logoutButtonInner: {
         paddingVertical: 16,
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
         minHeight: 50,
+        borderRadius: 12,
       },
       // Modal styles
       modalOverlay: {

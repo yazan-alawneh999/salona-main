@@ -248,18 +248,19 @@ const ProviderAccountScreen: React.FC = () => {
               <Icon name="help-outline" size={20} color={Colors.gold} />
               <Text style={styles.optionText}>{t.account.helpCenter}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={confirmLogout}>
-              <LinearGradient
-                colors={['#dc3545', '#b71c1c']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 0}}
-                style={styles.logoutGradient}>
+            <LinearGradient
+              colors={['#dc3545', '#b71c1c']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={styles.logoutGradient}>
+              <TouchableOpacity
+                style={styles.logoutButtonInner}
+                onPress={confirmLogout}
+                activeOpacity={0.8}>
                 <Icon name="power-settings-new" size={20} color={Colors.white} />
                 <Text style={[styles.logoutText, { marginLeft: 10 }]}>{t.account.logout}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </ScrollView>
         <ProviderFooter />
