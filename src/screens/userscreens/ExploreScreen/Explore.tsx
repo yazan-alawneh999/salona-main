@@ -472,7 +472,7 @@ const ExploreScreen: React.FC = () => {
                                   <Icon
                                     name="star"
                                     size={16}
-                                    color="#fafe35ff"
+                                    color="rgb(253, 217, 11)"
                                   />
                                   <Text style={styles.listCardRatingText}>
                                     {getAverageRating(item).toFixed(1)}

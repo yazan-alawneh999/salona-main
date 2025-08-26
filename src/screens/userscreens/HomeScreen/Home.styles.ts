@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     // paddingStart: 8,
     marginStart: 8,
     paddingBottom: 20,
+   
   },
   headerRTL: {
     flexDirection: 'row-reverse',
@@ -243,14 +244,15 @@ const styles = StyleSheet.create({
   },
   addressButton: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     backgroundColor: 'transparent',
     paddingHorizontal: 0,
     paddingVertical: 0,
     borderRadius: 0,
     borderWidth: 0,
-    maxWidth: 120,
+    // maxWidth: 120,
     height: 28,
+    justifyContent: 'flex-end',
   },
   addressButtonNotRTL: {
     flexDirection: 'row-reverse',
@@ -261,7 +263,10 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // justifyContent: 'space-between',
     minWidth: 40,
-    maxWidth: 120,
+    maxWidth: "80%",
+    paddingHorizontal: 4,
+    // alignSelf: 'flex-end',
+    justifyContent: 'flex-start',
 
     // gap: 3,
   },
@@ -273,6 +278,7 @@ const styles = StyleSheet.create({
     // marginRight: 4,
     // marginLeft: 4,
     alignItems: 'flex-start',
+    // paddingHorizontal: 4,
     // marginRight: 14,
   },
   addressTextPlaceholder: {
@@ -286,8 +292,8 @@ const styles = StyleSheet.create({
   addressText: {
     color: Colors.black,
     fontSize: 14,
-    maxWidth: 60,
-    paddingStart: 4,
+    // maxWidth: 100,
+    // paddingHorizontal: 4,
     // flexShrink: 1,
   },
   modalOverlay: {
@@ -416,6 +422,8 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: '#ffffff60',
     borderRadius: 8,
+
+  
   },
   searchContainer: {
     height: 60,

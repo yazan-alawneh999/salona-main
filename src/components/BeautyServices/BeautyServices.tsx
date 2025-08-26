@@ -69,7 +69,7 @@ const BeautyServicesSection: React.FC<BeautyServicesSectionProps> = ({
           />
           {salonItem.rating && (
             <View style={styles.ratingOverlay}>
-              <Icon name="star" size={12} color="#fffd73ff" />
+              <Icon name="star" size={12} color="rgb(253, 217, 11)" />
               <Text style={styles.ratingOverlayText}>{salonItem.rating}</Text>
             </View>
           )}

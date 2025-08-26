@@ -752,9 +752,9 @@ const HomeScreen: React.FC = () => {
                       styles.addressTextHolder,
                       !isRTL && styles.addressTextHolderNotRTL,
                     ]}>
-                    <Text style={styles.addressTextPlaceholder}>
+                    {/* <Text style={styles.addressTextPlaceholder}>
                       {t.home.amAt}
-                    </Text>
+                    </Text> */}
                     <Text style={styles.addressText} numberOfLines={1}>
                       {selectedAddress ? selectedAddress.description : ''}
                     </Text>
