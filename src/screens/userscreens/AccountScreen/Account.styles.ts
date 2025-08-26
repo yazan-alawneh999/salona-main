@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+        // borderBottomWidth: 1,
+        // borderBottomColor: 'rgba(87, 86, 86, 0)',
       },
       moreOption: {
         flexDirection: 'row-reverse',

@@ -9,6 +9,8 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
 import styles from './Account.styles';
@@ -168,6 +170,11 @@ const AccountScreen = () => {
     console.log('isRtl>>>>>>',isRTL),
     
     <View style={[styles.container, isRTL && styles.containerRTL]}>
+      <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
       <ScrollView>
         <ProfileHeader
           image={user?.image_url || user?.avatar}

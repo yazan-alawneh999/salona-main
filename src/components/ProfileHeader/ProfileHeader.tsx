@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 14,
-    color: Colors.black,
+    color: Colors.white,
     fontFamily: 'Maitree-Regular',
     marginBottom: 5,
   },
