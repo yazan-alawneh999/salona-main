@@ -572,7 +572,7 @@ export const en = {
     viewAll: 'View All',
     packages: 'Featured Packages',
     packagesTitle: 'Packages',
-    ourCategories: 'Bella Lounge',
+    ourCategories: 'Categories',
     savedLocations: 'Saved locations',
     deliverToDifferentLocation: 'Deliver to a different location',
     deliverToCurrentLocation: 'Deliver to current location',

@@ -527,7 +527,7 @@ const HomeScreen: React.FC = () => {
     }, [pkg.id]);
 
     return (
-      <View style={styles.packageContainer}>
+      <View style={[styles.packageContainer ]}>
         <View
           style={styles.packageCard}>
           <View style={styles.packageImageContainer}>
@@ -779,7 +779,7 @@ const HomeScreen: React.FC = () => {
 
               {/* offers */}
               <View style={styles.sectionSpacing2}>
-                <Text style={styles.sectionTitle}>{t.home.offers}</Text>
+                {/* <Text style={styles.sectionTitle}>{t.home.offers}</Text> */}
                 {/* <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -860,7 +860,7 @@ const HomeScreen: React.FC = () => {
               </View>
               {/* categories */}
 
-              <View style={[styles.sectionSpacing2]}>
+              <View style={[styles.sectionSpacing2 , {marginTop: 20}]}>
                 <Text style={styles.sectionTitle}>{t.home.ourCategories}</Text>
                 <ScrollView
                   horizontal
@@ -891,7 +891,7 @@ const HomeScreen: React.FC = () => {
                 </ScrollView>
               </View>
 
-              <View style={styles.sectionSpacing2}>
+              <View style={[styles.sectionSpacing2 , {marginTop: 20}]}>
                 <BeautyServicesSection
                   title={t.home.nearbySalons}
                   data={mappedSalons.slice(0, 4)}

@@ -526,6 +526,7 @@ const styles = StyleSheet.create({
   packageContainer: {
     marginRight: 16,
     // marginBottom: 8,
+    marginTop: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

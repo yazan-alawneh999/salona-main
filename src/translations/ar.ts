@@ -515,7 +515,7 @@ export const ar = {
     viewAll: 'عرض الكل',
     packages: 'الباقات المميزة',
     packagesTitle: 'الباقات',
-    ourCategories: 'صالة بيلا',
+    ourCategories: 'التصنيفات',
     savedLocations: 'المواقع المحفوظة',
     deliverToDifferentLocation: 'توصيل إلى موقع مختلف',
     deliverToCurrentLocation: 'توصيل إلى الموقع الحالي',
