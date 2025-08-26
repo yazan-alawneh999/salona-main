@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   profileImageWrapper: {
-    marginTop: 60,
+    // marginTop: 60,
     width: 100,
     height: 100,
     borderRadius: 50,

@@ -177,29 +177,29 @@ const AboutTab: React.FC<AboutTabProps> = ({salon, salonId, onAvailabilityUpdate
           {t.salonProfile.about.openingTimes}
         </Text>
         
-        {sortedAvailabilities.map((availability) => (
-          <View key={availability.id} style={[styles.row, !isRTL && styles.rowRTL]}>
-            <Text style={[styles.label, !isRTL && styles.labelRTL, {textTransform: 'capitalize'}]}>
-              {translateDay(availability.day)}:
-            </Text>
-            <View style={[styles.timeContainer, !isRTL && styles.timeContainerRTL]}>
-              <TouchableOpacity
-                style={[styles.editButton, isRTL && styles.editButtonRTL]}
-                onPress={() => handleEditPress(availability)}>
-                <Icon name="edit" size={16} color={Colors.gold} />
-              </TouchableOpacity>
-              <Text style={[styles.value, isRTL && styles.valueRTL]}>
-                {formatTime(availability.opening_time)} - {formatTime(availability.closing_time)}
-              </Text>
-            </View>
-          </View>
-        ))}
+                 {sortedAvailabilities.map((availability) => (
+           <View key={availability.id} style={[styles.row, isRTL && styles.rowRTL]}>
+             <Text style={[styles.label, isRTL && styles.labelRTL, {textTransform: 'capitalize'}]}>
+               {translateDay(availability.day)}
+             </Text>
+             <View style={[styles.timeContainer, isRTL && styles.timeContainerRTL]}>
+               <TouchableOpacity
+                 style={[styles.editButton, isRTL && styles.editButtonRTL]}
+                 onPress={() => handleEditPress(availability)}>
+                 <Icon name="edit" size={24} color={Colors.gold} />
+               </TouchableOpacity>
+               <Text style={[styles.value, isRTL && styles.valueRTL]}>
+                 {formatTime(availability.opening_time)} - {formatTime(availability.closing_time)}
+               </Text>
+             </View>
+           </View>
+         ))}
       </View>
 
       {/* Forbidden Times Section */}
       <View style={styles.sectionContainer}>
         <TouchableOpacity
-          style={[styles.button, { marginBottom: 20, backgroundColor: Colors.gold }]}
+          style={[styles.button, { marginBottom: 10, marginTop: 10, backgroundColor: Colors.gold }]}
           onPress={() => setIsBlockTimeModalVisible(true)}>
           <Text style={[styles.buttonText, { color: Colors.black }]}>{t.salonProfile.blockTime.title}</Text>
         </TouchableOpacity>

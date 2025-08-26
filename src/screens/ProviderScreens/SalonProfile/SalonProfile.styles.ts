@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    paddingTop: 20, // Reduced top padding for better spacing
+    // paddingTop: 20, // Reduced top padding for better spacing
     backgroundColor: Colors.black,
   },
   headerLeft: {
@@ -54,29 +54,29 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 15,
+    paddingVertical: 10,
     backgroundColor: Colors.black,
   },
   tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    minWidth: 80,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    minWidth: 60,
     alignItems: 'center',
   },
   activeTab: {
-    backgroundColor: Colors.gold,
+    backgroundColor: Colors.primary,
   },
   tabText: {
     color: Colors.white,
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: 'Maitree-Medium',
     textAlign: 'center',
   },
   activeTabText: {
     color: Colors.black,
-    fontWeight: 'bold',
-    fontFamily: 'Maitree-Bold',
+    fontWeight: '600',
+    fontFamily: 'Maitree-Medium',
   },
   content: {
     flex: 1,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: Colors.white,
-    marginBottom: 10,
+    marginBottom: 30,
     fontFamily: 'Maitree-Bold',
   },
   option: {
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   editButtonRTL: {
     marginRight: 0,
     marginLeft: 10,
+
   },
   blockTimeButton: {
     backgroundColor: Colors.gold,
@@ -261,12 +262,13 @@ const styles = StyleSheet.create({
   },
   // About Tab Styles
   aboutContainer: {
+    paddingTop:20,
     padding: 0,
     flex: 1,
     width: '100%',
   },
   sectionContainer: {
-    marginBottom: 24,
+    // marginBottom: 24,
     paddingHorizontal: 20,
     width: '100%',
   },
@@ -276,13 +278,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
   },
   label: {
     fontSize: 16,
     color: Colors.white,
-    fontWeight: '600',
-    flex: 0.3,
+    fontWeight: '900',
+    flex: 0.5,
     textAlign: 'right',
   },
   value: {
@@ -312,7 +314,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Colors.black,
-    padding: 15,
+    padding: 10,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -322,25 +324,31 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    // fontWeight: 'bold',
   },
   // RTL support
   rowRTL: {
-    flexDirection: 'row-reverse',
+    // flexDirection: 'row-reverse',
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '100%',
+    justifyContent: 'space-evenly',
   },
   labelRTL: {
-    textAlign: 'left',
-    flex: 1,
+    textAlign: 'right',
+    // flex: 1,
   },
   valueRTL: {
-    textAlign: 'left',
-    marginLeft: 0,
-    marginRight: 8,
+    // textAlign: 'right',
+   marginHorizontal: 10,
   },
   timeContainerRTL: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
+    
+    alignItems: 'center',
     flex: 1,
+    
   },
   // Modal Styles
   modalOverlay: {
