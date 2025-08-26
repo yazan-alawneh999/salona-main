@@ -260,16 +260,16 @@ const AccountScreen = () => {
             <Icon name="lock-outline" size={20} color={Colors.gold} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.moreOption, !isRTL && styles.moreoptionRTL]}
+            style={[styles.moreOption, !isRTL && styles.moreoptionRTL ,{borderWidth: 1, borderColor: Colors.red , borderRadius: 10 , paddingHorizontal: 10 , paddingVertical: 5 }]}
             onPress={handleLogoutPress}>
-            <Text style={[styles.optionText, isRTL && styles.optionTextRTL]}>{t.account.logout}</Text>
+            <Text style={[styles.optionText, isRTL && styles.optionTextRTL , {color: Colors.red}]}>{t.account.logout}</Text>
             <Icon name="logout" size={20} color={Colors.red} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.moreOption, !isRTL && styles.moreoptionRTL]}
+            style={[styles.moreOption, !isRTL && styles.moreoptionRTL , {borderWidth: 1, borderColor: 'rgba(244, 41, 41, 0.85)' , borderRadius: 10 , paddingHorizontal: 10 , paddingVertical: 5 , marginTop: 10, backgroundColor: 'rgba(244, 41, 41, 0.4)' , marginBottom: 10}]}
             onPress={() => setDeleteAccountModalVisible(true)}>
-            <Text style={[styles.optionText, !isRTL && styles.optionTextRTL]}>{t.account.deleteAccount}</Text>
-            <Icon name="delete-outline" size={20} color={Colors.red} />
+            <Text style={[styles.optionText, !isRTL && styles.optionTextRTL , {color: 'rgba(244, 41, 41, 0.85)'}]}>{t.account.deleteAccount}</Text>
+            <Icon name="delete-outline" size={20} color={'rgba(244, 41, 41, 0.85)'} />
           </TouchableOpacity>
         </View>
       </ScrollView>
