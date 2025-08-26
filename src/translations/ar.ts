@@ -599,7 +599,8 @@ export const ar = {
       services: 'خدمات',
       hour: 'س',
       minute: 'د',
-      and: 'و'
+      and: 'و',
+      noServices: 'لم يتم اختيار خدمات'
     },
     errors: {
       authenticationMessage: 'الرجاء تسجيل الدخول مرة أخرى للاستمرار.',

@@ -49,42 +49,82 @@ const ReviewConfirmModal = ({
             (sum, service) => sum + (service.price || 0),
             0,
           )
-        : 55; // Default value when no services selected
+        : 0; // No default value when no services selected
 
-    const discount = discountAmount >= 0 ? discountAmount : 10; // Default discount
+    const discount = discountAmount >= 0 ? discountAmount : 0; // No default discount
     const total = Math.max(0, subtotal - discount);
 
-    // Calculate total duration in minutes
+    // Calculate total duration in minutes from selected services only
     const totalMinutes =
       selectedServices.length > 0
         ? selectedServices.reduce(
-            (sum, service) => sum + (service.duration || 0),
+            (sum, service) => {
+              // Ensure duration is converted to a number
+              const duration = Number(service.duration) || 0;
+              return sum + duration;
+            },
             0,
           )
-        : 150; // Default 2.5 hours (150 minutes)
+        : 0; // No default duration when no services selected
+
+    // Ensure totalMinutes is a number
+    const finalTotalMinutes = Number(totalMinutes) || 0;
+    
+    // Debug logging
+    console.log('Duration calculation:', {
+      selectedServices: selectedServices.map(s => ({ 
+        name: s.name, 
+        duration: s.duration,
+        durationType: typeof s.duration,
+        durationRaw: s.duration
+      })),
+      totalMinutes,
+      totalMinutesType: typeof totalMinutes,
+      finalTotalMinutes,
+      finalTotalMinutesType: typeof finalTotalMinutes,
+      servicesCount: selectedServices.length
+    });
 
     // Format duration properly - convert to hours and minutes
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-
     let durationText = '';
-    if (hours > 0 && minutes > 0) {
-      // Format: "2 hr and 30 min" or "2 س و30 د"
-      durationText = `${hours} ${t.booking.reviewModal.hour} ${t.booking.reviewModal.and} ${minutes} ${t.booking.reviewModal.minute}`;
-    } else if (hours > 0) {
-      // Format: "2 hr" or "2 س"
-      durationText = `${hours} ${t.booking.reviewModal.hour}`;
-    } else if (minutes > 0) {
-      // Format: "30 min" or "30 د"
-      durationText = `${minutes} ${t.booking.reviewModal.minute}`;
+    if (finalTotalMinutes > 0) {
+      const hours = Math.floor(finalTotalMinutes / 60);
+      const minutes = finalTotalMinutes % 60;
+
+      console.log('Duration formatting:', {
+        totalMinutes,
+        calculatedHours: hours,
+        calculatedMinutes: minutes,
+        hoursType: typeof hours,
+        minutesType: typeof minutes
+      });
+
+      if (hours > 0 && minutes > 0) {
+        // Format: "2 hr and 30 min" or "2 س و30 د"
+        durationText = `${hours} ${t.booking.reviewModal.hour} ${t.booking.reviewModal.and} ${minutes} ${t.booking.reviewModal.minute}`;
+      } else if (hours > 0) {
+        // Format: "2 hr" or "2 س"
+        durationText = `${hours} ${t.booking.reviewModal.hour}`;
+      } else if (minutes > 0) {
+        // Format: "30 min" or "30 د"
+        durationText = `${minutes} ${t.booking.reviewModal.minute}`;
+      }
     } else {
-      // Default fallback: "2 hr and 30 min" or "2 س و30 د"
-      durationText = `2 ${t.booking.reviewModal.hour} ${t.booking.reviewModal.and} 30 ${t.booking.reviewModal.minute}`;
+      // No services selected
+      durationText = t.booking.reviewModal.noServices;
     }
 
-    const servicesCount =
-      selectedServices.length > 0 ? selectedServices.length : 2;
-    const serviceTime = `${t.booking.reviewModal.services} ${servicesCount} • ${durationText}`;
+    console.log('Final duration text:', durationText);
+    console.log('Translation keys:', {
+      hour: t.booking.reviewModal.hour,
+      minute: t.booking.reviewModal.minute,
+      and: t.booking.reviewModal.and
+    });
+
+    const servicesCount = selectedServices.length;
+    const serviceTime = servicesCount > 0 
+      ? `${t.booking.reviewModal.services} ${servicesCount} • ${durationText}`
+      : t.booking.reviewModal.noServices;
 
     return {
       subtotal: `${subtotal.toFixed(0)} ${t.home.currency}`,

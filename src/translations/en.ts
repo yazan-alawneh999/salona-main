@@ -656,7 +656,8 @@ export const en = {
       services: 'services',
       hour: 'hr',
       minute: 'min',
-      and: 'and'
+      and: 'and',
+      noServices: 'No services selected'
     },
     errors: {
       authenticationMessage: 'Please log in again to continue.',

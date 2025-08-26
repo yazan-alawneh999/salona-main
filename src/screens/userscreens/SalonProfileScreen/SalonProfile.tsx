@@ -430,7 +430,7 @@ const SalonProfileScreen = () => {
                 <View>
                   <Text style={modalStyles.serviceName}>{item.name}</Text>
                   <Text style={modalStyles.serviceDuration}>
-                    {item.duration}
+                    {item.duration} {t.salonProfile.services.mins}
                   </Text>
                 </View>
                 <Text
