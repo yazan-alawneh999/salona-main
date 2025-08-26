@@ -544,6 +544,7 @@ export const en = {
   },
   explore: {
     results: 'results',
+    all: 'All',
     filters: 'Filters',
     sortBy: {
       default: 'Sort By',
@@ -646,7 +647,7 @@ export const en = {
       discounts: 'Discounts',
       total: 'Total',
       payNow: 'Pay now',
-      payAtCenter: 'Pay at center',
+      payAtCenter: 'Pay at location',
       paymentMethod: 'Payment method',
       notes: 'Notes',
       notesPlaceholder: 'Add comments or special requests',

@@ -55,6 +55,7 @@ const ExploreScreen: React.FC = () => {
   const [isGridView, setIsGridView] = useState(false);
   const [rating, setRating] = useState<number | undefined>();
   const [categories, setCategories] = useState<string[] | undefined>();
+  const [categoryNames, setCategoryNames] = useState<string[] | undefined>();
   const [nearbySalons, setNearbySalons] = useState<NearbySalon[]>([]);
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -64,13 +65,25 @@ const ExploreScreen: React.FC = () => {
   // Handle filters from the Filter screen
   useEffect(() => {
     if (route.params?.filters) {
-      const {price_range, sort_by, rating, categories, search} =
+      const {price_range, sort_by, rating, categories, search, categoryNames} =
         route.params.filters;
       if (price_range) setPriceRange(price_range);
       if (sort_by) setSortBy(sort_by as typeof sortBy);
       if (rating) setRating(rating);
-      if (categories) setCategories(categories);
       if (search) setSearchQuery(search);
+      
+      // Handle category names and IDs separately
+      if (categoryNames && categoryNames.length > 0) {
+        // Set display names
+        setCategoryNames(categoryNames);
+        // Keep the original category IDs for API calls
+        if (categories && categories.length > 0) {
+          setCategories(categories);
+        }
+      } else if (categories && categories.length > 0) {
+        // Fallback to category IDs
+        setCategories(categories);
+      }
     }
   }, [route.params?.filters]);
 
@@ -84,6 +97,9 @@ const ExploreScreen: React.FC = () => {
   };
 
   console.log('API Query Parameters:', queryParams);
+  console.log('Categories state:', categories);
+  console.log('Category Names state:', categoryNames);
+  console.log('Search Query state:', searchQuery);
 
   // Use the combined parameters in the API call
   const {
@@ -96,8 +112,9 @@ const ExploreScreen: React.FC = () => {
   useEffect(() => {
     if (salonsData) {
       console.log('API Responseee:', {
-        // total_salons: salonsData.salons?.length,in
+        total_salons: salonsData.salons?.length,
         salons: salonsData.salons,
+        salonsData: salonsData,
       });
     }
     if (error) {
@@ -254,8 +271,16 @@ const ExploreScreen: React.FC = () => {
 
   // Map salons with distance and travel time information
   const mappedSalons = useMemo(() => {
-    if (!salonsData?.salons) return [];
+    console.log('mappedSalons - salonsData:', salonsData);
+    console.log('mappedSalons - salonsData.salons:', salonsData?.salons);
+    
+    if (!salonsData?.salons) {
+      console.log('No salons data available');
+      return [];
+    }
 
+    console.log('Processing salons:', salonsData.salons.length);
+    
     const salonsWithDistance = salonsData.salons.map((salon: Salon) => {
       // Find matching nearby salon to get distance and travel time
       const nearbySalon = nearbySalons.find(ns => ns.id === salon.id);
@@ -265,6 +290,7 @@ const ExploreScreen: React.FC = () => {
           : `${nearbySalon.distance.toFixed(1)} km`
         : undefined;
 
+      console.log('Processing salon:', salon.name, 'ID:', salon.id);
       console.log('distance:', distanceText);
       console.log('travelTime:', nearbySalon?.travelTime);
 
@@ -277,7 +303,7 @@ const ExploreScreen: React.FC = () => {
     });
 
     // Sort by distance: salons with distance first (closest to furthest), then salons without distance
-    return salonsWithDistance.sort((a, b) => {
+    const sortedSalons = salonsWithDistance.sort((a, b) => {
       // If both have distance, sort by distance value
       if (a.distanceValue !== undefined && b.distanceValue !== undefined) {
         return a.distanceValue - b.distanceValue;
@@ -292,6 +318,9 @@ const ExploreScreen: React.FC = () => {
       // If neither has distance, maintain original order
       return 0;
     });
+    
+    console.log('Final mappedSalons:', sortedSalons.length, 'salons');
+    return sortedSalons;
   }, [salonsData?.salons, nearbySalons]);
 
   const renderSalonItem = ({
@@ -374,7 +403,11 @@ const ExploreScreen: React.FC = () => {
             />
 
             <Text style={styles.resultCount}>
-              {salonsData?.salons?.length || 0} {t.explore.results}
+              {categoryNames && categoryNames.length > 0 
+                ? categoryNames[0] 
+                : searchQuery 
+                  ? `Search: ${searchQuery}`
+                  : t.explore.all}
             </Text>
 
             <View
@@ -478,11 +511,11 @@ const ExploreScreen: React.FC = () => {
                                     {getAverageRating(item).toFixed(1)}
                                   </Text>
                                 </View>
-                                <View style={styles.listCardRating}>
+                                {/* <View style={styles.listCardRating}>
                                   <Icon
                                     name="access-time"
                                     size={16}
-                                    // color="#fafe35ff"
+                                    color={Colors.gold}
                                   />
                                   <Text style={styles.listCardRatingText}>
                                     {item.travelTime}
@@ -492,12 +525,12 @@ const ExploreScreen: React.FC = () => {
                                   <Icon
                                     name="place"
                                     size={16}
-                                    // color="#fafe35ff"
+                                    color={Colors.gold}
                                   />
                                   <Text style={styles.listCardRatingText}>
                                     {item.distance}
                                   </Text>
-                                </View>
+                                </View> */}
                               </View>
                             </View>
                           </TouchableOpacity>

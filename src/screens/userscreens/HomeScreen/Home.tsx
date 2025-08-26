@@ -243,6 +243,13 @@ const HomeScreen: React.FC = () => {
     nearbySalonsLoading,
   });
 
+  // Loading state - much simpler now
+  const isLoadingAny =
+    packagesLoading ||
+    categoriesLoading ||
+    addressesLoading ||
+    nearbySalonsLoading;
+
   // Additional debugging for rendering
   console.log('Rendering Debug:', {
     packagesLength: packages.length,
@@ -369,7 +376,11 @@ const HomeScreen: React.FC = () => {
   );
 
   const handleGoSearch = useCallback(() => {
-    navigation.navigate('ExploreScreen');
+    navigation.navigate('ExploreScreen', {
+      filters: {
+        categories: [],
+      },
+    });
   }, [navigation]);
 
   const requestUserPermission = async () => {
@@ -462,13 +473,6 @@ const HomeScreen: React.FC = () => {
       };
     });
   }, [nearbySalons]);
-
-  // Loading state - much simpler now
-  const isLoadingAny =
-    packagesLoading ||
-    categoriesLoading ||
-    addressesLoading ||
-    nearbySalonsLoading;
 
   console.log('Loading states:', {
     packagesLoading,
@@ -685,7 +689,7 @@ const HomeScreen: React.FC = () => {
   );
 
   const handleSalonPress = useCallback(
-    salon => {
+    (salon: any) => {
       navigation.navigate('SalonProfileScreen', {
         salon,
         initialTab: 'Services',
@@ -701,10 +705,11 @@ const HomeScreen: React.FC = () => {
   }, [navigation]);
 
   const handleCategoryPress = useCallback(
-    (categoryId: number) => {
+    (categoryId: number, categoryName: string) => {
       navigation.navigate('ExploreScreen', {
         filters: {
           categories: [categoryId.toString()],
+          categoryNames: [categoryName],
           initialTab: 'Services',
         },
       });
@@ -871,7 +876,7 @@ const HomeScreen: React.FC = () => {
                       <TouchableOpacity
                         key={category.id}
                         style={styles.serviceItem}
-                        onPress={() => handleCategoryPress(category.id)}>
+                        onPress={() => handleCategoryPress(category.id, category.name)}>
                         <Image
                           source={
                             category.image_url

@@ -115,9 +115,14 @@ const FilterScreen: React.FC = () => {
       ? priceRanges.find(range => range.label === selectedPriceRange[0])?.value 
       : '';
 
-    // Get the category IDs from the selected categories
+    // Get the category IDs and names from the selected categories
     const categoryIds = selectedCategories.map(catLabel => 
       categories.find(cat => cat.label === catLabel)?.value
+    ).filter(Boolean);
+
+    // Get the category names for display
+    const categoryNames = selectedCategories.map(catLabel => 
+      categories.find(cat => cat.label === catLabel)?.label
     ).filter(Boolean);
 
     // Get the rating value (single selection)
@@ -128,6 +133,7 @@ const FilterScreen: React.FC = () => {
     const filters = {
       price_range: priceRangeValue || '',
       categories: categoryIds,
+      categoryNames: categoryNames,
       rating: ratingValue
     };
 

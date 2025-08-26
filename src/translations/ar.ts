@@ -488,6 +488,7 @@ export const ar = {
   },
   explore: {
     results: 'نتائج',
+    all: 'الكل',
     filters: 'تصفية',
     sortBy: {
       default: 'ترتيب حسب',
@@ -589,7 +590,7 @@ export const ar = {
       discounts: 'الخصومات',
       total: 'الإجمالي',
       payNow: 'الدفع الآن',
-      payAtCenter: 'الدفع في المركز',
+      payAtCenter: 'الدفع في الموقع',
       paymentMethod: 'طريقة الدفع',
       notes: 'ملاحظات',
       notesPlaceholder: 'إضافة تعليقات أو طلبات خاصة بالحجز',

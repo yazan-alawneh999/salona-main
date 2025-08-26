@@ -14,7 +14,7 @@ const Fonts = {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: 10,
+    // paddingTop: 10,
     // backgroundColor: Colors.black,
   },
   salonMetaRow: {
