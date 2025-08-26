@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
       gap: 10,
       padding: 16,
       paddingTop: 20,
-      backgroundColor: Colors.black,
+      // backgroundColor: Colors.black,
       borderBottomWidth: 1,
       borderBottomColor: 'rgba(255, 255, 255, 0.1)',
     },

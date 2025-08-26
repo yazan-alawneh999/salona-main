@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Footer from '../../../components/Footer/Footer';
 import chatService from '../../../services/chatService';
 
+
 interface ChatPreview {
   other_user_id: number;
   latest_message_sent: string;

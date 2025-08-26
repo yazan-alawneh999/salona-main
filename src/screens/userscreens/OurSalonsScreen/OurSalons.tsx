@@ -11,7 +11,9 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useTranslation } from '../../../contexts/TranslationContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../../constants/Colors';
-import { GOOGLE_MAPS_API_KEY } from '@env'; 
+import { GOOGLE_MAPS_API_KEY } from '@env';
+
+
 interface SalonResponse {
   salons: Salon[];
 }

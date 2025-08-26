@@ -20,6 +20,7 @@ import Footer from '../../../components/Footer/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './NotificationsScreen.styles';
 
+
 interface Notification {
   id: number;
   user_id: number;
@@ -392,17 +393,17 @@ const NotificationsScreen: React.FC = () => {
       <StatusBar
         translucent
         backgroundColor="transparent"
-        barStyle="light-content" // or 'dark-content' depending on background
+        barStyle="light-content"
       />
       <View style={styles.container}>
         <View style={[styles.header, isRTL && styles.headerRTL]}>
           <Text style={styles.headerTitle}>{t.notifications.title}</Text>
           {/* {notifications.length > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={handleClearAll}>
-              <Text style={styles.clearText}>{t.notifications.clearAll}</Text>
-              <Icon name="clear-all" size={20} color={Colors.gold} />
-            </TouchableOpacity>
-          )} */}
+        <TouchableOpacity style={styles.clearButton} onPress={handleClearAll}>
+          <Text style={styles.clearText}>{t.notifications.clearAll}</Text>
+          <Icon name="clear-all" size={20} color={Colors.gold} />
+        </TouchableOpacity>
+      )} */}
         </View>
 
         {loading && notifications.length === 0 ? (

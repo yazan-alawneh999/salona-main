@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image, StyleSheet, StatusBar, ImageBackground } from 'react-native';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Footer from '../../../components/Footer/Footer';
@@ -8,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useGetFavoritesQuery, useToggleFavoriteSalonMutation } from '../../../redux/api/salonApi';
 import { useTranslation } from '../../../contexts/TranslationContext';
 import styles from './Favorites.styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FavoriteSalon {
   id: number;
@@ -111,30 +111,39 @@ const FavoritesScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
-      <View style={styles.container}>
-        <View style={[styles.header, !isRTL && styles.headerRTL]}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t.favorites.title}</Text>
-        </View>
-
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderSalonItem}
-          contentContainerStyle={styles.listContainer}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{t.favorites.noFavorites}</Text>
-            </View>
-          )}
-        />
-        <Footer />
+ 
+   
+    <View style={styles.container}>
+         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
+    <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <View style={[styles.header, !isRTL && styles.headerRTL]}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name={isRTL ? "arrow-forward" : "arrow-back"} size={24} color={Colors.white} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t.favorites.title}</Text>
       </View>
-    </SafeAreaView>
+
+      <FlatList
+        data={favorites}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderSalonItem}
+        contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>{t.favorites.noFavorites}</Text>
+          </View>
+        )}
+      />
+      <Footer />
+      </SafeAreaView>
+    </View>
+         
+   
   );
 };
 

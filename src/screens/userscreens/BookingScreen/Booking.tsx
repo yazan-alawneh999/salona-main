@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -149,6 +151,11 @@ const BookingsPage = () => {
 
   return (
     <View style={[styles.container, isRTL && styles.containerRTL]}>
+      <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
       <View style={[styles.contentContainer, isRTL && styles.contentContainerRTL]}>
         <View style={[styles.header, !isRTL && styles.headerRTL]}>
           <TouchableOpacity 

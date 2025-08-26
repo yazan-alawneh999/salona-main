@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, Modal, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, TextInput, Modal, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView, ImageBackground } from 'react-native';
 import Colors from '../../../constants/Colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SuccessModal from '../../../components/SuccessModal/SuccessModal';
@@ -8,6 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from '../../../contexts/TranslationContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = NativeStackScreenProps<UserStackParamList, 'ReviewBookingScreen'>;
 
@@ -298,6 +299,13 @@ const ReviewBookingScreen = ({
 
   return (
     <View style={styles.container}>
+          <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black, paddingHorizontal: 15,
+    paddingVertical: 20,}}>
+      <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t.reviewBooking.title}</Text>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -471,6 +479,7 @@ const ReviewBookingScreen = ({
         onClose={handleSuccessModalClose}
         message={t.reviewBooking.successModal.message}
       />
+      </SafeAreaView>
     </View>
   );
 };
@@ -479,8 +488,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.black,
-    paddingHorizontal: 15,
-    paddingVertical: 20,
+    
   },
   header: {
     flexDirection: 'row',
@@ -502,7 +510,7 @@ headerTitle: {
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.softGray,
+    borderBottomColor: Colors.hardGray,
     paddingVertical: 15,
   },
   label: {
