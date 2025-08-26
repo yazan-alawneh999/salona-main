@@ -8,6 +8,8 @@ import {
   Modal,
   I18nManager,
   StatusBar,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
@@ -192,13 +194,20 @@ const ProviderSalonProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: Colors.black}}>
+    
+      <View style={[styles.container, isRTL && {direction: 'rtl'}]}>
+     
+        <SafeAreaView style={{flex: 1}}>
+        <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
       <StatusBar 
-        backgroundColor={Colors.black}
+        backgroundColor= 'transparent'
         barStyle="light-content"
         translucent={true}
       />
-      <View style={[styles.container, isRTL && {direction: 'rtl'}]}>
         <ScrollView>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
@@ -285,8 +294,9 @@ const ProviderSalonProfileScreen = () => {
           />
         </ScrollView>
         <ProviderFooter />
+      </SafeAreaView>
       </View>
-    </SafeAreaView>
+ 
   );
 };
 

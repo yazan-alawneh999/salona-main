@@ -49,7 +49,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     borderBottomWidth: 1,
     borderBottomColor: Colors.gold,
     paddingVertical: 10,

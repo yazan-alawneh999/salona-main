@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   StatusBar,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NotificationCard from '../../../components/NotificationCard/NotificationCard';
@@ -17,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTranslation} from '../../../contexts/TranslationContext';
 import { Notification, NotificationsResponse } from './types';
 import Colors from '../../../constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const ProviderNotificationsScreen: React.FC = () => {
@@ -251,11 +254,17 @@ const ProviderNotificationsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+      <SafeAreaView style={{flex: 1}}>
+         <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" />
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color="#FFFFFF" />
+          <Icon name="arrow-back" size={24} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t.notifications.title}</Text>
         <View style={{width: 24}} />
@@ -283,6 +292,7 @@ const ProviderNotificationsScreen: React.FC = () => {
       />
 
       <ProviderFooter />
+      </SafeAreaView>
     </View>
   );
 };

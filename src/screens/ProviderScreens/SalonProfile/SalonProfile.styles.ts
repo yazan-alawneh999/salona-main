@@ -5,7 +5,7 @@ import {withDecay} from 'react-native-reanimated';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
   },
   header: {
     flexDirection: 'row',
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     // paddingTop: 20, // Reduced top padding for better spacing
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
   },
   headerLeft: {
     flex: 1,
@@ -40,11 +40,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconButton: {
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: 'rgba(255, 217, 0, 0.25)',
     padding: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
+    borderColor: 'rgba(255, 217, 0, 0.82)',
   },
   notificationIcon: {
     backgroundColor: Colors.white,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
   },
   tab: {
     paddingVertical: 6,

@@ -10,6 +10,8 @@ import {
   Alert,
   Linking,
   StatusBar,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../../constants/Colors';
@@ -254,8 +256,13 @@ const ProviderBookings = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+    <SafeAreaView style={{ flex: 1 }}>
+         <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      />
+      <StatusBar barStyle="light-content" backgroundColor='transparent' />
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t.providerBookings.title}</Text>

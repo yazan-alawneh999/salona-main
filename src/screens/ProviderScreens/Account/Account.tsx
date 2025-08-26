@@ -10,6 +10,8 @@ import {
   Modal,
   ActivityIndicator,
   StatusBar,
+  ImageBackground,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -155,8 +157,14 @@ const ProviderAccountScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.black }}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.black} />
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar barStyle="light-content" backgroundColor='transparent' />
+      <ImageBackground
+        source={require('../../../assets/images/pink-bg.png')}
+        style={StyleSheet.absoluteFillObject}
+
+        resizeMode="cover"
+      />
       <View style={[styles.container, isRTL && { direction: 'rtl' }]}>
         <ScrollView>
           <ProfileHeader

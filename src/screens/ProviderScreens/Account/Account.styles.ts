@@ -3,7 +3,8 @@ import Colors from "../../../constants/Colors";
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: Colors.black,
+      paddingTop: 20,
+      // backgroundColor: Colors.black,
     },
     section: {
         // marginBottom: 20,
