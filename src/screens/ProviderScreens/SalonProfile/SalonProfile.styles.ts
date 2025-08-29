@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
@@ -439,7 +439,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   viewerCloseButton: {
-    backgroundColor: 'rgba(195, 192, 192, 0.59)',
+    backgroundColor: Colors.goldTransparent20,
+    // backgroundColor: 'rgba(195, 192, 192, 0.59)',
     padding: 12,
     borderRadius: 25,
     width: 50,

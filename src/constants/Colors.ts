@@ -17,6 +17,12 @@ const Colors = {
   lightGrey: '#FCF8FF',
   grey: '#EEE9F0',
   primary: '#e37673',
+
+  transparent: 'transparent', // fully transparent
+  blackTransparent50: 'rgba(0,0,0,0.5)', // 50% transparent black
+  whiteTransparent30: 'rgba(255,255,255,0.3)', // 30% transparent white
+  goldTransparent20: 'rgba(227,118,115,0.2)', // 20% transparent gold
 };
+
 
 export default Colors;

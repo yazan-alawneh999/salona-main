@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {StatusBar} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.',
   'Warning: ...',
@@ -40,6 +41,8 @@ const AppNavigator = () => {
 };
 
 const App = () => {
+
+
   useEffect(() => {
     const initializeApp = async () => {
       // Initialize auth
@@ -54,6 +57,7 @@ const App = () => {
           console.log('❌ FAILED TO INITIALIZE FIREBASE IN APP.TSX');
         }
       });
+
     };
 
     initializeApp();

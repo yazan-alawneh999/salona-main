@@ -5,6 +5,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Location } from '../types';
 import { useTranslation } from '../../../../contexts/TranslationContext';
 
+// Check if location services are enabled
+const checkLocationServicesEnabled = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    Geolocation.getCurrentPosition(
+      () => resolve(true),
+      (error) => {
+        if (error.code === 2) {
+          resolve(false); // Location services disabled
+        } else {
+          resolve(true); // Other errors, but services might be enabled
+        }
+      },
+      { timeout: 5000, maximumAge: 60000 }
+    );
+  });
+};
+
 const LOCATION_STORAGE_KEY = 'last_known_location';
 
 export const useLocation = () => {
@@ -131,6 +148,22 @@ export const useLocation = () => {
         return null;
       }
 
+      // Check if location services are enabled
+      const servicesEnabled = await checkLocationServicesEnabled();
+      if (!servicesEnabled) {
+        console.log('Location services are disabled');
+        Alert.alert(
+          'Location Services Disabled',
+          'Please enable location services in your device settings to use this feature.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() }
+          ]
+        );
+        setLoading(false);
+        return null;
+      }
+
       return new Promise((resolve, reject) => {
         console.log('Calling getCurrentPosition...');
         
@@ -173,12 +206,19 @@ export const useLocation = () => {
             if (error.code === 3) {
               errorMessage = 'Location request timed out. Please check your GPS signal and try again.';
             } else if (error.code === 2) {
-              errorMessage = 'Location is unavailable. Please check your GPS settings.';
+              errorMessage = 'No location provider available. Please:\n\n1. Turn ON Location Services\n2. Enable GPS\n3. Check if you\'re in airplane mode\n4. Try moving to an area with better signal';
             } else if (error.code === 1) {
               errorMessage = 'Location permission denied. Please enable location services.';
             }
             
-            Alert.alert(t.editLocation.error.locationError, errorMessage);
+            Alert.alert(
+              'Location Error', 
+              errorMessage,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Open Settings', onPress: () => Linking.openSettings() }
+              ]
+            );
             reject(error);
           },
           {

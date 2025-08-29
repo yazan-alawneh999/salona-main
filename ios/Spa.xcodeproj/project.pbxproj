@@ -25,6 +25,8 @@
 		AFE267E4B2F64C4FB6E46789 /* Maitree-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CBD08E0442FA4D218156BEAE /* Maitree-Regular.ttf */; };
 		87A4DBB683674810BE4A435E /* Maitree-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 246F0085BDC04548970E725C /* Maitree-SemiBold.ttf */; };
 		F9764D7428BE4A35AA473416 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF685BBC71E34CF88D9653E0 /* Poppins-SemiBold.ttf */; };
+		DCD4D20CF0A6461CB46AA779 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A01CBDEA444A467B8CF9C391 /* BootSplash.storyboard */; };
+		BA38CF646D8E4C99B3920033 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6185859D21A24FD98DC8688F /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +69,8 @@
 		CBD08E0442FA4D218156BEAE /* Maitree-Regular.ttf */ = {isa = PBXFileReference; name = "Maitree-Regular.ttf"; path = "../assets/fonts/Maitree-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		246F0085BDC04548970E725C /* Maitree-SemiBold.ttf */ = {isa = PBXFileReference; name = "Maitree-SemiBold.ttf"; path = "../assets/fonts/Maitree-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		BF685BBC71E34CF88D9653E0 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; name = "Poppins-SemiBold.ttf"; path = "../assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A01CBDEA444A467B8CF9C391 /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "Spa/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6185859D21A24FD98DC8688F /* Colors.xcassets */ = {isa = PBXFileReference; name = "Colors.xcassets"; path = "Spa/Colors.xcassets"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = folder.assetcatalog; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +120,8 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				A01CBDEA444A467B8CF9C391 /* BootSplash.storyboard */,
+				6185859D21A24FD98DC8688F /* Colors.xcassets */,
 			);
 			name = Spa;
 			sourceTree = "<group>";
@@ -298,6 +304,8 @@
 				AFE267E4B2F64C4FB6E46789 /* Maitree-Regular.ttf in Resources */,
 				87A4DBB683674810BE4A435E /* Maitree-SemiBold.ttf in Resources */,
 				F9764D7428BE4A35AA473416 /* Poppins-SemiBold.ttf in Resources */,
+				DCD4D20CF0A6461CB46AA779 /* BootSplash.storyboard in Resources */,
+				BA38CF646D8E4C99B3920033 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -81,7 +81,7 @@ const PortfolioGrid = ({data, tr}) => {
         imageIndex={currentIndex}
         visible={isViewerVisible}
         onRequestClose={() => setViewerVisible(false)}
-        onImageIndexChange={setCurrentIndex}
+        // onImageIndexChange={setCurrentIndex}
         HeaderComponent={renderImageViewerHeader}
       />
     </View>
