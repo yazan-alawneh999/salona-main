@@ -28,6 +28,7 @@ const ReviewConfirmModal = ({
   isRTL = true,
   isBooking,
   initialNotes = '',
+  service_fee = 0,
 }) => {
   const {t} = useTranslation();
   
@@ -52,7 +53,17 @@ const ReviewConfirmModal = ({
         : 0; // No default value when no services selected
 
     const discount = discountAmount >= 0 ? discountAmount : 0; // No default discount
-    const total = Math.max(0, subtotal - discount);
+    const serviceFee = Number(service_fee) || 0;
+    const total = Math.max(0, subtotal + serviceFee - discount);
+
+    console.log('ReviewConfirmModal calculation:', {
+      selectedServices: selectedServices.map(s => ({ name: s.name, price: s.price })),
+      subtotal,
+      serviceFee,
+      discount,
+      total,
+      service_fee_prop: service_fee
+    });
 
     // Calculate total duration in minutes from selected services only
     const totalMinutes =
@@ -128,6 +139,7 @@ const ReviewConfirmModal = ({
 
     return {
       subtotal: `${subtotal.toFixed(0)} ${t.home.currency}`,
+      serviceFee: `${serviceFee.toFixed(0)} ${t.home.currency}`,
       discount: `${discount.toFixed(0)}- ${t.home.currency}`,
       total: `${total.toFixed(0)} ${t.home.currency}`,
       payNow: `0 ${t.home.currency}`,
@@ -211,6 +223,13 @@ const ReviewConfirmModal = ({
                 <Text style={styles.summaryValue}>{orderData.subtotal}</Text>
                 <Text style={styles.summaryLabel}>
                   {t.booking.reviewModal.subtotal}
+                </Text>
+              </View>
+
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryValue}>{orderData.serviceFee}</Text>
+                <Text style={styles.summaryLabel}>
+                  {t.booking.reviewModal.serviceFee}
                 </Text>
               </View>
 

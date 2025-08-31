@@ -36,7 +36,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../../redux/store';
 import PortfolioGrid from './components/PortfolioGrid ';
 import PackagesList from './components/Packages';
-// import ReviewConfirmModal from './components/ReviewConfirmModal';
+import ReviewConfirmModal from './components/ReviewConfirmModal';
 
 type SalonProfileRouteProp = RouteProp<
   {
@@ -77,6 +77,7 @@ const SalonProfileScreen = () => {
   }>({});
   const [modalVisible, setModalVisible] = useState(false);
   const [dateModalVisible, setDateModalVisible] = useState(false);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
   const {t, isRTL} = useTranslation();
   const [isFavorite, setIsFavorite] = useState(false);
   const [salonAddress, setSalonAddress] = useState<string>('');
@@ -206,6 +207,7 @@ const SalonProfileScreen = () => {
 
   const handleBookingSuccess = () => {
     setSelectedServices({});
+    setReviewModalVisible(false);
     // setModalVisible(true);
   };
 
@@ -456,8 +458,11 @@ const SalonProfileScreen = () => {
               <View>
                 <View style={modalStyles.summary}>
                   <Text style={modalStyles.summaryText}>
-                    {t.salonProfile.services.serviceFees}:{' '}
-                    {salonData?.salons?.service_fee || 0}{' '}
+                    {t.salonProfile.services.subtotal}: {totalPrice - serviceFees}{' '}
+                    {t.salonProfile.services.price}
+                  </Text>
+                  <Text style={modalStyles.summaryText}>
+                    {t.salonProfile.services.serviceFees}: {serviceFees}{' '}
                     {t.salonProfile.services.price}
                   </Text>
                   <Text style={modalStyles.summaryText}>
@@ -465,18 +470,30 @@ const SalonProfileScreen = () => {
                     {t.salonProfile.services.price}
                   </Text>
                 </View>
-                <TouchableOpacity
-                  style={modalStyles.continueButton}
-                  onPress={() => {
-                    setModalVisible(false);
-                    setDateModalVisible(true);
-
-                    // console.log('Proceeding with:', selectedServices);
-                  }}>
-                  <Text style={modalStyles.continueButtonText}>
+                <View style={modalStyles.buttonContainer}>
+                  <TouchableOpacity
+                    style={modalStyles.continueButton}
+                    onPress={() => {
+                      setModalVisible(false);
+                      setDateModalVisible(true);
+                    }}>
+                    <Text style={modalStyles.bookButtonText}>
                     {t.salonProfile.services.actions.continue}
-                  </Text>
-                </TouchableOpacity>
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  {/* <TouchableOpacity
+                    style={modalStyles.bookButton}
+                    onPress={() => {
+                      setModalVisible(false);
+                      setReviewModalVisible(true);
+                    }}>
+                       <Text style={modalStyles.continueButtonText}>
+                      {t.salonProfile.services.actions.continue}
+                    </Text>
+                   
+                  </TouchableOpacity> */}
+                </View>
               </View>
             }
           />
@@ -576,16 +593,17 @@ const SalonProfileScreen = () => {
         </ScrollView>
         <Footer />
         {renderModal()}
-        {/* <ReviewConfirmModal
+        <ReviewConfirmModal
           visible={reviewModalVisible}
-          onClose={handleCloseModal}
-          onConfirm={handleConfirm}
+          onClose={() => setReviewModalVisible(false)}
+          onConfirm={handleBookingSuccess}
           selectedServices={Object.values(selectedServices)}
           // discountCode={'DISCOUNT10'}
-          discountAmount={5.0}
-          paymentMethod="الدفع في المركز"
-          isRTL={true}
-        /> */}
+          discountAmount={0.0}
+          paymentMethod={t.booking.reviewModal.payAtCenter}
+          isRTL={isRTL}
+          service_fee={salonData?.salons?.service_fee || 0}
+        />
         <DateSelectionModal
           visible={dateModalVisible}
           onClose={() => setDateModalVisible(false)}
@@ -593,6 +611,7 @@ const SalonProfileScreen = () => {
           totalDuration={calculateTotalDuration()}
           selectedServices={Object.values(selectedServices)}
           onBookingSuccess={handleBookingSuccess}
+          service_fee={salonData?.salons?.service_fee || 0}
         />
         {activeTab === 'Services' &&
           Object.values(selectedServices).length > 0 && (
@@ -687,6 +706,12 @@ const modalStyles = StyleSheet.create({
     fontFamily: 'Maitree-SemiBold',
     marginBottom: 5,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginTop: 20,
+  },
   continueButton: {
     backgroundColor: Colors.black,
     padding: 15,
@@ -694,10 +719,22 @@ const modalStyles = StyleSheet.create({
     borderColor: Colors.gold,
     borderWidth: 1,
     alignItems: 'center',
-    marginTop: 20,
+    flex: 1,
   },
   continueButtonText: {
     color: Colors.white,
+    fontSize: 16,
+    fontFamily: 'Maitree-Bold',
+  },
+  bookButton: {
+    backgroundColor: Colors.gold,
+    padding: 15,
+    borderRadius: 34,
+    alignItems: 'center',
+    flex: 1,
+  },
+  bookButtonText: {
+    color: Colors.gold,
     fontSize: 16,
     fontFamily: 'Maitree-Bold',
   },

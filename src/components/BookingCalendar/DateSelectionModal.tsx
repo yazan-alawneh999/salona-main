@@ -48,6 +48,7 @@ const DateSelectionModal = ({
   totalDuration,
   selectedServices = [],
   onBookingSuccess,
+  service_fee = 0,
 }: DateSelectionModalProps) => {
   const {t} = useTranslation();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -1071,6 +1072,7 @@ const DateSelectionModal = ({
         paymentMethod={t.booking.reviewModal.payAtCenter}
         isRTL={isRTL}
         initialNotes={appointmentNotes}
+        service_fee={service_fee}
       />
     </>
   );

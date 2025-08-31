@@ -216,6 +216,7 @@ export const ar = {
       price: 'د.أ',
       remove: 'إزالة',
       serviceFees: 'رسوم الخدمة',
+      subtotal: 'المجموع الفرعي',
       total: 'المجموع',
       continue: 'متابعة',
       addNew: 'إضافة خدمة جديدة',
@@ -232,6 +233,7 @@ export const ar = {
         edit: 'تعديل',
         delete: 'حذف',
         continue: 'متابعة',
+        book: 'حجز',
       },
     },
     packages: {
@@ -587,6 +589,7 @@ export const ar = {
       discountCode: 'رمز الخصم',
       add: 'إضافة',
       subtotal: 'المجموع الفرعي',
+      serviceFee: 'رسوم الخدمة',
       discounts: 'الخصومات',
       total: 'الإجمالي',
       payNow: 'الدفع الآن',

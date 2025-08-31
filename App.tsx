@@ -42,7 +42,6 @@ const AppNavigator = () => {
 
 const App = () => {
 
-
   useEffect(() => {
     const initializeApp = async () => {
       // Initialize auth

@@ -267,6 +267,7 @@ export const en = {
       price: 'JDs',
       remove: 'Remove',
       serviceFees: 'Service fees',
+      subtotal: 'Subtotal',
       total: 'Total',
       continue: 'Continue',
       addNew: 'Add a new service',
@@ -283,6 +284,7 @@ export const en = {
         delete: 'Delete',
         continue: 'Continue',
         remove: 'Remove',
+        book: 'Book',
       },
     },
     packages: {
@@ -644,6 +646,7 @@ export const en = {
       discountCode: 'Discount code',
       add: 'Add',
       subtotal: 'Subtotal',
+      serviceFee: 'Service Fee',
       discounts: 'Discounts',
       total: 'Total',
       payNow: 'Pay now',
