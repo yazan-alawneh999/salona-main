@@ -590,6 +590,13 @@ export const en = {
     min: 'min',
     viewDetails: 'View Details',
     differentLocation: 'Different location',
+    locationPermission: {
+      title: 'Location Access Required',
+      message: 'We need access to your current location to show you nearby salons and provide better service.',
+      allowButton: 'Allow Location Access',
+      notNowButton: 'Not Now',
+      icon: '📍',
+    },
     services: {
       haircut: 'Haircut',
       nails: 'Nails',

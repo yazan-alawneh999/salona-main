@@ -17,6 +17,7 @@ import {
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import BottomSheetModal from './components/BottomSheetModal';
+import LocationPermissionModal from './components/LocationPermissionModal';
 
 import Colors from '../../../constants/Colors';
 import styles from './Home.styles';
@@ -43,7 +44,7 @@ import {skip} from '@reduxjs/toolkit/query';
 import {Package} from '../../../components/PackagesSection/PackagesSection';
 import messaging from '@react-native-firebase/messaging';
 import {GOOGLE_MAPS_API_KEY} from '@env';
-import {useLocation} from '../../userscreens/EditLocation/hooks/useLocation';
+
 import SearchBarWithMenu from '../../../components/SearchBarWithMenu/SearchBarWithMenu';
 import {Address} from '../../userscreens/EditLocation/types';
 import DeliveryLocationSheet from './components/DeliveryLocatioinSheet';
@@ -172,6 +173,8 @@ const HomeScreen: React.FC = () => {
   } | null>(null);
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showLocationPermissionModal, setShowLocationPermissionModal] = useState(false);
+  const [hasRequestedLocationPermission, setHasRequestedLocationPermission] = useState(false);
 
   // RTK Query hooks
   const {data: salonsData, isLoading: salonsLoading} = useGetAllSalonsQuery({});
@@ -198,7 +201,7 @@ const HomeScreen: React.FC = () => {
     (state: RootState) => state.salons.selectedAddress,
   );
 
-  const {getCurrentLocation, requestLocationPermission} = useLocation();
+
 
   // Nearby salons query - only runs when we have coordinates
   const {data: nearbySalonsData, isLoading: nearbySalonsLoading} =
@@ -259,24 +262,49 @@ const HomeScreen: React.FC = () => {
     categoriesLoading,
   });
 
-  const getAndSetCurrentLocation = async () => {
-    console.log('selected address mother', selectedAddress);
 
+
+  const handleLocationPermissionAllow = async () => {
+    setShowLocationPermissionModal(false);
+    setHasRequestedLocationPermission(true);
+    
     try {
-      const granted = await requestLocationPermission();
-      if (granted) {
-        const location = await getCurrentLocation();
-        if (location) {
-          setCurrentLocation({lat: location.latitude, lng: location.longitude});
-        } else {
-          console.error('Failed to get location from device');
+      // For Android, request location permission
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // Permission granted, get current location using Geolocation
+          const Geolocation = require('@react-native-community/geolocation');
+          Geolocation.getCurrentPosition(
+            (position) => {
+              setCurrentLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              });
+              console.log('Location permission granted and location obtained');
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+          );
         }
       } else {
-        console.warn('Location permission not granted');
+        // For iOS, we'll need to implement iOS-specific location handling
+        // For now, just log that permission was granted
+        console.log('Location permission granted on iOS');
       }
     } catch (error) {
-      console.error('Error getting location:', error);
+      console.error('Error getting location after permission:', error);
     }
+  };
+
+  const handleLocationPermissionNotNow = () => {
+    setShowLocationPermissionModal(false);
+    setHasRequestedLocationPermission(true);
+    console.log('User chose not to grant location permission');
   };
 
   // Handle address selection
@@ -317,6 +345,9 @@ const HomeScreen: React.FC = () => {
         isFavorite: false,
       };
       handleAddressSelect(currentLocationAddress);
+    } else {
+      // No location available, show message or handle accordingly
+      console.log('No current location available');
     }
   }, [currentLocation, handleAddressSelect]);
 
@@ -407,11 +438,38 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  // Initialize current location on mount
+  // Initialize location permission check on mount
   useEffect(() => {
-    getAndSetCurrentLocation();
+    // Check if we should show location permission modal
+    const checkLocationPermission = async () => {
+      try {
+        // Check if location permission is already granted
+        if (Platform.OS === 'ios') {
+          // For iOS, we'll show the modal and let the user decide
+          setShowLocationPermissionModal(true);
+        } else {
+          // For Android, check current permission status
+          const granted = await PermissionsAndroid.check(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          );
+          if (!granted && !hasRequestedLocationPermission) {
+            setShowLocationPermissionModal(true);
+          }
+          // Don't automatically get location even if permission is granted
+          // User must explicitly allow through the modal
+        }
+      } catch (error) {
+        console.error('Error checking location permission:', error);
+        // Fallback to showing modal
+        setShowLocationPermissionModal(true);
+      }
+    };
+
+    checkLocationPermission();
     requestUserPermission();
-  }, []);
+  }, [hasRequestedLocationPermission]);
+
+
 
   // Set primary address when addresses are loaded
   useEffect(() => {
@@ -631,6 +689,9 @@ const HomeScreen: React.FC = () => {
                 pointerEvents="none" // prevent touch
               />
             </TouchableOpacity>
+            
+
+            
             <TouchableOpacity
               style={styles.optionButton}
               activeOpacity={0.9}
@@ -918,6 +979,13 @@ const HomeScreen: React.FC = () => {
       )}
       {/* </View> */}
       <Footer />
+      
+      {/* Location Permission Modal */}
+      <LocationPermissionModal
+        visible={showLocationPermissionModal}
+        onAllow={handleLocationPermissionAllow}
+        onNotNow={handleLocationPermissionNotNow}
+      />
     </View>
   );
 };

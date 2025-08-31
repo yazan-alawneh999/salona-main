@@ -516,7 +516,7 @@ export const ar = {
     beautyServices: 'صالة بيلا',
     nearbySalons: 'مختارة لَكِ ',
     viewAll: 'عرض الكل',
-    packages: 'الباقات المميزة',
+    packages: 'Featured Packages',
     packagesTitle: 'الباقات',
     ourCategories: 'التصنيفات',
     savedLocations: 'المواقع المحفوظة',
@@ -534,6 +534,13 @@ export const ar = {
     min: 'دقيقة',
     viewDetails: 'عرض التفاصيل',
     differentLocation: 'موقع مختلف',
+    locationPermission: {
+      title: 'الوصول للموقع مطلوب',
+      message: 'نحتاج للوصول لموقعك الحالي لعرض الصالونات القريبة وتقديم خدمة أفضل.',
+      allowButton: 'السماح بالوصول للموقع',
+      notNowButton: 'ليس الآن',
+      icon: '📍',
+    },
     services: {
       haircut: 'قص الشعر',
       nails: 'الأظافر',

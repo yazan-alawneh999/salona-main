@@ -15,6 +15,8 @@ interface SearchBarWithMenuProps {
   onSearchSubmit?: () => void;
   onMenuPress: () => void;
   value?: string;
+  showLocationIndicator?: boolean;
+  onLocationPress?: () => void;
 }
 
 const SearchBarWithMenu: React.FC<SearchBarWithMenuProps> = ({
@@ -22,6 +24,8 @@ const SearchBarWithMenu: React.FC<SearchBarWithMenuProps> = ({
   onSearchSubmit,
   onMenuPress,
   value,
+  showLocationIndicator = false,
+  onLocationPress,
 }) => {
   const { t } = useTranslation();
   return (
@@ -38,6 +42,18 @@ const SearchBarWithMenu: React.FC<SearchBarWithMenuProps> = ({
           returnKeyType="search"
         />
       </View>
+      
+      {/* Location Indicator */}
+      {showLocationIndicator && (
+        <TouchableOpacity 
+          style={styles.locationIndicator} 
+          onPress={onLocationPress}
+          activeOpacity={0.7}
+        >
+          <Icon name="location-on" size={20} color={Colors.gold} />
+        </TouchableOpacity>
+      )}
+      
       {/* <TouchableOpacity style={styles.menuIconWrapper} onPress={onMenuPress}>
         <Icon name="menu" size={24} color={Colors.gold} />
       </TouchableOpacity> */}

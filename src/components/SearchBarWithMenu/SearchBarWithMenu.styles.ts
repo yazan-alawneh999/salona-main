@@ -43,5 +43,16 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
   },
+  locationIndicator: {
+    marginLeft: 10,
+    backgroundColor: Colors.black,
+    borderColor: Colors.gold,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    height: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 export default styles;
