@@ -31,6 +31,7 @@ const PortfolioGrid = ({data, tr}) => {
 
   const renderImageViewerHeader = () => (
     <View style={styles.viewerHeader}>
+     
       <TouchableOpacity 
         style={styles.viewerCloseButton}
         onPress={() => setViewerVisible(false)}
@@ -38,7 +39,10 @@ const PortfolioGrid = ({data, tr}) => {
         <Icon name="close" size={24} color={Colors.white} />
       </TouchableOpacity>
     </View>
+
   );
+
+
 
   if (!portfolioImages || portfolioImages.length === 0) {
     return (
@@ -53,8 +57,8 @@ const PortfolioGrid = ({data, tr}) => {
   return (
     <View style={styles.portfolioContainer}>
       <StatusBar 
-        backgroundColor={Colors.white} 
-        barStyle="light-content" 
+        backgroundColor={isViewerVisible ?Colors.white : Colors.transparent} 
+        barStyle={isViewerVisible ? "dark-content" : "light-content"} 
       />
       
       <FlatList
@@ -109,10 +113,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   viewerCloseButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(248, 244, 244, 0.8)',
     padding: 12,
     borderRadius: 25,
     width: 50,
